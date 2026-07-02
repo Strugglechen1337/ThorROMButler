@@ -1,5 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Thor ROM Butler</string>
-    <string name="placeholder_subtitle">Der Butler für deine ROM-Sammlung</string>
+
+    <!-- Common actions -->
+    <string name="action_cancel">Abbrechen</string>
+
+    <!-- Setup screen -->
+    <string name="setup_title">Einrichtung</string>
+    <string name="setup_subtitle">Drei Schritte, dann übernimmt der Butler.</string>
+    <string name="setup_permission_title">Dateizugriff erlauben</string>
+    <string name="setup_permission_description">Thor ROM Butler braucht Zugriff auf alle Dateien, um Archive zu analysieren und ROMs zu verschieben. Es werden keine Daten ins Internet gesendet.</string>
+    <string name="setup_permission_button">Berechtigung erteilen</string>
+    <string name="setup_permission_granted">Berechtigung erteilt – alles bereit.</string>
+    <string name="setup_download_title">Download-Ordner wählen</string>
+    <string name="setup_download_description">Dieser Ordner wird nach heruntergeladenen ROM-Archiven durchsucht.</string>
+    <string name="setup_rombase_title">ROM-Basisordner wählen</string>
+    <string name="setup_rombase_description">Der Ordner mit deinen System-Unterordnern (z. B. roms/nes, roms/snes). Erkannte ROMs werden dorthin verschoben.</string>
+    <string name="setup_choose_folder">Ordner wählen</string>
+    <string name="setup_step_done">Erledigt</string>
+    <string name="setup_done_button">Los geht’s ⚡</string>
+
+    <!-- Folder picker -->
+    <string name="picker_up">Übergeordneter Ordner</string>
+    <string name="picker_storage_roots">Speicherorte</string>
+    <string name="picker_internal_storage">Interner Speicher</string>
+    <string name="picker_empty">Keine Unterordner vorhanden.</string>
+    <string name="picker_select_this_folder">Diesen Ordner verwenden</string>
+
+    <!-- Scan screen -->
+    <string name="scan_placeholder">Scanner folgt in M2 …</string>
+    <string name="scan_open_setup">Einrichtung öffnen</string>
 </resources>
