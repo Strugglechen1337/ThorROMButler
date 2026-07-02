@@ -55,6 +55,8 @@ import dev.thor.rombutler.domain.model.Confidence
 import dev.thor.rombutler.ui.components.ConfidenceChip
 import dev.thor.rombutler.ui.components.SystemPickerDialog
 import dev.thor.rombutler.ui.components.formatFileSize
+import dev.thor.rombutler.ui.components.goldGlow
+import dev.thor.rombutler.ui.components.neonGlow
 
 /**
  * Review screen: the user confirms or corrects the system assignment for
@@ -135,6 +137,7 @@ fun ReviewScreen(
         ) {
             items(state.items, key = { it.id }) { item ->
                 ReviewItemCard(
+                    modifier = Modifier.animateItem(),
                     item = item,
                     onPickSystem = { pickerItemId = item.id },
                     onAcceptSuggestion = {
@@ -216,7 +219,8 @@ private fun ReviewBottomBar(
                     enabled = !state.moving && !state.creatingFolders,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(52.dp),
+                        .height(52.dp)
+                        .then(if (!state.moving) Modifier.goldGlow() else Modifier),
                 ) {
                     if (state.moving) {
                         CircularProgressIndicator(
@@ -258,9 +262,13 @@ private fun ReviewItemCard(
     item: ReviewItem,
     onPickSystem: () -> Unit,
     onAcceptSuggestion: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
+    // Assigned cards glow neon, open decisions stay visually calm
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .neonGlow(elevation = if (item.selectedSystemId != null) 8.dp else 3.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
         ),

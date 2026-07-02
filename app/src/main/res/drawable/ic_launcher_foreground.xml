@@ -1,19 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Lightning bolt on the adaptive-icon safe zone (66/108 center circle).
-     Neon blue bolt with a gold core stripe — placeholder until M7 polish. -->
+<!-- Thor bolt, final M7 version. Layers (back to front):
+     1. soft neon glow disc, 2. gold bolt as depth shadow,
+     3. neon bolt, 4. bright highlight stripe.
+     Everything sits inside the 66/108 adaptive-icon safe zone. -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp"
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
 
-    <!-- Outer bolt, neon blue -->
+    <!-- Soft glow disc -->
     <path
-        android:fillColor="#38C8FF"
-        android:pathData="M60,26 L40,58 L51,58 L46,82 L68,48 L56,48 Z" />
+        android:fillColor="#2438C8FF"
+        android:pathData="M54,26 a28,28 0 1,0 0.001,0 z" />
+    <path
+        android:fillColor="#1A38C8FF"
+        android:pathData="M54,21 a33,33 0 1,0 0.001,0 z" />
 
-    <!-- Inner highlight stripe, gold -->
+    <!-- Gold depth shadow, slightly offset -->
     <path
         android:fillColor="#F5C542"
-        android:pathData="M57,32 L46,52 L52,52 L49,68 L61,50 L54,50 Z" />
+        android:pathData="M62.5,24.5 L40.5,59.5 L51.5,59.5 L46.5,85.5 L70.5,49.5 L58.5,49.5 Z" />
+
+    <!-- Neon bolt -->
+    <path
+        android:fillColor="#38C8FF"
+        android:pathData="M60,22 L38,57 L49,57 L44,83 L68,47 L56,47 Z" />
+
+    <!-- Highlight stripe -->
+    <path
+        android:fillColor="#7ADCFF"
+        android:pathData="M58,28 L45,50 L51,50 L48,66 L60,49 L53,49 Z" />
 </vector>

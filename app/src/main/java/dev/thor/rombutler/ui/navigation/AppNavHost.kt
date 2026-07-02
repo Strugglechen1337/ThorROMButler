@@ -1,5 +1,9 @@
 package dev.thor.rombutler.ui.navigation
 
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -23,6 +27,25 @@ fun AppNavHost(
     NavHost(
         navController = navController,
         startDestination = startDestination,
+        // Fluid slide+fade transitions between the flow's screens
+        enterTransition = {
+            slideIntoContainer(
+                towards = AnimatedContentTransitionScope.SlideDirection.Start,
+                animationSpec = tween(NAV_ANIM_MILLIS),
+            ) + fadeIn(tween(NAV_ANIM_MILLIS))
+        },
+        exitTransition = {
+            fadeOut(tween(NAV_ANIM_MILLIS))
+        },
+        popEnterTransition = {
+            fadeIn(tween(NAV_ANIM_MILLIS))
+        },
+        popExitTransition = {
+            slideOutOfContainer(
+                towards = AnimatedContentTransitionScope.SlideDirection.End,
+                animationSpec = tween(NAV_ANIM_MILLIS),
+            ) + fadeOut(tween(NAV_ANIM_MILLIS))
+        },
     ) {
         composable(Routes.SETUP) {
             SetupScreen(
@@ -59,3 +82,5 @@ fun AppNavHost(
         }
     }
 }
+
+private const val NAV_ANIM_MILLIS = 320

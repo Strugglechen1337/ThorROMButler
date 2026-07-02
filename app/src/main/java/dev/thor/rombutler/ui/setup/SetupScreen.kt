@@ -3,6 +3,12 @@ package dev.thor.rombutler.ui.setup
 import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
+import androidx.compose.animation.core.EaseInOutSine
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -36,6 +42,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -46,6 +53,8 @@ import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.thor.rombutler.R
 import dev.thor.rombutler.ui.components.FolderPickerDialog
+import dev.thor.rombutler.ui.components.goldGlow
+import dev.thor.rombutler.ui.components.neonGlow
 
 /**
  * First-run setup: request the all-files permission and pick the two folders
@@ -77,7 +86,17 @@ fun SetupScreen(
                 .padding(horizontal = 20.dp, vertical = 16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            // Header
+            // Header with a gently pulsing bolt (Thor motif, "dezent")
+            val pulse = rememberInfiniteTransition(label = "boltPulse")
+            val boltAlpha by pulse.animateFloat(
+                initialValue = 0.7f,
+                targetValue = 1f,
+                animationSpec = infiniteRepeatable(
+                    animation = tween(durationMillis = 1600, easing = EaseInOutSine),
+                    repeatMode = RepeatMode.Reverse,
+                ),
+                label = "boltAlpha",
+            )
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -88,7 +107,9 @@ fun SetupScreen(
                     imageVector = Icons.Filled.Bolt,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(56.dp),
+                    modifier = Modifier
+                        .size(56.dp)
+                        .graphicsLayer { alpha = boltAlpha },
                 )
                 Text(
                     text = stringResource(R.string.setup_title),
@@ -151,7 +172,8 @@ fun SetupScreen(
                 enabled = state.isComplete,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(56.dp),
+                    .height(56.dp)
+                    .then(if (state.isComplete) Modifier.goldGlow() else Modifier),
             ) {
                 Text(
                     text = stringResource(R.string.setup_done_button),
@@ -200,7 +222,9 @@ private fun SetupCard(
     onClick: () -> Unit,
 ) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .neonGlow(elevation = if (done) 10.dp else 4.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
         ),

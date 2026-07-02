@@ -1,5 +1,10 @@
 package dev.thor.rombutler.ui.scan
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -53,6 +58,8 @@ import dev.thor.rombutler.domain.model.DetectedRom
 import dev.thor.rombutler.ui.components.ConfidenceChip
 import dev.thor.rombutler.ui.components.formatDate
 import dev.thor.rombutler.ui.components.formatFileSize
+import dev.thor.rombutler.ui.components.goldGlow
+import dev.thor.rombutler.ui.components.neonGlow
 
 /**
  * Lists all archive candidates found in the download folder as cards.
@@ -86,7 +93,8 @@ fun ScanScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(16.dp)
-                            .height(52.dp),
+                            .height(52.dp)
+                            .then(if (found.analysisComplete) Modifier.goldGlow() else Modifier),
                     ) {
                         Text(
                             text = if (found.analysisComplete) {
@@ -145,13 +153,21 @@ fun ScanScreen(
             )
         },
     ) { innerPadding ->
-        when (val s = state) {
-            ScanUiState.Scanning -> ScanningIndicator(Modifier.padding(innerPadding))
-            ScanUiState.Empty -> EmptyState(Modifier.padding(innerPadding))
-            is ScanUiState.Found -> ArchiveList(
-                items = s.items,
-                contentPadding = innerPadding,
-            )
+        // Crossfade between scanning / empty / results
+        AnimatedContent(
+            targetState = state,
+            transitionSpec = { fadeIn(tween(250)) togetherWith fadeOut(tween(250)) },
+            contentKey = { it::class },
+            label = "scanState",
+        ) { s ->
+            when (s) {
+                ScanUiState.Scanning -> ScanningIndicator(Modifier.padding(innerPadding))
+                ScanUiState.Empty -> EmptyState(Modifier.padding(innerPadding))
+                is ScanUiState.Found -> ArchiveList(
+                    items = s.items,
+                    contentPadding = innerPadding,
+                )
+            }
         }
     }
 }
@@ -224,7 +240,7 @@ private fun ArchiveList(
             )
         }
         items(items, key = { it.archive.path }) { item ->
-            ArchiveCard(item)
+            ArchiveCard(item, modifier = Modifier.animateItem())
         }
     }
 }
@@ -234,10 +250,12 @@ private fun ArchiveList(
  * detection results as soon as the analysis finished.
  */
 @Composable
-private fun ArchiveCard(item: ArchiveListItem) {
+private fun ArchiveCard(item: ArchiveListItem, modifier: Modifier = Modifier) {
     val archive = item.archive
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .neonGlow(elevation = 5.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
         ),
