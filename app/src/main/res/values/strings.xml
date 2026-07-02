@@ -28,6 +28,12 @@
     <string name="picker_select_this_folder">Diesen Ordner verwenden</string>
 
     <!-- Scan screen -->
-    <string name="scan_placeholder">Scanner folgt in M2 …</string>
+    <string name="scan_title">Archive</string>
+    <string name="scan_refresh">Neu scannen</string>
     <string name="scan_open_setup">Einrichtung öffnen</string>
+    <string name="scan_in_progress">Durchsuche Download-Ordner …</string>
+    <string name="scan_empty_title">Keine Archive gefunden</string>
+    <string name="scan_empty_hint">Im Download-Ordner liegen keine ZIP-, 7z- oder RAR-Dateien.</string>
+    <string name="scan_found_count">%d Archive gefunden</string>
+    <string name="scan_rar5_unsupported">RAR5 wird nicht unterstützt – bitte als ZIP oder 7z laden.</string>
 </resources>

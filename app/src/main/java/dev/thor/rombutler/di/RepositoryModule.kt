@@ -4,7 +4,9 @@ import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import dev.thor.rombutler.data.files.FileArchiveScanner
 import dev.thor.rombutler.data.settings.SettingsDataStore
+import dev.thor.rombutler.domain.repository.ArchiveRepository
 import dev.thor.rombutler.domain.repository.SettingsRepository
 import javax.inject.Singleton
 
@@ -18,4 +20,8 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindSettingsRepository(impl: SettingsDataStore): SettingsRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindArchiveRepository(impl: FileArchiveScanner): ArchiveRepository
 }
