@@ -59,6 +59,13 @@ data class ExtractionProgress(
 /** Result of a finished run. */
 data class MoveSummary(val moved: Int, val failed: Int)
 
+/** One failed extraction task with the user-facing error message. */
+data class ExtractionFailure(
+    val taskId: String,
+    val taskName: String,
+    val message: String,
+)
+
 /** State machine of the extraction manager. */
 sealed interface ExtractionRunState {
     data object Idle : ExtractionRunState
@@ -68,6 +75,7 @@ sealed interface ExtractionRunState {
     data class Finished(
         val summary: MoveSummary,
         val processedIds: Set<String>,
+        val failures: List<ExtractionFailure>,
         val cancelled: Boolean,
     ) : ExtractionRunState
 }
@@ -83,7 +91,7 @@ class ExtractionManager @Inject constructor(
     @param:ApplicationContext private val context: Context,
     private val romExtractor: RomExtractor,
     private val logRepository: LogRepository,
-    @param:IoDispatcher ioDispatcher: CoroutineDispatcher,
+    @IoDispatcher ioDispatcher: CoroutineDispatcher,
 ) {
     private val scope = CoroutineScope(SupervisorJob() + ioDispatcher)
     private var runJob: Job? = null
@@ -117,6 +125,7 @@ class ExtractionManager @Inject constructor(
             var cancelled = false
             var cancelledTaskName: String? = null
             val processedIds = mutableSetOf<String>()
+            val failures = mutableListOf<ExtractionFailure>()
 
             val totalBytes = tasks.sumOf { it.expectedBytes }.coerceAtLeast(1)
             var doneBytes = 0L
@@ -176,9 +185,15 @@ class ExtractionManager @Inject constructor(
                         )
                     }.onFailure { error ->
                         failed++
+                        val message = error.message ?: "Unbekannter Fehler"
+                        failures += ExtractionFailure(
+                            taskId = task.id,
+                            taskName = task.primaryName,
+                            message = message,
+                        )
                         logRepository.append(
                             LogLevel.ERROR,
-                            "${task.primaryName}: ${error.message ?: "Unbekannter Fehler"}",
+                            "${task.primaryName}: $message",
                         )
                     }
                 }
@@ -219,6 +234,7 @@ class ExtractionManager @Inject constructor(
                 _state.value = ExtractionRunState.Finished(
                     summary = MoveSummary(moved = processed, failed = failed),
                     processedIds = processedIds,
+                    failures = failures,
                     cancelled = cancelled,
                 )
             }

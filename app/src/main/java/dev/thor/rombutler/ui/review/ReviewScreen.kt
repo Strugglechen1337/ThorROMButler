@@ -15,9 +15,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.DriveFileMove
 import androidx.compose.material.icons.filled.CreateNewFolder
 import androidx.compose.material.icons.filled.DoneAll
-import androidx.compose.material.icons.filled.DriveFileMove
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.FolderOpen
 import androidx.compose.material3.Button
@@ -52,15 +52,17 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.thor.rombutler.R
+import dev.thor.rombutler.domain.model.ArchiveType
 import dev.thor.rombutler.domain.model.Confidence
 import dev.thor.rombutler.ui.components.ConfidenceChip
 import dev.thor.rombutler.ui.components.SystemPickerDialog
 import dev.thor.rombutler.ui.components.formatFileSize
 import dev.thor.rombutler.ui.components.goldGlow
 import dev.thor.rombutler.ui.components.neonGlow
+import java.io.File
 
 /**
  * Review screen: the user confirms or corrects the system assignment for
@@ -94,11 +96,18 @@ fun ReviewScreen(
         }
     }
 
-    // Move run finished -> hand over to the log screen
-    LaunchedEffect(state.moveSummary) {
-        if (state.moveSummary != null) {
+    val moveFailureText = state.moveSummary?.takeIf { it.failed > 0 }?.let { summary ->
+        state.lastFailureMessage ?: stringResource(R.string.review_move_failed_many, summary.failed)
+    }
+    // Successful runs go to the log. Failed items stay on review for retry.
+    LaunchedEffect(state.moveSummary, moveFailureText) {
+        val summary = state.moveSummary
+        if (summary != null && summary.failed == 0) {
             viewModel.consumeMoveSummary()
             onMoved()
+        } else if (summary != null) {
+            snackbarHostState.showSnackbar(moveFailureText.orEmpty())
+            viewModel.consumeMoveSummary()
         }
     }
 
@@ -265,6 +274,8 @@ private fun ReviewBottomBar(
                 }
             } else if (movableCount > 0) {
                 Spacer(Modifier.height(10.dp))
+                PreflightHint(state)
+                Spacer(Modifier.height(10.dp))
                 Button(
                     onClick = onMove,
                     enabled = !state.creatingFolders,
@@ -274,22 +285,69 @@ private fun ReviewBottomBar(
                         .goldGlow(),
                 ) {
                     Icon(
-                        imageVector = Icons.Filled.DriveFileMove,
+                        imageVector = Icons.AutoMirrored.Filled.DriveFileMove,
                         contentDescription = null,
                         modifier = Modifier.size(20.dp),
                     )
                     Spacer(Modifier.width(8.dp))
                     Text(
-                        text = pluralStringResource(
-                            R.plurals.review_move_button,
-                            movableCount,
-                            movableCount,
-                        ),
+                        text = if (state.retryAvailable) {
+                            pluralStringResource(
+                                R.plurals.review_retry_failed_button,
+                                movableCount,
+                                movableCount,
+                            )
+                        } else {
+                            pluralStringResource(
+                                R.plurals.review_move_button,
+                                movableCount,
+                                movableCount,
+                            )
+                        },
                         style = MaterialTheme.typography.labelLarge,
                     )
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun PreflightHint(state: ReviewUiState) {
+    val processableItems = state.items.filter {
+        it.selectedSystemId != null && (!it.targetOccupied || it.overwrite)
+    }
+    val requiredBytes = processableItems.sumOf { it.rom.totalSizeBytes.coerceAtLeast(0L) }
+    val freeBytes = processableItems
+        .mapNotNull { it.targetPath }
+        .distinct()
+        .mapNotNull { usableSpaceForPath(it) }
+        .filter { it > 0L }
+        .minOrNull()
+    val hasSevenZ = processableItems.any { item ->
+        (item.source as? RomSource.ArchiveEntry)?.archiveType == ArchiveType.SEVEN_ZIP
+    }
+
+    Text(
+        text = if (freeBytes != null) {
+            stringResource(
+                R.string.review_preflight_storage,
+                formatFileSize(requiredBytes),
+                formatFileSize(freeBytes),
+            )
+        } else {
+            stringResource(R.string.review_preflight_storage_unknown, formatFileSize(requiredBytes))
+        },
+        style = MaterialTheme.typography.labelMedium,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+    )
+    if (hasSevenZ) {
+        Spacer(Modifier.height(4.dp))
+        Text(
+            text = stringResource(R.string.review_preflight_7z_warning),
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.secondary,
+        )
     }
 }
 
@@ -466,4 +524,12 @@ private fun TargetRow(
             Text(stringResource(R.string.review_pick_system))
         }
     }
+}
+
+private fun usableSpaceForPath(path: String): Long? {
+    var file: File? = File(path)
+    while (file != null && !file.exists()) {
+        file = file.parentFile
+    }
+    return file?.usableSpace?.takeIf { it > 0L }
 }

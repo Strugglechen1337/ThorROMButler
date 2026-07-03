@@ -84,6 +84,8 @@ data class ReviewUiState(
     val moving: Boolean = false,
     val progress: ExtractionProgress? = null,
     val moveSummary: MoveSummary? = null,
+    val retryAvailable: Boolean = false,
+    val lastFailureMessage: String? = null,
 ) {
     val assignedCount: Int get() = items.count { it.selectedSystemId != null }
     val missingFolderCount: Int get() = items.count { it.selectedSystemId != null && it.targetExists == false }
@@ -133,6 +135,8 @@ class ReviewViewModel @Inject constructor(
                                 progress = null,
                                 items = s.items.filterNot { it.id in runState.processedIds },
                                 moveSummary = runState.summary,
+                                retryAvailable = runState.summary.failed > 0,
+                                lastFailureMessage = runState.failures.toReviewMessage(),
                             )
                         }
                         extractionManager.acknowledgeFinished()
@@ -326,7 +330,14 @@ class ReviewViewModel @Inject constructor(
         }
         if (assigned.isEmpty() || state.moving) return
 
-        _uiState.update { it.copy(moving = true, moveSummary = null) }
+        _uiState.update {
+            it.copy(
+                moving = true,
+                moveSummary = null,
+                retryAvailable = false,
+                lastFailureMessage = null,
+            )
+        }
         viewModelScope.launch {
             val deleteArchives = settingsRepository.settings.first().deleteArchivesAfterExtract
 
@@ -373,6 +384,13 @@ class ReviewViewModel @Inject constructor(
 
     /** Clears the one-shot move feedback after the UI handled it. */
     fun consumeMoveSummary() {
-        _uiState.update { it.copy(moveSummary = null) }
+        _uiState.update { it.copy(moveSummary = null, lastFailureMessage = null) }
     }
+
+    private fun List<dev.thor.rombutler.extraction.ExtractionFailure>.toReviewMessage(): String? =
+        when (size) {
+            0 -> null
+            1 -> "${first().taskName}: ${first().message}"
+            else -> null
+        }
 }

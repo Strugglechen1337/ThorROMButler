@@ -80,14 +80,24 @@
     <string name="system_picker_title">Choose target system</string>
     <string name="review_moving">Extracting …</string>
     <string name="review_extract_progress">ROM %1$d of %2$d: %3$s</string>
+    <string name="review_preflight_storage">Needs about %1$s · free: %2$s</string>
+    <string name="review_preflight_storage_unknown">Needs about %s · free space will be checked before writing</string>
+    <string name="review_preflight_7z_warning">7z archives can need extra RAM depending on compression. ZIP is safest for very large ROMs.</string>
+    <string name="review_move_failed_many">%d ROM(s) failed. They stayed in review and can be retried.</string>
     <plurals name="review_move_button">
         <item quantity="one">Sort in 1 ROM</item>
         <item quantity="other">Sort in %d ROMs</item>
+    </plurals>
+    <plurals name="review_retry_failed_button">
+        <item quantity="one">Retry failed ROM</item>
+        <item quantity="other">Retry %d failed ROMs</item>
     </plurals>
 
     <!-- Log screen -->
     <string name="log_title">Log</string>
     <string name="log_clear">Clear log</string>
+    <string name="log_share">Share log</string>
+    <string name="log_share_subject">Thor ROM Butler log</string>
     <string name="log_empty">No actions logged yet.</string>
 
     <!-- Settings screen -->
@@ -102,6 +112,9 @@
     <string name="settings_download_update">Download update</string>
     <string name="settings_open_release">Open release on GitHub</string>
     <string name="settings_update_failed">Update check failed: %s</string>
+    <string name="settings_support_title">Optional support</string>
+    <string name="settings_support_hint">Thor ROM Butler stays free. If you want to say thanks, you can buy me a coffee.</string>
+    <string name="settings_support_button">Buy me a coffee</string>
 
     <!-- Extraction service notification -->
     <string name="notification_channel_extract">Sorting</string>

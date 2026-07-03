@@ -1,5 +1,6 @@
 package dev.thor.rombutler.ui.log
 
+import android.content.Intent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -19,6 +20,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.HistoryToggleOff
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -33,9 +35,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.thor.rombutler.R
 import dev.thor.rombutler.domain.model.LogEntry
@@ -52,6 +55,7 @@ fun LogScreen(
     viewModel: LogViewModel = hiltViewModel(),
 ) {
     val entries by viewModel.entries.collectAsStateWithLifecycle()
+    val context = LocalContext.current
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -68,6 +72,27 @@ fun LogScreen(
                 },
                 actions = {
                     if (entries.isNotEmpty()) {
+                        IconButton(
+                            onClick = {
+                                val sendIntent = Intent(Intent.ACTION_SEND).apply {
+                                    type = "text/plain"
+                                    putExtra(Intent.EXTRA_SUBJECT, context.getString(R.string.log_share_subject))
+                                    putExtra(Intent.EXTRA_TEXT, entries.toShareText())
+                                }
+                                context.startActivity(
+                                    Intent.createChooser(
+                                        sendIntent,
+                                        context.getString(R.string.log_share),
+                                    ),
+                                )
+                            },
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Share,
+                                contentDescription = stringResource(R.string.log_share),
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
                         IconButton(onClick = viewModel::clearLog) {
                             Icon(
                                 imageVector = Icons.Filled.Delete,
@@ -122,6 +147,11 @@ fun LogScreen(
         }
     }
 }
+
+private fun List<LogEntry>.toShareText(): String =
+    asReversed().joinToString(separator = "\n") { entry ->
+        "${formatDateTime(entry.timestampMillis)} [${entry.level}] ${entry.message}"
+    }
 
 @Composable
 private fun LogEntryCard(entry: LogEntry) {

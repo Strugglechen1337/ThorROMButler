@@ -17,6 +17,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.SystemUpdate
 import androidx.compose.material3.Card
@@ -44,7 +45,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.thor.rombutler.R
 import dev.thor.rombutler.ui.components.FolderPickerDialog
@@ -159,6 +160,42 @@ fun SettingsScreen(
                     },
                 )
             }
+
+            // Optional support
+            SettingsCard {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        imageVector = Icons.Filled.Favorite,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.secondary,
+                        modifier = Modifier.size(24.dp),
+                    )
+                    Spacer(Modifier.width(12.dp))
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = stringResource(R.string.settings_support_title),
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onSurface,
+                        )
+                        Text(
+                            text = stringResource(R.string.settings_support_hint),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                }
+                Spacer(Modifier.size(10.dp))
+                OutlinedButton(
+                    onClick = {
+                        context.startActivity(
+                            Intent(Intent.ACTION_VIEW, Uri.parse(SUPPORT_URL)),
+                        )
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Text(stringResource(R.string.settings_support_button))
+                }
+            }
         }
     }
 
@@ -185,6 +222,8 @@ fun SettingsScreen(
         )
     }
 }
+
+private const val SUPPORT_URL = "https://paypal.me/marcelstrohmeyer"
 
 @Composable
 private fun SettingsCard(content: @Composable () -> Unit) {

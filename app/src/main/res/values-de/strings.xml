@@ -79,14 +79,24 @@
     <string name="system_picker_title">Zielsystem wählen</string>
     <string name="review_moving">Entpacke …</string>
     <string name="review_extract_progress">ROM %1$d von %2$d: %3$s</string>
+    <string name="review_preflight_storage">Benötigt ca. %1$s · frei: %2$s</string>
+    <string name="review_preflight_storage_unknown">Benötigt ca. %s · freier Speicher wird vor dem Schreiben geprüft</string>
+    <string name="review_preflight_7z_warning">7z-Archive können je nach Kompression extra RAM brauchen. ZIP ist für sehr große ROMs am sichersten.</string>
+    <string name="review_move_failed_many">%d ROM(s) fehlgeschlagen. Sie bleiben in der Zuordnung und können erneut versucht werden.</string>
     <plurals name="review_move_button">
         <item quantity="one">1 ROM einsortieren</item>
         <item quantity="other">%d ROMs einsortieren</item>
+    </plurals>
+    <plurals name="review_retry_failed_button">
+        <item quantity="one">Fehlgeschlagene ROM erneut versuchen</item>
+        <item quantity="other">%d fehlgeschlagene ROMs erneut versuchen</item>
     </plurals>
 
     <!-- Log screen -->
     <string name="log_title">Log</string>
     <string name="log_clear">Log leeren</string>
+    <string name="log_share">Log teilen</string>
+    <string name="log_share_subject">Thor ROM Butler Log</string>
     <string name="log_empty">Noch keine Aktionen protokolliert.</string>
 
     <!-- Settings screen -->
@@ -101,6 +111,9 @@
     <string name="settings_download_update">Update herunterladen</string>
     <string name="settings_open_release">Release auf GitHub öffnen</string>
     <string name="settings_update_failed">Update-Prüfung fehlgeschlagen: %s</string>
+    <string name="settings_support_title">Optional unterstützen</string>
+    <string name="settings_support_hint">Thor ROM Butler bleibt kostenlos. Wenn du Danke sagen möchtest, kannst du mir freiwillig einen Kaffee ausgeben.</string>
+    <string name="settings_support_button">Kaffee ausgeben</string>
 
     <!-- Extraction service notification -->
     <string name="notification_channel_extract">Einsortieren</string>

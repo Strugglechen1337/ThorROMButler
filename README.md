@@ -1,5 +1,10 @@
 # ⚡ Thor ROM Butler
 
+[![CI](https://github.com/Strugglechen1337/ThorROMButler/actions/workflows/ci.yml/badge.svg)](https://github.com/Strugglechen1337/ThorROMButler/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/Strugglechen1337/ThorROMButler?label=release)](https://github.com/Strugglechen1337/ThorROMButler/releases)
+[![License: MIT](https://img.shields.io/badge/license-MIT-gold.svg)](#license)
+[![Android 13+](https://img.shields.io/badge/Android-13%2B-3DDC84.svg)](#installation)
+
 **Deutsch** | **English**
 
 ## Screenshots
@@ -62,6 +67,17 @@ Game Gear · Saturn · Atari 2600 · Arcade (MAME) · Neo Geo
 | RAR4   | ✅ Lesen & Analysieren |
 | RAR5   | ⚠️ Wird erkannt, aber als "nicht unterstützt" gemeldet |
 
+### Große Archive
+
+Große Archive, auch mehrere Gigabyte, werden beim Einsortieren blockweise
+geschrieben und nicht vollständig in den Arbeitsspeicher geladen. Entscheidend
+sind freier Speicherplatz im Zielordner und die Kompressionsart.
+
+Für sehr große ROMs ist **ZIP** am zuverlässigsten. **7z/LZMA2** funktioniert,
+kann aber je nach Dictionary-Größe viel RAM brauchen. Wenn ein 7z-Archiv trotz
+`largeHeap` scheitert, bitte am PC als ZIP oder als 7z mit kleinerem Dictionary
+(z. B. 32 MB oder 64 MB) neu packen.
+
 ### Berechtigungen
 
 Die App benötigt **"Verwaltung aller Dateien"** (`MANAGE_EXTERNAL_STORAGE`).
@@ -78,6 +94,8 @@ Es werden keinerlei Nutzungsdaten gesendet.
 1. Neueste APK von den [GitHub Releases](../../releases) herunterladen
 2. APK installieren ("Unbekannte Quellen" erlauben)
 3. Beim ersten Start den Berechtigungs-Dialog bestätigen und ROM-Basisordner wählen
+
+Änderungen je Version stehen im [Changelog](CHANGELOG.md).
 
 ### Build
 
@@ -155,6 +173,17 @@ Game Gear · Saturn · Atari 2600 · Arcade (MAME) · Neo Geo
 | RAR4   | ✅ Read & analyze |
 | RAR5   | ⚠️ Detected, but reported as unsupported |
 
+### Large Archives
+
+Large archives, including multi-gigabyte files, are written in chunks while
+sorting and are not loaded fully into memory. The important limits are free
+space in the target folder and the archive compression method.
+
+For very large ROMs, **ZIP** is the safest option. **7z/LZMA2** works, but can
+require a lot of RAM depending on dictionary size. If a 7z archive still fails
+despite `largeHeap`, repack it on a PC as ZIP or as 7z with a smaller dictionary
+(for example 32 MB or 64 MB).
+
 ### Permissions
 
 The app requires **Manage all files** (`MANAGE_EXTERNAL_STORAGE`). This is a
@@ -170,6 +199,8 @@ app calls the GitHub Releases API and does not send analytics or user data.
 1. Download the latest APK from [GitHub Releases](../../releases)
 2. Install the APK and allow installation from unknown sources when Android asks
 3. On first launch, grant the file permission and choose your ROM base folder
+
+Version-by-version changes are listed in the [changelog](CHANGELOG.md).
 
 ### Build
 

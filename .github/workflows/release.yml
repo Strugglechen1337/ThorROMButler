@@ -12,15 +12,25 @@ on:
   push:
     tags:
       - "v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag to build, e.g. v0.4.0"
+        required: true
+        type: string
 
 jobs:
   release:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+    env:
+      RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.RELEASE_TAG }}
 
       - uses: actions/setup-java@v4
         with:
@@ -59,11 +69,12 @@ jobs:
         if: steps.signing.outputs.available == 'true'
         run: |
           cp app/build/outputs/apk/release/app-release.apk \
-             ThorRomButler-${{ github.ref_name }}.apk
+             ThorRomButler-${{ env.RELEASE_TAG }}.apk
 
       - name: Create GitHub release
         if: steps.signing.outputs.available == 'true'
         uses: softprops/action-gh-release@v2
         with:
-          files: ThorRomButler-${{ github.ref_name }}.apk
+          tag_name: ${{ env.RELEASE_TAG }}
+          files: ThorRomButler-${{ env.RELEASE_TAG }}.apk
           generate_release_notes: true
