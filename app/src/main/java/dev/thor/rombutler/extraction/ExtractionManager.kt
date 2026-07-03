@@ -110,6 +110,7 @@ class ExtractionManager @Inject constructor(
         tasks: List<ExtractionTask>,
         archiveCleanups: List<ArchiveCleanup>,
         deleteArchives: Boolean,
+        trashInsteadOfDelete: Boolean = false,
     ) {
         if (tasks.isEmpty() || _state.value is ExtractionRunState.Running) return
         _state.value = ExtractionRunState.Running(
@@ -233,10 +234,19 @@ class ExtractionManager @Inject constructor(
                 if (deleteArchives && !cancelled) {
                     for (cleanup in archiveCleanups) {
                         if (cleanup.taskIds.isNotEmpty() && cleanup.taskIds.all { it in processedIds }) {
-                            if (romExtractor.deleteArchive(cleanup.archivePath)) {
+                            val removed = if (trashInsteadOfDelete) {
+                                romExtractor.moveToTrash(cleanup.archivePath)
+                            } else {
+                                romExtractor.deleteArchive(cleanup.archivePath)
+                            }
+                            if (removed) {
                                 logRepository.append(
                                     LogLevel.INFO,
-                                    "Quellarchiv gelöscht: ${cleanup.archiveFileName}",
+                                    if (trashInsteadOfDelete) {
+                                        "Quellarchiv in Papierkorb verschoben: ${cleanup.archiveFileName}"
+                                    } else {
+                                        "Quellarchiv gelöscht: ${cleanup.archiveFileName}"
+                                    },
                                 )
                             } else {
                                 logRepository.append(

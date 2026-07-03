@@ -28,7 +28,7 @@ läuft aber auf jedem Android-Smartphone ab Android 13.
 ### Features
 
 - 🔍 **Scanner**: findet ROM-Archive (ZIP, 7z, RAR4) **und lose ROM-Dateien**
-  im Download-Ordner
+  im Download-Ordner und beliebigen weiteren Quellordnern
 - 🧠 **Detection Engine**: bestimmt das Zielsystem über Dateiendungen und Magic
   Bytes (inkl. ISO-, RVZ- und CHD-Header) - mit ehrlichen Confidence-Leveln
   (*sicher* / *wahrscheinlich* / *unbekannt*)
@@ -157,7 +157,7 @@ newer.
 ### Features
 
 - 🔍 **Scanner**: finds ROM archives (ZIP, 7z, RAR4) **and loose ROM files**
-  in the Downloads folder
+  in the Downloads folder and any number of additional source folders
 - 🧠 **Detection engine**: identifies the target system from file extensions and
   magic bytes, including ISO, RVZ, and CHD headers, with honest confidence levels
   (*certain* / *probable* / *unknown*)

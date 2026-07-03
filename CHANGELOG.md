@@ -2,6 +2,19 @@
 
 All notable user-facing changes are documented here.
 
+## 0.8.0
+
+- Added adaptive two-column layout for scan and review on wide/landscape
+  screens (AYN Thor & co.).
+- Added support for multiple source folders in addition to the download
+  folder.
+- Added optional trash mode: processed archives move to a hidden trash
+  folder (auto-purged after 7 days) instead of being deleted.
+- Added settings backup: export/import all settings as JSON via the
+  download folder.
+- Added per-app language switch (Android 13+ system settings).
+- Added the missing MIT LICENSE file and GitHub repository topics.
+
 ## 0.7.0
 
 - Added optional watcher mode: periodic background check of the download

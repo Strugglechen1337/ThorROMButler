@@ -20,6 +20,13 @@ data class AppSettings(
     val autoUpdateCheck: Boolean = false,
     /** Opt-in: periodic background scan of the download folder (default OFF). */
     val watcherEnabled: Boolean = false,
+    /** Extra folders scanned in addition to [downloadPath] (Telegram, USB, ...). */
+    val additionalSourcePaths: List<String> = emptyList(),
+    /**
+     * When deleting processed archives, move them to a hidden `.thor_trash`
+     * folder (auto-purged after 7 days) instead of deleting immediately.
+     */
+    val trashInsteadOfDelete: Boolean = false,
     /**
      * Per-system folder overrides (systemId -> folder name) for users whose
      * frontend does not follow the ES-DE convention (e.g. `roms/ps1`).

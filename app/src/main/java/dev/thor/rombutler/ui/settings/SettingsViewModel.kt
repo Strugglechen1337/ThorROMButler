@@ -103,6 +103,82 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
+    fun setTrashInsteadOfDelete(enabled: Boolean) {
+        viewModelScope.launch { settingsRepository.setTrashInsteadOfDelete(enabled) }
+    }
+
+    fun addSourcePath(path: String) {
+        viewModelScope.launch { settingsRepository.addSourcePath(path) }
+    }
+
+    fun removeSourcePath(path: String) {
+        viewModelScope.launch { settingsRepository.removeSourcePath(path) }
+    }
+
+    /** Writes all settings as JSON into the download folder. */
+    fun exportSettings(onResult: (Boolean) -> Unit) {
+        viewModelScope.launch {
+            val result = runCatching {
+                val s = settings.value
+                val json = org.json.JSONObject()
+                    .put("romBasePath", s.romBasePath)
+                    .put("downloadPath", s.downloadPath)
+                    .put("additionalSourcePaths", org.json.JSONArray(s.additionalSourcePaths))
+                    .put("deleteArchivesAfterExtract", s.deleteArchivesAfterExtract)
+                    .put("trashInsteadOfDelete", s.trashInsteadOfDelete)
+                    .put("autoUpdateCheck", s.autoUpdateCheck)
+                    .put("watcherEnabled", s.watcherEnabled)
+                    .put("folderOverrides", org.json.JSONObject(s.folderOverrides as Map<*, *>))
+                    .toString(2)
+                val dir = s.downloadPath ?: error("Kein Download-Ordner")
+                java.io.File(dir, BACKUP_FILE_NAME).writeText(json)
+            }
+            onResult(result.isSuccess)
+        }
+    }
+
+    /** Reads the JSON backup from the download folder and applies it. */
+    fun importSettings(onResult: (Boolean) -> Unit) {
+        viewModelScope.launch {
+            val result = runCatching {
+                val dir = settings.value.downloadPath ?: error("Kein Download-Ordner")
+                val file = java.io.File(dir, BACKUP_FILE_NAME)
+                check(file.isFile) { "Backup-Datei fehlt" }
+                val json = org.json.JSONObject(file.readText())
+
+                json.optString("romBasePath").takeIf { it.isNotBlank() }
+                    ?.let { settingsRepository.setRomBasePath(it) }
+                json.optString("downloadPath").takeIf { it.isNotBlank() }
+                    ?.let { settingsRepository.setDownloadPath(it) }
+                json.optJSONArray("additionalSourcePaths")?.let { arr ->
+                    for (i in 0 until arr.length()) {
+                        settingsRepository.addSourcePath(arr.getString(i))
+                    }
+                }
+                settingsRepository.setDeleteArchivesAfterExtract(
+                    json.optBoolean("deleteArchivesAfterExtract", true),
+                )
+                settingsRepository.setTrashInsteadOfDelete(
+                    json.optBoolean("trashInsteadOfDelete", false),
+                )
+                settingsRepository.setAutoUpdateCheck(json.optBoolean("autoUpdateCheck", false))
+                val watcher = json.optBoolean("watcherEnabled", false)
+                settingsRepository.setWatcherEnabled(watcher)
+                watcherScheduler.setEnabled(watcher)
+                json.optJSONObject("folderOverrides")?.let { overrides ->
+                    for (key in overrides.keys()) {
+                        settingsRepository.setFolderOverride(key, overrides.getString(key))
+                    }
+                }
+            }
+            onResult(result.isSuccess)
+        }
+    }
+
+    private companion object {
+        const val BACKUP_FILE_NAME = "ThorRomButler-settings.json"
+    }
+
     /** Scans the ROM library: per-system statistics + misplaced ROMs. */
     fun checkLibrary() {
         if (_libraryState.value == LibraryCheckState.Running) return

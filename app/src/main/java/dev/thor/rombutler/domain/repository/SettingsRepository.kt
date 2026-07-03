@@ -27,6 +27,15 @@ interface SettingsRepository {
     /** Persists the opt-in background watcher mode. */
     suspend fun setWatcherEnabled(enabled: Boolean)
 
+    /** Adds an extra source folder to scan. */
+    suspend fun addSourcePath(path: String)
+
+    /** Removes an extra source folder. */
+    suspend fun removeSourcePath(path: String)
+
+    /** Persists the trash-instead-of-delete behavior for archives. */
+    suspend fun setTrashInsteadOfDelete(enabled: Boolean)
+
     /**
      * Overrides the target folder name for one system; `null` or blank
      * restores the ES-DE default.

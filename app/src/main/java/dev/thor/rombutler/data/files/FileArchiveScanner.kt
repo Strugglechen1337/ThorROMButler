@@ -26,14 +26,27 @@ class FileArchiveScanner @Inject constructor(
 ) : ArchiveRepository {
 
     override suspend fun scanForArchives(): List<RomArchive> = withContext(ioDispatcher) {
-        val downloadPath = settingsRepository.settings.first().downloadPath
-            ?: return@withContext emptyList()
-        val root = File(downloadPath)
-        if (!root.isDirectory) return@withContext emptyList()
+        val settings = settingsRepository.settings.first()
+        val roots = (listOfNotNull(settings.downloadPath) + settings.additionalSourcePaths)
+            .distinct()
+            .map(::File)
+            .filter { it.isDirectory }
+        if (roots.isEmpty()) return@withContext emptyList()
 
         val results = mutableListOf<RomArchive>()
-        scanDirectory(root, depth = 0, results = results)
+        for (root in roots) {
+            purgeOldTrash(root)
+            scanDirectory(root, depth = 0, results = results)
+        }
         results.sortedByDescending { it.lastModifiedMillis }
+    }
+
+    /** Removes trash entries older than 7 days (see trash-instead-of-delete). */
+    private fun purgeOldTrash(root: File) {
+        val cutoff = System.currentTimeMillis() - 7L * 24 * 60 * 60 * 1000
+        File(root, TRASH_DIR_NAME).listFiles()
+            ?.filter { it.lastModified() < cutoff }
+            ?.forEach { it.deleteRecursively() }
     }
 
     private fun scanDirectory(dir: File, depth: Int, results: MutableList<RomArchive>) {
@@ -61,6 +74,9 @@ class FileArchiveScanner @Inject constructor(
     }
 
     companion object {
+        /** Hidden trash folder inside each source root. */
+        const val TRASH_DIR_NAME = ".thor_trash"
+
         /** Recursion limit — download folders are usually flat. */
         private const val MAX_DEPTH = 3
 

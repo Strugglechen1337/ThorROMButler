@@ -29,13 +29,17 @@ class LooseRomScanner @Inject constructor(
 ) : LooseRomRepository {
 
     override suspend fun scanAndDetect(): List<DetectedRom> = withContext(ioDispatcher) {
-        val downloadPath = settingsRepository.settings.first().downloadPath
-            ?: return@withContext emptyList()
-        val root = File(downloadPath)
-        if (!root.isDirectory) return@withContext emptyList()
+        val settings = settingsRepository.settings.first()
+        val roots = (listOfNotNull(settings.downloadPath) + settings.additionalSourcePaths)
+            .distinct()
+            .map(::File)
+            .filter { it.isDirectory }
+        if (roots.isEmpty()) return@withContext emptyList()
 
         val romFiles = mutableListOf<File>()
-        collectRomFiles(root, depth = 0, into = romFiles)
+        for (root in roots) {
+            collectRomFiles(root, depth = 0, into = romFiles)
+        }
 
         // Group per directory, like inside archives
         romFiles.groupBy { it.parentFile?.absolutePath.orEmpty() }

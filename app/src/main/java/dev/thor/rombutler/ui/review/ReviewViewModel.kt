@@ -341,7 +341,9 @@ class ReviewViewModel @Inject constructor(
             )
         }
         viewModelScope.launch {
-            val deleteArchives = settingsRepository.settings.first().deleteArchivesAfterExtract
+            val currentSettings = settingsRepository.settings.first()
+            val deleteArchives = currentSettings.deleteArchivesAfterExtract
+            val trashMode = currentSettings.trashInsteadOfDelete
 
             val tasks = assigned.mapNotNull { item ->
                 val system = registry.byId(item.selectedSystemId ?: return@mapNotNull null)
@@ -375,7 +377,7 @@ class ReviewViewModel @Inject constructor(
                     )
                 }
 
-            extractionManager.start(tasks, cleanups, deleteArchives)
+            extractionManager.start(tasks, cleanups, deleteArchives, trashMode)
         }
     }
 

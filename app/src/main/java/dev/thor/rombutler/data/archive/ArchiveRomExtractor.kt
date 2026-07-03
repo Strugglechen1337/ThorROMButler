@@ -106,6 +106,14 @@ class ArchiveRomExtractor @Inject constructor(
             File(archivePath).delete()
         }
 
+    override suspend fun moveToTrash(archivePath: String): Boolean =
+        withContext(ioDispatcher) {
+            val source = File(archivePath)
+            val trashDir = File(source.parentFile, ".thor_trash")
+            if (!trashDir.isDirectory && !trashDir.mkdirs()) return@withContext false
+            source.renameTo(File(trashDir, source.name))
+        }
+
     /** Creates the target dir and verifies free space when [expectedBytes] > 0. */
     private fun prepareTargetDir(targetDir: String, expectedBytes: Long): File {
         val dir = File(targetDir)

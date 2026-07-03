@@ -27,6 +27,8 @@ class SettingsDataStore @Inject constructor(
         val AUTO_UPDATE_CHECK = booleanPreferencesKey("auto_update_check")
         val WATCHER_ENABLED = booleanPreferencesKey("watcher_enabled")
         val FOLDER_OVERRIDES = stringPreferencesKey("folder_overrides") // JSON object
+        val EXTRA_SOURCES = stringPreferencesKey("extra_source_paths") // JSON array
+        val TRASH_MODE = booleanPreferencesKey("trash_instead_of_delete")
     }
 
     override val settings: Flow<AppSettings> = dataStore.data.map { prefs ->
@@ -37,6 +39,8 @@ class SettingsDataStore @Inject constructor(
             autoUpdateCheck = prefs[Keys.AUTO_UPDATE_CHECK] ?: false,
             watcherEnabled = prefs[Keys.WATCHER_ENABLED] ?: false,
             folderOverrides = prefs[Keys.FOLDER_OVERRIDES].parseOverrides(),
+            additionalSourcePaths = prefs[Keys.EXTRA_SOURCES].parseStringList(),
+            trashInsteadOfDelete = prefs[Keys.TRASH_MODE] ?: false,
         )
     }
 
@@ -60,6 +64,26 @@ class SettingsDataStore @Inject constructor(
         dataStore.edit { it[Keys.WATCHER_ENABLED] = enabled }
     }
 
+    override suspend fun addSourcePath(path: String) {
+        dataStore.edit { prefs ->
+            val current = prefs[Keys.EXTRA_SOURCES].parseStringList()
+            if (path !in current) {
+                prefs[Keys.EXTRA_SOURCES] = org.json.JSONArray(current + path).toString()
+            }
+        }
+    }
+
+    override suspend fun removeSourcePath(path: String) {
+        dataStore.edit { prefs ->
+            val current = prefs[Keys.EXTRA_SOURCES].parseStringList()
+            prefs[Keys.EXTRA_SOURCES] = org.json.JSONArray(current - path).toString()
+        }
+    }
+
+    override suspend fun setTrashInsteadOfDelete(enabled: Boolean) {
+        dataStore.edit { it[Keys.TRASH_MODE] = enabled }
+    }
+
     override suspend fun setFolderOverride(systemId: String, folder: String?) {
         dataStore.edit { prefs ->
             val current = prefs[Keys.FOLDER_OVERRIDES].parseOverrides().toMutableMap()
@@ -70,6 +94,14 @@ class SettingsDataStore @Inject constructor(
     }
 
     private companion object {
+        fun String?.parseStringList(): List<String> {
+            if (this.isNullOrBlank()) return emptyList()
+            return runCatching {
+                val arr = org.json.JSONArray(this)
+                (0 until arr.length()).map { arr.getString(it) }
+            }.getOrDefault(emptyList())
+        }
+
         fun String?.parseOverrides(): Map<String, String> {
             if (this.isNullOrBlank()) return emptyMap()
             return runCatching {

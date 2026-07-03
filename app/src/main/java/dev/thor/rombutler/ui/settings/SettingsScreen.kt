@@ -16,6 +16,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Folder
@@ -69,6 +70,7 @@ fun SettingsScreen(
     var showDownloadPicker by remember { mutableStateOf(false) }
     var showRomBasePicker by remember { mutableStateOf(false) }
     var showFolderOverrides by remember { mutableStateOf(false) }
+    var showSourcePicker by remember { mutableStateOf(false) }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -135,6 +137,28 @@ fun SettingsScreen(
                         onCheckedChange = viewModel::setDeleteArchives,
                     )
                 }
+                if (settings.deleteArchivesAfterExtract) {
+                    Spacer(Modifier.size(14.dp))
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = stringResource(R.string.settings_trash),
+                                style = MaterialTheme.typography.titleMedium,
+                                color = MaterialTheme.colorScheme.onSurface,
+                            )
+                            Text(
+                                text = stringResource(R.string.settings_trash_hint),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                        Spacer(Modifier.width(12.dp))
+                        Switch(
+                            checked = settings.trashInsteadOfDelete,
+                            onCheckedChange = viewModel::setTrashInsteadOfDelete,
+                        )
+                    }
+                }
                 Spacer(Modifier.size(14.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Column(modifier = Modifier.weight(1f)) {
@@ -174,6 +198,91 @@ fun SettingsScreen(
                         checked = settings.watcherEnabled,
                         onCheckedChange = viewModel::setWatcherEnabled,
                     )
+                }
+            }
+
+            // Additional source folders (Telegram, USB imports, ...)
+            SettingsCard {
+                Text(
+                    text = stringResource(R.string.settings_sources_title),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+                Text(
+                    text = stringResource(R.string.settings_sources_hint),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                for (path in settings.additionalSourcePaths) {
+                    Spacer(Modifier.size(8.dp))
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text = path,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.primary,
+                            maxLines = 1,
+                            overflow = TextOverflow.StartEllipsis,
+                            modifier = Modifier.weight(1f),
+                        )
+                        IconButton(onClick = { viewModel.removeSourcePath(path) }) {
+                            Icon(
+                                imageVector = Icons.Filled.Delete,
+                                contentDescription = stringResource(R.string.settings_sources_remove),
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                    }
+                }
+                Spacer(Modifier.size(8.dp))
+                OutlinedButton(
+                    onClick = { showSourcePicker = true },
+                    modifier = Modifier.fillMaxWidth(),
+                ) { Text(stringResource(R.string.settings_sources_add)) }
+            }
+
+            // Settings backup: export/import via JSON in the download folder
+            SettingsCard {
+                Text(
+                    text = stringResource(R.string.settings_backup_title),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+                Text(
+                    text = stringResource(R.string.settings_backup_hint),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Spacer(Modifier.size(10.dp))
+                Row {
+                    OutlinedButton(
+                        onClick = {
+                            viewModel.exportSettings { ok ->
+                                android.widget.Toast.makeText(
+                                    context,
+                                    context.getString(
+                                        if (ok) R.string.settings_backup_done else R.string.settings_backup_failed,
+                                    ),
+                                    android.widget.Toast.LENGTH_SHORT,
+                                ).show()
+                            }
+                        },
+                        modifier = Modifier.weight(1f),
+                    ) { Text(stringResource(R.string.settings_backup_export)) }
+                    Spacer(Modifier.width(10.dp))
+                    OutlinedButton(
+                        onClick = {
+                            viewModel.importSettings { ok ->
+                                android.widget.Toast.makeText(
+                                    context,
+                                    context.getString(
+                                        if (ok) R.string.settings_backup_done else R.string.settings_backup_failed,
+                                    ),
+                                    android.widget.Toast.LENGTH_SHORT,
+                                ).show()
+                            }
+                        },
+                        modifier = Modifier.weight(1f),
+                    ) { Text(stringResource(R.string.settings_backup_import)) }
                 }
             }
 
@@ -421,6 +530,17 @@ fun SettingsScreen(
         }
     }
 
+    if (showSourcePicker) {
+        FolderPickerDialog(
+            title = stringResource(R.string.settings_sources_add),
+            initialPath = settings.downloadPath,
+            onSelect = {
+                viewModel.addSourcePath(it)
+                showSourcePicker = false
+            },
+            onDismiss = { showSourcePicker = false },
+        )
+    }
     if (showFolderOverrides) {
         FolderOverridesDialog(
             systems = viewModel.registry.systems,

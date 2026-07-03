@@ -47,4 +47,12 @@ interface RomExtractor {
 
     /** Deletes a fully processed archive. @return true when gone. */
     suspend fun deleteArchive(archivePath: String): Boolean
+
+    /**
+     * Moves a fully processed archive into the hidden `.thor_trash` folder
+     * next to it (purged automatically after 7 days).
+     *
+     * @return true when the move succeeded.
+     */
+    suspend fun moveToTrash(archivePath: String): Boolean
 }
