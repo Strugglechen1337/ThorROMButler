@@ -95,6 +95,12 @@ Thor ROM Butler verwaltet nur Dateien, die sich bereits auf deinem Gerät befind
 Die App enthält keine ROMs und stellt keine Download-Funktionen bereit. Bitte
 verwende nur Sicherungskopien von Spielen, die du besitzt.
 
+### Optional unterstützen
+
+Thor ROM Butler bleibt kostenlos. Wenn dir die App hilft und du freiwillig Danke
+sagen möchtest, kannst du mir gerne einen Kaffee ausgeben:
+[paypal.me/marcelstrohmeyer](https://paypal.me/marcelstrohmeyer)
+
 ## English
 
 **The butler for your ROM collection.** Thor ROM Butler detects downloaded ROM
@@ -180,6 +186,12 @@ The debug APK is generated at `app/build/outputs/apk/debug/`.
 Thor ROM Butler only manages files that are already present on your device. The
 app does not include ROMs and does not provide any download functionality. Please
 use only backup copies of games you own.
+
+### Optional Support
+
+Thor ROM Butler stays free. If the app helps you and you would like to say
+thanks voluntarily, you can buy me a coffee:
+[paypal.me/marcelstrohmeyer](https://paypal.me/marcelstrohmeyer)
 
 ## License
 
