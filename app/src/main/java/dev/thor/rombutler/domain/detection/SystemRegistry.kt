@@ -89,7 +89,15 @@ class SystemRegistry @Inject constructor() {
             id = "n3ds",
             displayName = "Nintendo 3DS",
             esdeFolder = "n3ds",
-            extensions = mapOf("3ds" to CERTAIN, "cia" to CERTAIN),
+            // cci = NCSD cartridge dump (same container as .3ds),
+            // cxi = NCCH executable, 3dsx = homebrew format
+            extensions = mapOf(
+                "3ds" to CERTAIN,
+                "cia" to CERTAIN,
+                "cci" to CERTAIN,
+                "cxi" to CERTAIN,
+                "3dsx" to CERTAIN,
+            ),
         ),
 
         SystemDefinition(

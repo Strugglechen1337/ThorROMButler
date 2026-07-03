@@ -27,6 +27,8 @@ class DetectionEngineTest {
             "Zelda OOT.z64" to "n64",
             "Mario Kart DS.nds" to "nds",
             "Zelda ALBW.3ds" to "n3ds",
+            "Mario Kart 7.cci" to "n3ds",
+            "Luigis Mansion 2.cia" to "n3ds",
             "Crisis Core.cso" to "psp",
             "Wind Waker.gcm" to "gc",
             "Xenoblade.wbfs" to "wii",
