@@ -8,10 +8,14 @@ package dev.thor.rombutler.domain.model
  *   the user completed the setup.
  * @property downloadPath Absolute path of the folder that is scanned for
  *   downloaded ROM archives.
+ * @property deleteArchivesAfterExtract when true (default), archives whose
+ *   ROMs were all extracted successfully are removed from the download
+ *   folder.
  */
 data class AppSettings(
     val romBasePath: String? = null,
     val downloadPath: String? = null,
+    val deleteArchivesAfterExtract: Boolean = true,
 ) {
     /** Setup is complete once both folders are configured. */
     val isSetupComplete: Boolean

@@ -64,6 +64,8 @@ dependencies {
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
     implementation(libs.hilt.navigation.compose)
+    // Dagger-generated service components reference @CanIgnoreReturnValue
+    compileOnly(libs.errorprone.annotations)
 
     implementation(libs.commons.compress)
     implementation(libs.xz)

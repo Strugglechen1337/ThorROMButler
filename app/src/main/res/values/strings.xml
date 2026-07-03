@@ -36,7 +36,8 @@
     <string name="scan_in_progress">Durchsuche Download-Ordner …</string>
     <string name="scan_empty_title">Keine Archive gefunden</string>
     <string name="scan_empty_hint">Im Download-Ordner liegen keine ZIP-, 7z- oder RAR-Dateien.</string>
-    <string name="scan_found_count">%d Archive gefunden</string>
+    <string name="scan_found_count">%d Funde</string>
+    <string name="scan_loose_title">Lose ROM-Dateien (%d)</string>
     <string name="scan_rar5_unsupported">RAR5 wird nicht unterstützt – bitte als ZIP oder 7z laden.</string>
 
     <!-- Archive analysis -->
@@ -60,6 +61,10 @@
     <string name="scan_analyzing_wait">Analyse läuft …</string>
     <string name="review_title">Zuordnung</string>
     <string name="review_source">aus %1$s · %2$s</string>
+    <string name="review_source_loose">Download-Ordner (lose)</string>
+    <string name="review_accept_all">Alle übernehmen (%d)</string>
+    <string name="review_duplicate_skip">Bereits im Zielordner vorhanden – wird übersprungen</string>
+    <string name="review_duplicate_replace">Vorhandene Datei wird ERSETZT</string>
     <string name="review_source_with_members">aus %1$s · %2$d Dateien · %3$s</string>
     <string name="review_pick_system">System wählen</string>
     <string name="review_pick_other">Anderes …</string>
@@ -82,4 +87,20 @@
     <string name="log_title">Log</string>
     <string name="log_clear">Log leeren</string>
     <string name="log_empty">Noch keine Aktionen protokolliert.</string>
+
+    <!-- Settings screen -->
+    <string name="settings_title">Einstellungen</string>
+    <string name="settings_folder_not_set">Nicht festgelegt</string>
+    <string name="settings_delete_archives">Archive nach Entpacken löschen</string>
+    <string name="settings_delete_archives_hint">Vollständig einsortierte Archive aus dem Download-Ordner entfernen.</string>
+    <string name="settings_version">Thor ROM Butler %s</string>
+    <string name="settings_check_updates">Auf Updates prüfen</string>
+    <string name="settings_up_to_date">Du hast die neueste Version.</string>
+    <string name="settings_update_available">Version %s ist verfügbar!</string>
+    <string name="settings_open_release">Release auf GitHub öffnen</string>
+    <string name="settings_update_failed">Update-Prüfung fehlgeschlagen: %s</string>
+
+    <!-- Extraction service notification -->
+    <string name="notification_channel_extract">Einsortieren</string>
+    <string name="notification_extract_title">Thor ROM Butler sortiert ein …</string>
 </resources>

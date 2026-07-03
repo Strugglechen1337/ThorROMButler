@@ -165,6 +165,43 @@ class DetectionEngineTest {
     }
 
     @Test
+    fun `new systems detect by unique extension`() {
+        val cases = mapOf(
+            "Turrican II.adf" to "amiga",
+            "Last Ninja 2.d64" to "c64",
+            "Sonic 2.md" to "megadrive",
+            "Alex Kidd.sms" to "mastersystem",
+            "Shinobi.gg" to "gamegear",
+            "Pitfall.a26" to "atari2600",
+        )
+        for ((fileName, expectedSystem) in cases) {
+            val result = engine.detect(fileName)
+            assertThat(result.system?.id).isEqualTo(expectedSystem)
+            assertThat(result.confidence).isEqualTo(Confidence.CERTAIN)
+        }
+    }
+
+    @Test
+    fun `bin with mega drive header is certain megadrive`() {
+        val header = ByteArray(0x120)
+        "SEGA MEGA DRIVE".toByteArray(Charsets.US_ASCII).copyInto(header, 0x100)
+
+        val result = engine.detect("Sonic the Hedgehog.bin", header)
+        assertThat(result.system?.id).isEqualTo("megadrive")
+        assertThat(result.confidence).isEqualTo(Confidence.CERTAIN)
+    }
+
+    @Test
+    fun `bin with saturn header is certain saturn`() {
+        val header = ByteArray(0x120)
+        "SEGA SEGASATURN ".toByteArray(Charsets.US_ASCII).copyInto(header, 0x10)
+
+        val result = engine.detect("Panzer Dragoon.bin", header)
+        assertThat(result.system?.id).isEqualTo("saturn")
+        assertThat(result.confidence).isEqualTo(Confidence.CERTAIN)
+    }
+
+    @Test
     fun `iso with unrecognized header stays unknown`() {
         val header = ByteArray(0x9000) // all zeros, no marker
         val result = engine.detect("Mystery.iso", header)

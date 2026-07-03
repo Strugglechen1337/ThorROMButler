@@ -48,4 +48,10 @@ class RomFolderManager @Inject constructor(
                 folder.absolutePath
             }
         }
+
+    override suspend fun anyFileExists(dirPath: String, fileNames: List<String>): Boolean =
+        withContext(ioDispatcher) {
+            val dir = File(dirPath)
+            dir.isDirectory && fileNames.any { File(dir, it).exists() }
+        }
 }

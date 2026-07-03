@@ -9,10 +9,12 @@ class SystemRegistryTest {
     private val registry = SystemRegistry()
 
     @Test
-    fun `registry contains all 16 launch systems`() {
+    fun `registry contains all supported systems`() {
         val expected = setOf(
             "nes", "snes", "gb", "gbc", "gba", "n64", "nds", "n3ds",
             "psx", "ps2", "psp", "gc", "wii", "wiiu", "dreamcast", "switch",
+            "amiga", "c64", "megadrive", "mastersystem", "gamegear",
+            "saturn", "atari2600",
         )
         assertThat(registry.systems.map { it.id }.toSet()).isEqualTo(expected)
     }

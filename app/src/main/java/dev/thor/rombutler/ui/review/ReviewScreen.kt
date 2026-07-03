@@ -16,6 +16,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CreateNewFolder
+import androidx.compose.material.icons.filled.DoneAll
 import androidx.compose.material.icons.filled.DriveFileMove
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.FolderOpen
@@ -34,7 +35,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -113,6 +116,25 @@ fun ReviewScreen(
                         )
                     }
                 },
+                actions = {
+                    // Confirm all PROBABLE suggestions with one tap
+                    if (state.openSuggestionCount > 0) {
+                        TextButton(onClick = viewModel::acceptAllSuggestions) {
+                            Icon(
+                                imageVector = Icons.Filled.DoneAll,
+                                contentDescription = null,
+                                modifier = Modifier.size(18.dp),
+                            )
+                            Spacer(Modifier.width(6.dp))
+                            Text(
+                                stringResource(
+                                    R.string.review_accept_all,
+                                    state.openSuggestionCount,
+                                ),
+                            )
+                        }
+                    }
+                },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.background,
                 ),
@@ -123,6 +145,7 @@ fun ReviewScreen(
                 state = state,
                 onCreateFolders = viewModel::createMissingFolders,
                 onMove = viewModel::extractAssigned,
+                onCancel = viewModel::cancelExtraction,
             )
         },
     ) { innerPadding ->
@@ -144,6 +167,7 @@ fun ReviewScreen(
                     onAcceptSuggestion = {
                         item.rom.detection.system?.let { viewModel.selectSystem(item.id, it.id) }
                     },
+                    onSetOverwrite = { viewModel.setOverwrite(item.id, it) },
                 )
             }
         }
@@ -166,6 +190,7 @@ private fun ReviewBottomBar(
     state: ReviewUiState,
     onCreateFolders: () -> Unit,
     onMove: () -> Unit,
+    onCancel: () -> Unit,
 ) {
     Surface(color = MaterialTheme.colorScheme.surfaceContainerHigh) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -204,7 +229,7 @@ private fun ReviewBottomBar(
                     }
                 }
             }
-            val movableCount = state.assignedCount
+            val movableCount = state.processableCount
             if (state.moving) {
                 // Live progress: bar (byte-based) + "ROM x von y: name"
                 Spacer(Modifier.height(12.dp))
@@ -216,22 +241,28 @@ private fun ReviewBottomBar(
                     trackColor = MaterialTheme.colorScheme.surfaceContainerHighest,
                 )
                 Spacer(Modifier.height(6.dp))
-                Text(
-                    text = if (progress != null) {
-                        stringResource(
-                            R.string.review_extract_progress,
-                            progress.currentIndex,
-                            progress.totalCount,
-                            progress.currentName,
-                        )
-                    } else {
-                        stringResource(R.string.review_moving)
-                    },
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = if (progress != null) {
+                            stringResource(
+                                R.string.review_extract_progress,
+                                progress.currentIndex,
+                                progress.totalCount,
+                                progress.currentName,
+                            )
+                        } else {
+                            stringResource(R.string.review_moving)
+                        },
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f),
+                    )
+                    TextButton(onClick = onCancel) {
+                        Text(stringResource(R.string.action_cancel))
+                    }
+                }
             } else if (movableCount > 0) {
                 Spacer(Modifier.height(10.dp))
                 Button(
@@ -272,6 +303,7 @@ private fun ReviewItemCard(
     item: ReviewItem,
     onPickSystem: () -> Unit,
     onAcceptSuggestion: () -> Unit,
+    onSetOverwrite: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     // Assigned cards glow neon, open decisions stay visually calm
@@ -299,18 +331,22 @@ private fun ReviewItemCard(
 
             Spacer(Modifier.height(4.dp))
             val members = item.rom.group.members.size
+            val sourceName = when (val source = item.source) {
+                is RomSource.ArchiveEntry -> source.archiveFileName
+                is RomSource.LooseFiles -> stringResource(R.string.review_source_loose)
+            }
             Text(
                 text = if (members > 1) {
                     stringResource(
                         R.string.review_source_with_members,
-                        item.archiveFileName,
+                        sourceName,
                         members,
                         formatFileSize(item.rom.totalSizeBytes),
                     )
                 } else {
                     stringResource(
                         R.string.review_source,
-                        item.archiveFileName,
+                        sourceName,
                         formatFileSize(item.rom.totalSizeBytes),
                     )
                 },
@@ -328,6 +364,7 @@ private fun ReviewItemCard(
                 item = item,
                 onPickSystem = onPickSystem,
                 onAcceptSuggestion = onAcceptSuggestion,
+                onSetOverwrite = onSetOverwrite,
             )
         }
     }
@@ -338,6 +375,7 @@ private fun TargetRow(
     item: ReviewItem,
     onPickSystem: () -> Unit,
     onAcceptSuggestion: () -> Unit,
+    onSetOverwrite: (Boolean) -> Unit,
 ) {
     val selected = item.selectedSystemId != null
     val suggestion = item.rom.detection.system
@@ -376,6 +414,29 @@ private fun TargetRow(
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.secondary,
                 )
+            }
+            if (item.targetOccupied) {
+                // Duplicate at the target: user must explicitly opt in
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = if (item.overwrite) {
+                            stringResource(R.string.review_duplicate_replace)
+                        } else {
+                            stringResource(R.string.review_duplicate_skip)
+                        },
+                        style = MaterialTheme.typography.labelMedium,
+                        color = if (item.overwrite) {
+                            MaterialTheme.colorScheme.error
+                        } else {
+                            MaterialTheme.colorScheme.secondary
+                        },
+                        modifier = Modifier.weight(1f),
+                    )
+                    Switch(
+                        checked = item.overwrite,
+                        onCheckedChange = onSetOverwrite,
+                    )
+                }
             }
         }
 

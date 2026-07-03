@@ -17,4 +17,7 @@ interface SettingsRepository {
 
     /** Persists the folder that is scanned for downloaded archives. */
     suspend fun setDownloadPath(path: String)
+
+    /** Persists whether fully extracted archives get deleted. */
+    suspend fun setDeleteArchivesAfterExtract(enabled: Boolean)
 }

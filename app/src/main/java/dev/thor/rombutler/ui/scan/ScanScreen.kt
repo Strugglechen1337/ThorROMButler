@@ -166,6 +166,7 @@ fun ScanScreen(
                 ScanUiState.Empty -> EmptyState(Modifier.padding(innerPadding))
                 is ScanUiState.Found -> ArchiveList(
                     items = s.items,
+                    looseRoms = s.looseRoms,
                     contentPadding = innerPadding,
                 )
             }
@@ -220,6 +221,7 @@ private fun EmptyState(modifier: Modifier = Modifier) {
 @Composable
 private fun ArchiveList(
     items: List<ArchiveListItem>,
+    looseRoms: List<DetectedRom>,
     contentPadding: PaddingValues,
 ) {
     LazyColumn(
@@ -234,14 +236,54 @@ private fun ArchiveList(
     ) {
         item {
             Text(
-                text = stringResource(R.string.scan_found_count, items.size),
+                text = stringResource(R.string.scan_found_count, items.size + looseRoms.size),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(bottom = 4.dp),
             )
         }
+        if (looseRoms.isNotEmpty()) {
+            item(key = "loose") {
+                LooseRomsCard(looseRoms, modifier = Modifier.animateItem())
+            }
+        }
         items(items, key = { it.archive.path }) { item ->
             ArchiveCard(item, modifier = Modifier.animateItem())
+        }
+    }
+}
+
+/** Unarchived ROM files found directly in the download folder. */
+@Composable
+private fun LooseRomsCard(looseRoms: List<DetectedRom>, modifier: Modifier = Modifier) {
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .neonGlow(elevation = 5.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+        ),
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(
+                text = stringResource(R.string.scan_loose_title, looseRoms.size),
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurface,
+            )
+            Spacer(Modifier.size(10.dp))
+            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                for (rom in looseRoms.take(MAX_ROM_ROWS)) {
+                    DetectedRomRow(rom)
+                }
+                val more = looseRoms.size - MAX_ROM_ROWS
+                if (more > 0) {
+                    Text(
+                        text = stringResource(R.string.analysis_more_roms, more),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
         }
     }
 }

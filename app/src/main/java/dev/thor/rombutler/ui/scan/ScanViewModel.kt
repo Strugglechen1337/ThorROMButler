@@ -4,9 +4,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.thor.rombutler.domain.model.ArchiveAnalysis
+import dev.thor.rombutler.domain.model.DetectedRom
 import dev.thor.rombutler.domain.model.RomArchive
 import dev.thor.rombutler.domain.repository.ArchiveAnalyzer
 import dev.thor.rombutler.domain.repository.ArchiveRepository
+import dev.thor.rombutler.domain.repository.LooseRomRepository
 import dev.thor.rombutler.ui.review.ReviewSession
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -33,17 +35,21 @@ sealed interface ScanUiState {
     /** Directory scan in progress. */
     data object Scanning : ScanUiState
 
-    /** Scan finished without finding any archives. */
+    /** Scan finished without finding any archives or loose ROMs. */
     data object Empty : ScanUiState
 
-    /** Archives found; analyses stream in one by one. */
-    data class Found(val items: List<ArchiveListItem>) : ScanUiState {
+    /** Archives and/or loose ROM files found; analyses stream in. */
+    data class Found(
+        val items: List<ArchiveListItem>,
+        val looseRoms: List<DetectedRom> = emptyList(),
+    ) : ScanUiState {
         /** All analyses finished? */
         val analysisComplete: Boolean get() = items.all { it.analysis != null }
 
         /** Anything to review (at least one readable ROM)? */
         val hasReviewableRoms: Boolean
-            get() = items.any { (it.analysis as? ArchiveAnalysis.Success)?.roms?.isNotEmpty() == true }
+            get() = looseRoms.isNotEmpty() ||
+                items.any { (it.analysis as? ArchiveAnalysis.Success)?.roms?.isNotEmpty() == true }
     }
 }
 
@@ -51,6 +57,7 @@ sealed interface ScanUiState {
 class ScanViewModel @Inject constructor(
     private val archiveRepository: ArchiveRepository,
     private val archiveAnalyzer: ArchiveAnalyzer,
+    private val looseRomRepository: LooseRomRepository,
     private val reviewSession: ReviewSession,
 ) : ViewModel() {
 
@@ -73,8 +80,9 @@ class ScanViewModel @Inject constructor(
         val successes = state.items
             .mapNotNull { it.analysis as? ArchiveAnalysis.Success }
             .filter { it.roms.isNotEmpty() }
-        if (successes.isEmpty()) return false
+        if (successes.isEmpty() && state.looseRoms.isEmpty()) return false
         reviewSession.analyses = successes
+        reviewSession.looseRoms = state.looseRoms
         return true
     }
 
@@ -93,11 +101,15 @@ class ScanViewModel @Inject constructor(
         _uiState.value = ScanUiState.Scanning
         scanJob = viewModelScope.launch {
             val archives = archiveRepository.scanForArchives()
-            if (archives.isEmpty()) {
+            val looseRoms = looseRomRepository.scanAndDetect()
+            if (archives.isEmpty() && looseRoms.isEmpty()) {
                 _uiState.value = ScanUiState.Empty
                 return@launch
             }
-            _uiState.value = ScanUiState.Found(archives.map { ArchiveListItem(it) })
+            _uiState.value = ScanUiState.Found(
+                items = archives.map { ArchiveListItem(it) },
+                looseRoms = looseRoms,
+            )
 
             // Sequential on purpose: archive I/O is disk-bound, and cards
             // filling in one after another reads as pleasant progress.

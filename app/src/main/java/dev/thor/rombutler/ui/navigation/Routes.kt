@@ -9,4 +9,5 @@ object Routes {
     const val SCAN = "scan"
     const val REVIEW = "review"
     const val LOG = "log"
+    const val SETTINGS = "settings"
 }

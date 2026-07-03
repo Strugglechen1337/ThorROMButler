@@ -190,7 +190,16 @@ class SystemRegistry @Inject constructor() {
             id = "dreamcast",
             displayName = "Dreamcast",
             esdeFolder = "dreamcast",
-            extensions = mapOf("cdi" to CERTAIN, "gdi" to CERTAIN, "chd" to UNKNOWN),
+            extensions = mapOf(
+                "cdi" to CERTAIN,
+                "gdi" to CERTAIN,
+                "chd" to UNKNOWN,
+                "bin" to UNKNOWN,
+            ),
+            magicRules = listOf(
+                // Disc header hardware id at offset 0
+                MagicRule.TextInRange(rangeStart = 0, rangeEnd = 0x120, text = "SEGA SEGAKATANA"),
+            ),
             // GDI games (gdi + track files) must sit in one folder per game
             gameSubfolder = true,
         ),
@@ -200,6 +209,75 @@ class SystemRegistry @Inject constructor() {
             displayName = "Nintendo Switch",
             esdeFolder = "switch",
             extensions = mapOf("nsp" to CERTAIN, "xci" to CERTAIN),
+        ),
+
+        SystemDefinition(
+            id = "amiga",
+            displayName = "Commodore Amiga",
+            esdeFolder = "amiga",
+            extensions = mapOf("adf" to CERTAIN, "ipf" to CERTAIN, "hdf" to CERTAIN),
+        ),
+
+        SystemDefinition(
+            id = "c64",
+            displayName = "Commodore 64",
+            esdeFolder = "c64",
+            extensions = mapOf(
+                "d64" to CERTAIN,
+                "t64" to CERTAIN,
+                "crt" to CERTAIN,
+                "prg" to PROBABLE, // generic executable extension
+                "tap" to PROBABLE, // tape images exist for other systems too
+            ),
+        ),
+
+        SystemDefinition(
+            id = "megadrive",
+            displayName = "Sega Mega Drive",
+            esdeFolder = "megadrive",
+            extensions = mapOf(
+                "md" to CERTAIN,
+                "gen" to CERTAIN,
+                "smd" to CERTAIN,
+                "bin" to UNKNOWN,
+            ),
+            magicRules = listOf(
+                // Cartridge header console name at 0x100
+                MagicRule.TextInRange(rangeStart = 0x100, rangeEnd = 0x110, text = "SEGA MEGA DRIVE"),
+                MagicRule.TextInRange(rangeStart = 0x100, rangeEnd = 0x110, text = "SEGA GENESIS"),
+            ),
+        ),
+
+        SystemDefinition(
+            id = "mastersystem",
+            displayName = "Sega Master System",
+            esdeFolder = "mastersystem",
+            extensions = mapOf("sms" to CERTAIN),
+        ),
+
+        SystemDefinition(
+            id = "gamegear",
+            displayName = "Sega Game Gear",
+            esdeFolder = "gamegear",
+            extensions = mapOf("gg" to CERTAIN),
+        ),
+
+        SystemDefinition(
+            id = "saturn",
+            displayName = "Sega Saturn",
+            esdeFolder = "saturn",
+            extensions = mapOf("bin" to UNKNOWN, "iso" to UNKNOWN, "chd" to UNKNOWN),
+            magicRules = listOf(
+                // Disc header hardware id at offset 0
+                MagicRule.TextInRange(rangeStart = 0, rangeEnd = 0x120, text = "SEGA SEGASATURN"),
+            ),
+        ),
+
+        SystemDefinition(
+            id = "atari2600",
+            displayName = "Atari 2600",
+            esdeFolder = "atari2600",
+            extensions = mapOf("a26" to CERTAIN),
         ),
     )
 

@@ -20,4 +20,10 @@ interface RomFolderRepository {
      * @return the absolute folder path on success.
      */
     suspend fun ensureFolder(system: SystemDefinition): Result<String>
+
+    /**
+     * True when any of [fileNames] already exists in [dirPath] — used to
+     * warn about duplicates before extracting.
+     */
+    suspend fun anyFileExists(dirPath: String, fileNames: List<String>): Boolean
 }

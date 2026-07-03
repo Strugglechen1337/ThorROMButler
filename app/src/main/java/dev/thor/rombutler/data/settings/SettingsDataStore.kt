@@ -2,6 +2,7 @@ package dev.thor.rombutler.data.settings
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import dev.thor.rombutler.domain.model.AppSettings
@@ -22,12 +23,14 @@ class SettingsDataStore @Inject constructor(
     private object Keys {
         val ROM_BASE_PATH = stringPreferencesKey("rom_base_path")
         val DOWNLOAD_PATH = stringPreferencesKey("download_path")
+        val DELETE_ARCHIVES = booleanPreferencesKey("delete_archives_after_extract")
     }
 
     override val settings: Flow<AppSettings> = dataStore.data.map { prefs ->
         AppSettings(
             romBasePath = prefs[Keys.ROM_BASE_PATH],
             downloadPath = prefs[Keys.DOWNLOAD_PATH],
+            deleteArchivesAfterExtract = prefs[Keys.DELETE_ARCHIVES] ?: true,
         )
     }
 
@@ -37,5 +40,9 @@ class SettingsDataStore @Inject constructor(
 
     override suspend fun setDownloadPath(path: String) {
         dataStore.edit { it[Keys.DOWNLOAD_PATH] = path }
+    }
+
+    override suspend fun setDeleteArchivesAfterExtract(enabled: Boolean) {
+        dataStore.edit { it[Keys.DELETE_ARCHIVES] = enabled }
     }
 }

@@ -204,12 +204,13 @@ class CommonsArchiveAnalyzerTest {
 
     @Test
     fun `unclaimed extensions are reported when no roms are found`() = runTest {
-        val zipFile = tempFolder.newFile("amiga.zip")
+        // .lha (Amiga WHDLoad) and .wad are not on the system list (yet)
+        val zipFile = tempFolder.newFile("unsupported.zip")
         writeZip(
             zipFile,
             mapOf(
-                "Turrican II.adf" to ByteArray(128),
-                "Turrican II.ipf" to ByteArray(128),
+                "Turrican II.lha" to ByteArray(128),
+                "doom.wad" to ByteArray(128),
             ),
         )
 
@@ -218,7 +219,7 @@ class CommonsArchiveAnalyzerTest {
 
         val success = analysis as ArchiveAnalysis.Success
         assertThat(success.roms).isEmpty()
-        assertThat(success.otherExtensions).containsExactly("adf", "ipf").inOrder()
+        assertThat(success.otherExtensions).containsExactly("lha", "wad").inOrder()
     }
 
     @Test
