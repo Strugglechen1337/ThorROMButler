@@ -90,6 +90,9 @@ Review (Zuordnung/Vorschläge), Log.
   Topics, Kurzbeschreibung oder andere GitHub-Metadaten angepasst werden müssen.
   Nutzerrelevante Features, Fixes, Einschränkungen und neue Releases immer auch
   auf GitHub/README nachvollziehbar dokumentieren.
+- **Zweisprachigkeit (verbindlich)**: Release-Notes IMMER Deutsch UND Englisch
+  (DE zuerst, dann EN). Die README hat parallele DE/EN-Sektionen — bei neuen
+  Features/Releases immer BEIDE pflegen. App-Strings: `values-de` + `values`.
 
 ## Projektstruktur
 

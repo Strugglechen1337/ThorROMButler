@@ -24,6 +24,7 @@ class SettingsDataStore @Inject constructor(
         val ROM_BASE_PATH = stringPreferencesKey("rom_base_path")
         val DOWNLOAD_PATH = stringPreferencesKey("download_path")
         val DELETE_ARCHIVES = booleanPreferencesKey("delete_archives_after_extract")
+        val AUTO_UPDATE_CHECK = booleanPreferencesKey("auto_update_check")
     }
 
     override val settings: Flow<AppSettings> = dataStore.data.map { prefs ->
@@ -31,6 +32,7 @@ class SettingsDataStore @Inject constructor(
             romBasePath = prefs[Keys.ROM_BASE_PATH],
             downloadPath = prefs[Keys.DOWNLOAD_PATH],
             deleteArchivesAfterExtract = prefs[Keys.DELETE_ARCHIVES] ?: true,
+            autoUpdateCheck = prefs[Keys.AUTO_UPDATE_CHECK] ?: false,
         )
     }
 
@@ -44,5 +46,9 @@ class SettingsDataStore @Inject constructor(
 
     override suspend fun setDeleteArchivesAfterExtract(enabled: Boolean) {
         dataStore.edit { it[Keys.DELETE_ARCHIVES] = enabled }
+    }
+
+    override suspend fun setAutoUpdateCheck(enabled: Boolean) {
+        dataStore.edit { it[Keys.AUTO_UPDATE_CHECK] = enabled }
     }
 }

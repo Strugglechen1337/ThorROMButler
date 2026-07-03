@@ -56,7 +56,9 @@ läuft aber auf jedem Android-Smartphone ab Android 13.
 NES · SNES · Game Boy · Game Boy Color · Game Boy Advance · Nintendo 64 ·
 Nintendo DS · Nintendo 3DS · PlayStation 1 · PlayStation 2 · PSP · GameCube ·
 Wii · Wii U · Dreamcast · Switch · Amiga · C64 · Mega Drive · Master System ·
-Game Gear · Saturn · Atari 2600 · Arcade (MAME) · Neo Geo
+Game Gear · Saturn · Sega 32X · Atari 2600 · Atari 7800 · Atari Lynx ·
+PC Engine / TurboGrafx-16 · Neo Geo Pocket (Color) · WonderSwan (Color) ·
+Arcade (MAME) · Neo Geo
 
 ### Unterstützte Archive
 
@@ -85,9 +87,10 @@ Das ist eine bewusste Entscheidung: ROM-Archive sind oft mehrere Gigabyte groß,
 und die Analyse ohne Entpacken braucht schnellen wahlfreien Zugriff auf die
 Archivdateien - das Storage Access Framework ist dafür zu langsam.
 
-Internet nutzt die App ausschließlich für den **manuellen Update-Check**
-(Einstellungen -> "Auf Updates prüfen", fragt die GitHub-Releases-API ab).
-Es werden keinerlei Nutzungsdaten gesendet.
+Internet nutzt die App ausschließlich für den **Update-Check** gegen die
+GitHub-Releases-API: manuell in den Einstellungen, optional (standardmäßig
+**aus**) auch automatisch beim App-Start. Es werden keinerlei Nutzungsdaten
+gesendet.
 
 ### Installation
 
@@ -162,7 +165,9 @@ newer.
 NES · SNES · Game Boy · Game Boy Color · Game Boy Advance · Nintendo 64 ·
 Nintendo DS · Nintendo 3DS · PlayStation 1 · PlayStation 2 · PSP · GameCube ·
 Wii · Wii U · Dreamcast · Switch · Amiga · C64 · Mega Drive · Master System ·
-Game Gear · Saturn · Atari 2600 · Arcade (MAME) · Neo Geo
+Game Gear · Saturn · Sega 32X · Atari 2600 · Atari 7800 · Atari Lynx ·
+PC Engine / TurboGrafx-16 · Neo Geo Pocket (Color) · WonderSwan (Color) ·
+Arcade (MAME) · Neo Geo
 
 ### Supported Archives
 
@@ -191,8 +196,9 @@ deliberate choice: ROM archives are often several gigabytes in size, and
 analyzing them without extraction needs fast random access to archive files.
 The Storage Access Framework is too slow for this workflow.
 
-Internet access is used only for the **manual update check** in Settings. The
-app calls the GitHub Releases API and does not send analytics or user data.
+Internet access is used only for the **update check** against the GitHub
+Releases API: manually from Settings and, optionally (**off** by default),
+automatically on app start. The app does not send analytics or user data.
 
 ### Installation
 

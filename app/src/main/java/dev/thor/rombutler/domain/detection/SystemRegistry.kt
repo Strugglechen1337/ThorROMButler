@@ -287,6 +287,62 @@ class SystemRegistry @Inject constructor() {
             extensions = mapOf("a26" to CERTAIN),
         ),
 
+        SystemDefinition(
+            id = "atari7800",
+            displayName = "Atari 7800",
+            esdeFolder = "atari7800",
+            extensions = mapOf("a78" to CERTAIN),
+        ),
+
+        SystemDefinition(
+            id = "atarilynx",
+            displayName = "Atari Lynx",
+            esdeFolder = "atarilynx",
+            extensions = mapOf("lnx" to CERTAIN),
+        ),
+
+        SystemDefinition(
+            id = "pcengine",
+            displayName = "PC Engine / TurboGrafx-16",
+            esdeFolder = "pcengine",
+            extensions = mapOf("pce" to CERTAIN),
+        ),
+
+        SystemDefinition(
+            id = "sega32x",
+            displayName = "Sega 32X",
+            esdeFolder = "sega32x",
+            extensions = mapOf("32x" to CERTAIN),
+        ),
+
+        SystemDefinition(
+            id = "ngp",
+            displayName = "Neo Geo Pocket",
+            esdeFolder = "ngp",
+            extensions = mapOf("ngp" to CERTAIN),
+        ),
+
+        SystemDefinition(
+            id = "ngpc",
+            displayName = "Neo Geo Pocket Color",
+            esdeFolder = "ngpc",
+            extensions = mapOf("ngc" to CERTAIN),
+        ),
+
+        SystemDefinition(
+            id = "wonderswan",
+            displayName = "WonderSwan",
+            esdeFolder = "wonderswan",
+            extensions = mapOf("ws" to CERTAIN),
+        ),
+
+        SystemDefinition(
+            id = "wonderswancolor",
+            displayName = "WonderSwan Color",
+            esdeFolder = "wonderswancolor",
+            extensions = mapOf("wsc" to CERTAIN),
+        ),
+
         // Arcade systems: ROM sets are ZIPs that MUST stay zipped. They
         // claim no extensions (a plain .zip is indistinguishable from a
         // ROM archive) — users assign whole archives manually in review,

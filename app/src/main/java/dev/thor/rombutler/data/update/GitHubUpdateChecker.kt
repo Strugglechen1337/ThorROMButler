@@ -78,7 +78,10 @@ class GitHubUpdateChecker @Inject constructor(
 
     companion object {
         const val REPO_OWNER = "Strugglechen1337"
-        const val REPO_NAME = "ThorRomButtler"
+
+        // Must match the CURRENT repo name — GitHub redirects renamed repos,
+        // but relying on that is fragile (old name could be re-registered).
+        const val REPO_NAME = "ThorROMButler"
         private const val API_URL =
             "https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/releases/latest"
         const val RELEASES_URL =

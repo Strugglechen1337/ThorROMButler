@@ -84,7 +84,11 @@ Review (Zuordnung/Vorschläge), Log.
 - M5: Review-UI + fehlende Ordner anlegen
 - M6: Verschieben + Log + Fehlerbehandlung
 - M7: Polish (Animationen, Glow, App-Icon)
-- Code gut dokumentiert (KDoc), **deutsche UI-Texte, englische Code-Kommentare**.
+- Code gut dokumentiert (KDoc), englische Code-Kommentare.
+- **Zweisprachigkeit (verbindlich)**: App-Strings in `values` (EN, Default) und
+  `values-de` (DE). Release-Notes IMMER Deutsch UND Englisch (DE zuerst).
+  Die README hat parallele DE/EN-Sektionen — bei neuen Features/Releases immer
+  BEIDE pflegen, ebenso andere GitHub-Metadaten (Notes, Screenshots, Topics).
 - Aktuelle stabile Library-Versionen recherchieren, nicht raten.
 
 ## Projektstruktur

@@ -15,6 +15,8 @@ class SystemRegistryTest {
             "psx", "ps2", "psp", "gc", "wii", "wiiu", "dreamcast", "switch",
             "amiga", "c64", "megadrive", "mastersystem", "gamegear",
             "saturn", "atari2600", "arcade", "neogeo",
+            "atari7800", "atarilynx", "pcengine", "sega32x",
+            "ngp", "ngpc", "wonderswan", "wonderswancolor",
         )
         assertThat(registry.systems.map { it.id }.toSet()).isEqualTo(expected)
     }

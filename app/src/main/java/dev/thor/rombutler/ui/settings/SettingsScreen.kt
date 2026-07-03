@@ -131,6 +131,26 @@ fun SettingsScreen(
                         onCheckedChange = viewModel::setDeleteArchives,
                     )
                 }
+                Spacer(Modifier.size(14.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = stringResource(R.string.settings_auto_update),
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onSurface,
+                        )
+                        Text(
+                            text = stringResource(R.string.settings_auto_update_hint),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                    Spacer(Modifier.width(12.dp))
+                    Switch(
+                        checked = settings.autoUpdateCheck,
+                        onCheckedChange = viewModel::setAutoUpdateCheck,
+                    )
+                }
             }
 
             // Version + update check

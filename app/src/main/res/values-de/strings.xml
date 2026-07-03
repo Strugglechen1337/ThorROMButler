@@ -5,6 +5,7 @@
     <!-- Common actions -->
     <string name="action_cancel">Abbrechen</string>
     <string name="action_back">Zurück</string>
+    <string name="action_create">Anlegen</string>
 
     <!-- Setup screen -->
     <string name="setup_title">Einrichtung</string>
@@ -28,6 +29,8 @@
     <string name="picker_empty">Keine Unterordner vorhanden.</string>
     <string name="picker_select_this_folder">Diesen Ordner verwenden</string>
     <string name="picker_select_named_folder">„%s“ verwenden</string>
+    <string name="picker_new_folder">Neuer Ordner</string>
+    <string name="picker_new_folder_hint">Ordnername</string>
 
     <!-- Scan screen -->
     <string name="scan_title">Archive</string>
@@ -35,7 +38,7 @@
     <string name="scan_open_setup">Einrichtung öffnen</string>
     <string name="scan_in_progress">Durchsuche Download-Ordner …</string>
     <string name="scan_empty_title">Keine Archive gefunden</string>
-    <string name="scan_empty_hint">Im Download-Ordner liegen keine ZIP-, 7z- oder RAR-Dateien.</string>
+    <string name="scan_empty_hint">Im Download-Ordner liegen keine Archive (ZIP, 7z, RAR) und keine losen ROM-Dateien.</string>
     <string name="scan_found_count">%d Funde</string>
     <string name="scan_loose_title">Lose ROM-Dateien (%d)</string>
     <string name="scan_rar5_unsupported">RAR5 wird nicht unterstützt – bitte als ZIP oder 7z laden.</string>
@@ -104,6 +107,8 @@
     <string name="settings_folder_not_set">Nicht festgelegt</string>
     <string name="settings_delete_archives">Archive nach Entpacken löschen</string>
     <string name="settings_delete_archives_hint">Vollständig einsortierte Archive aus dem Download-Ordner entfernen.</string>
+    <string name="settings_auto_update">Beim Start auf Updates prüfen</string>
+    <string name="settings_auto_update_hint">Fragt beim App-Start die GitHub-Releases-API ab und zeigt einen Punkt am Zahnrad-Symbol, wenn es eine neue Version gibt.</string>
     <string name="settings_version">Thor ROM Butler %s</string>
     <string name="settings_check_updates">Auf Updates prüfen</string>
     <string name="settings_up_to_date">Du hast die neueste Version.</string>

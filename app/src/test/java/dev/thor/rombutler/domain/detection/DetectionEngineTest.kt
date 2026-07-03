@@ -206,6 +206,14 @@ class DetectionEngineTest {
             "Alex Kidd.sms" to "mastersystem",
             "Shinobi.gg" to "gamegear",
             "Pitfall.a26" to "atari2600",
+            "Ninja Golf.a78" to "atari7800",
+            "California Games.lnx" to "atarilynx",
+            "R-Type.pce" to "pcengine",
+            "Knuckles Chaotix.32x" to "sega32x",
+            "Samurai Shodown.ngp" to "ngp",
+            "SNK vs Capcom.ngc" to "ngpc",
+            "Gunpey.ws" to "wonderswan",
+            "Final Fantasy.wsc" to "wonderswancolor",
         )
         for ((fileName, expectedSystem) in cases) {
             val result = engine.detect(fileName)

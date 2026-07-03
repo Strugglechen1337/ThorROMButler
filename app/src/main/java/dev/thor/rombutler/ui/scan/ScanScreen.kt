@@ -26,6 +26,8 @@ import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.foundation.layout.height
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -141,11 +143,21 @@ fun ScanScreen(
                         )
                     }
                     IconButton(onClick = onOpenSetup) {
-                        Icon(
-                            imageVector = Icons.Filled.Settings,
-                            contentDescription = stringResource(R.string.scan_open_setup),
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
+                        // Gold dot when the opt-in start-up check found an update
+                        val update by viewModel.updateAvailable.collectAsStateWithLifecycle()
+                        BadgedBox(
+                            badge = {
+                                if (update != null) {
+                                    Badge(containerColor = MaterialTheme.colorScheme.secondary)
+                                }
+                            },
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Settings,
+                                contentDescription = stringResource(R.string.scan_open_setup),
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(

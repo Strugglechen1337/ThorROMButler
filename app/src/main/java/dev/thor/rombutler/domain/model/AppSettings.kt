@@ -16,6 +16,8 @@ data class AppSettings(
     val romBasePath: String? = null,
     val downloadPath: String? = null,
     val deleteArchivesAfterExtract: Boolean = true,
+    /** Opt-in: query GitHub for a newer release on app start (default OFF). */
+    val autoUpdateCheck: Boolean = false,
 ) {
     /** Setup is complete once both folders are configured. */
     val isSetupComplete: Boolean

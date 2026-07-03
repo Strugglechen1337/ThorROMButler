@@ -3,6 +3,7 @@ package dev.thor.rombutler.ui.scan
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dev.thor.rombutler.data.update.UpdateAvailability
 import dev.thor.rombutler.domain.model.ArchiveAnalysis
 import dev.thor.rombutler.domain.model.DetectedRom
 import dev.thor.rombutler.domain.model.RomArchive
@@ -62,7 +63,11 @@ class ScanViewModel @Inject constructor(
     private val archiveAnalyzer: ArchiveAnalyzer,
     private val looseRomRepository: LooseRomRepository,
     private val reviewSession: ReviewSession,
+    updateAvailability: UpdateAvailability,
 ) : ViewModel() {
+
+    /** Non-null when the (opt-in) start-up check found a newer release. */
+    val updateAvailable = updateAvailability.available
 
     private val _uiState = MutableStateFlow<ScanUiState>(ScanUiState.Scanning)
     val uiState: StateFlow<ScanUiState> = _uiState.asStateFlow()

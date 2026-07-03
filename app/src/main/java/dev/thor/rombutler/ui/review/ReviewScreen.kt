@@ -79,6 +79,22 @@ fun ReviewScreen(
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
 
+    // Existing installs never ran the (new) setup notification prompt —
+    // ask here so the extraction progress notification is visible.
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val notificationLauncher = androidx.activity.compose.rememberLauncherForActivityResult(
+        androidx.activity.result.contract.ActivityResultContracts.RequestPermission(),
+    ) { }
+    LaunchedEffect(Unit) {
+        if (androidx.core.content.ContextCompat.checkSelfPermission(
+                context,
+                android.Manifest.permission.POST_NOTIFICATIONS,
+            ) != android.content.pm.PackageManager.PERMISSION_GRANTED
+        ) {
+            notificationLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+        }
+    }
+
     // Which item's system picker is open (null = none)
     var pickerItemId by remember { mutableStateOf<String?>(null) }
 

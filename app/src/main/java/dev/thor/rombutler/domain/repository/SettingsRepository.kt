@@ -20,4 +20,7 @@ interface SettingsRepository {
 
     /** Persists whether fully extracted archives get deleted. */
     suspend fun setDeleteArchivesAfterExtract(enabled: Boolean)
+
+    /** Persists the opt-in automatic update check on app start. */
+    suspend fun setAutoUpdateCheck(enabled: Boolean)
 }

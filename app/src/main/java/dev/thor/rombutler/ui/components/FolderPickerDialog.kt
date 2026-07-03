@@ -12,10 +12,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.CreateNewFolder
 import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.SdCard
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -61,6 +63,20 @@ fun FolderPickerDialog(
     var currentDir by remember {
         mutableStateOf(initialPath?.let(::File)?.takeIf { it.isDirectory })
     }
+    var showNewFolderDialog by remember { mutableStateOf(false) }
+
+    if (showNewFolderDialog) {
+        NewFolderDialog(
+            onCreate = { name ->
+                val created = currentDir?.let { File(it, name) }
+                if (created != null && (created.isDirectory || created.mkdirs())) {
+                    currentDir = created // jump into the new folder
+                }
+                showNewFolderDialog = false
+            },
+            onDismiss = { showNewFolderDialog = false },
+        )
+    }
 
     Dialog(
         onDismissRequest = onDismiss,
@@ -103,7 +119,17 @@ fun FolderPickerDialog(
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 1,
                         overflow = TextOverflow.StartEllipsis,
+                        modifier = Modifier.weight(1f),
                     )
+                    if (dir != null) {
+                        IconButton(onClick = { showNewFolderDialog = true }) {
+                            Icon(
+                                imageVector = Icons.Filled.CreateNewFolder,
+                                contentDescription = stringResource(R.string.picker_new_folder),
+                                tint = MaterialTheme.colorScheme.secondary,
+                            )
+                        }
+                    }
                 }
 
                 HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
@@ -200,6 +226,40 @@ private fun FolderRow(file: File, isRoot: Boolean, onClick: () -> Unit) {
             )
         }
     }
+}
+
+/** Small name-input dialog for creating a subfolder in the current dir. */
+@Composable
+private fun NewFolderDialog(
+    onCreate: (String) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    var name by remember { mutableStateOf("") }
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.picker_new_folder)) },
+        text = {
+            OutlinedTextField(
+                value = name,
+                onValueChange = { name = it },
+                singleLine = true,
+                label = { Text(stringResource(R.string.picker_new_folder_hint)) },
+            )
+        },
+        confirmButton = {
+            Button(
+                onClick = { onCreate(name.trim()) },
+                enabled = name.isNotBlank() && !name.contains('/') && !name.contains('\\'),
+            ) {
+                Text(stringResource(R.string.action_create))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.action_cancel))
+            }
+        },
+    )
 }
 
 /** Folder name for UI labels; the internal-storage root gets a real name. */

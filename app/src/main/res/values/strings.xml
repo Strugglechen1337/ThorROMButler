@@ -6,6 +6,7 @@
     <!-- Common actions -->
     <string name="action_cancel">Cancel</string>
     <string name="action_back">Back</string>
+    <string name="action_create">Create</string>
 
     <!-- Setup screen -->
     <string name="setup_title">Setup</string>
@@ -29,6 +30,8 @@
     <string name="picker_empty">No subfolders here.</string>
     <string name="picker_select_this_folder">Use this folder</string>
     <string name="picker_select_named_folder">Use “%s”</string>
+    <string name="picker_new_folder">New folder</string>
+    <string name="picker_new_folder_hint">Folder name</string>
 
     <!-- Scan screen -->
     <string name="scan_title">Archives</string>
@@ -36,7 +39,7 @@
     <string name="scan_open_setup">Open setup</string>
     <string name="scan_in_progress">Scanning download folder …</string>
     <string name="scan_empty_title">No archives found</string>
-    <string name="scan_empty_hint">No ZIP, 7z or RAR files in the download folder.</string>
+    <string name="scan_empty_hint">No archives (ZIP, 7z, RAR) and no loose ROM files in the download folder.</string>
     <string name="scan_found_count">%d found</string>
     <string name="scan_loose_title">Loose ROM files (%d)</string>
     <string name="scan_rar5_unsupported">RAR5 is not supported – please download as ZIP or 7z.</string>
@@ -105,6 +108,8 @@
     <string name="settings_folder_not_set">Not set</string>
     <string name="settings_delete_archives">Delete archives after extraction</string>
     <string name="settings_delete_archives_hint">Remove fully sorted archives from the download folder.</string>
+    <string name="settings_auto_update">Check for updates on start</string>
+    <string name="settings_auto_update_hint">Queries the GitHub releases API on app start and shows a dot on the gear icon when a new version exists.</string>
     <string name="settings_version">Thor ROM Butler %s</string>
     <string name="settings_check_updates">Check for updates</string>
     <string name="settings_up_to_date">You have the latest version.</string>

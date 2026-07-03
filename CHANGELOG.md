@@ -2,6 +2,17 @@
 
 All notable user-facing changes are documented here.
 
+## 0.5.0
+
+- Added 8 systems: Atari 7800, Atari Lynx, PC Engine/TurboGrafx-16, Sega 32X,
+  Neo Geo Pocket (Color), WonderSwan (Color).
+- Added "create new folder" inside the folder picker.
+- Added opt-in automatic update check on app start (badge on the settings icon).
+- Fixed the in-app update check to use the renamed GitHub repository.
+- Notification permission is now also requested on the review screen for
+  existing installations.
+- Updated the empty-scan hint to mention loose ROM files.
+
 ## 0.4.0
 
 - Added retry flow for failed sorting jobs; failed ROMs remain in review and can be started again.

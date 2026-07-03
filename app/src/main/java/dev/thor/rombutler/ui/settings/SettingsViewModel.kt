@@ -62,6 +62,10 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch { settingsRepository.setDeleteArchivesAfterExtract(enabled) }
     }
 
+    fun setAutoUpdateCheck(enabled: Boolean) {
+        viewModelScope.launch { settingsRepository.setAutoUpdateCheck(enabled) }
+    }
+
     /** Manual update check — the app's only network access. */
     fun checkForUpdates() {
         if (_updateState.value == UpdateCheckState.Checking) return
