@@ -77,6 +77,7 @@ class CommonsArchiveAnalyzer @Inject constructor(
                         val detection = detectWithHeaderFallback(file, source, primaryEntry)
                         DetectedRom(
                             group = group,
+                            memberEntryPaths = group.members.mapNotNull { byName[it]?.path },
                             detection = detection,
                             totalSizeBytes = group.members.sumOf {
                                 byName[it]?.sizeBytes ?: 0L

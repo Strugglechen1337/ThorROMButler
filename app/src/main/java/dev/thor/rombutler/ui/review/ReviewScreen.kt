@@ -121,7 +121,7 @@ fun ReviewScreen(
             ReviewBottomBar(
                 state = state,
                 onCreateFolders = viewModel::createMissingFolders,
-                onMove = viewModel::moveAssigned,
+                onMove = viewModel::extractAssigned,
             )
         },
     ) { innerPadding ->
@@ -177,14 +177,6 @@ private fun ReviewBottomBar(
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
-            if (state.blockedArchiveCount > 0) {
-                Spacer(Modifier.height(4.dp))
-                Text(
-                    text = stringResource(R.string.review_blocked_hint, state.blockedArchiveCount),
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.secondary,
-                )
-            }
             if (state.missingFolderCount > 0 || state.creatingFolders) {
                 Spacer(Modifier.height(10.dp))
                 OutlinedButton(
@@ -211,7 +203,7 @@ private fun ReviewBottomBar(
                     }
                 }
             }
-            val movableCount = state.movableArchivePaths.size
+            val movableCount = state.assignedCount
             if (movableCount > 0 || state.moving) {
                 Spacer(Modifier.height(10.dp))
                 Button(

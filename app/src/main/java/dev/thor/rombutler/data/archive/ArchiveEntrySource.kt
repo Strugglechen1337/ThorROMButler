@@ -36,6 +36,15 @@ interface ArchiveEntrySource {
      * or `null` when the entry cannot be read.
      */
     fun readEntryPrefix(archiveFile: File, entryPath: String, maxBytes: Int): ByteArray?
+
+    /**
+     * Extracts the entries in [targets] (entry path -> destination file)
+     * in ONE pass over the archive — important for solid 7z blocks.
+     * Destination files are created; parent dirs must already exist.
+     *
+     * @throws java.io.IOException when an entry is missing or writing fails.
+     */
+    fun extractEntries(archiveFile: File, targets: Map<String, File>)
 }
 
 /** Reads an [InputStream] up to [maxBytes] into a right-sized array. */
@@ -73,6 +82,18 @@ class ZipEntrySource @Inject constructor() : ArchiveEntrySource {
             val entry = zip.getEntry(entryPath) ?: return null
             zip.getInputStream(entry).use { it.readPrefix(maxBytes) }
         }
+
+    override fun extractEntries(archiveFile: File, targets: Map<String, File>) {
+        ZipFile.builder().setFile(archiveFile).get().use { zip ->
+            for ((entryPath, targetFile) in targets) {
+                val entry = zip.getEntry(entryPath)
+                    ?: throw java.io.IOException("Eintrag nicht gefunden: $entryPath")
+                zip.getInputStream(entry).use { input ->
+                    targetFile.outputStream().use { output -> input.copyTo(output) }
+                }
+            }
+        }
+    }
 }
 
 /**
@@ -108,6 +129,31 @@ class SevenZEntrySource @Inject constructor() : ArchiveEntrySource {
             }
             null
         }
+
+    override fun extractEntries(archiveFile: File, targets: Map<String, File>) {
+        var remaining = targets.size
+        SevenZFile.builder().setFile(archiveFile).get().use { sevenZ ->
+            var entry = sevenZ.nextEntry
+            while (entry != null && remaining > 0) {
+                val targetFile = targets[entry.name]
+                if (targetFile != null && !entry.isDirectory) {
+                    targetFile.outputStream().use { output ->
+                        val buffer = ByteArray(64 * 1024)
+                        while (true) {
+                            val read = sevenZ.read(buffer)
+                            if (read < 0) break
+                            output.write(buffer, 0, read)
+                        }
+                    }
+                    remaining--
+                }
+                entry = sevenZ.nextEntry
+            }
+        }
+        if (remaining > 0) {
+            throw java.io.IOException("$remaining Einträge nicht im Archiv gefunden")
+        }
+    }
 }
 
 /**
@@ -136,6 +182,23 @@ class RarEntrySource @Inject constructor() : ArchiveEntrySource {
             } ?: return null
             rar.getInputStream(header).use { it.readPrefix(maxBytes) }
         }
+
+    override fun extractEntries(archiveFile: File, targets: Map<String, File>) {
+        var remaining = targets.size
+        Archive(archiveFile).use { rar ->
+            for (header in rar.fileHeaders) {
+                if (header.isDirectory) continue
+                val targetFile = targets[header.fileName.replace('\\', '/')] ?: continue
+                targetFile.outputStream().use { output ->
+                    rar.extractFile(header, output)
+                }
+                remaining--
+            }
+        }
+        if (remaining > 0) {
+            throw java.io.IOException("$remaining Einträge nicht im Archiv gefunden")
+        }
+    }
 }
 
 /**

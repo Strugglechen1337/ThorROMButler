@@ -7,9 +7,10 @@ import dev.thor.rombutler.domain.detection.SystemRegistry
 import dev.thor.rombutler.domain.model.Confidence
 import dev.thor.rombutler.domain.model.DetectedRom
 import dev.thor.rombutler.domain.model.SystemDefinition
+import dev.thor.rombutler.domain.model.ArchiveType
 import dev.thor.rombutler.domain.model.LogLevel
-import dev.thor.rombutler.domain.repository.ArchiveMover
 import dev.thor.rombutler.domain.repository.LogRepository
+import dev.thor.rombutler.domain.repository.RomExtractor
 import dev.thor.rombutler.domain.repository.RomFolderRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -35,6 +36,7 @@ data class ReviewItem(
     val id: String,
     val archiveFileName: String,
     val archivePath: String,
+    val archiveType: ArchiveType,
     val rom: DetectedRom,
     val selectedSystemId: String? = null,
     val targetPath: String? = null,
@@ -57,8 +59,8 @@ data class MoveSummary(val moved: Int, val failed: Int)
  * @property items all ROMs of the current scan session.
  * @property creatingFolders folder creation in progress.
  * @property folderResult one-shot feedback after creating folders.
- * @property moving move run in progress.
- * @property moveSummary one-shot feedback after moving (UI navigates to log).
+ * @property moving extraction run in progress.
+ * @property moveSummary one-shot feedback after extracting (UI opens log).
  */
 data class ReviewUiState(
     val items: List<ReviewItem> = emptyList(),
@@ -69,35 +71,13 @@ data class ReviewUiState(
 ) {
     val assignedCount: Int get() = items.count { it.selectedSystemId != null }
     val missingFolderCount: Int get() = items.count { it.selectedSystemId != null && it.targetExists == false }
-
-    private val itemsByArchive: Map<String, List<ReviewItem>>
-        get() = items.groupBy { it.archivePath }
-
-    /**
-     * Archives ready to move: EVERY ROM group inside is assigned and all
-     * point to the SAME system. Archives are moved as a whole (v0.1 does
-     * not extract), so mixed assignments must stay blocked.
-     */
-    val movableArchivePaths: List<String>
-        get() = itemsByArchive
-            .filterValues { group ->
-                group.all { it.selectedSystemId != null } &&
-                    group.map { it.selectedSystemId }.distinct().size == 1
-            }
-            .keys.toList()
-
-    /** Archives with at least one assignment that still cannot be moved. */
-    val blockedArchiveCount: Int
-        get() = itemsByArchive
-            .filterValues { group -> group.any { it.selectedSystemId != null } }
-            .size - movableArchivePaths.size
 }
 
 @HiltViewModel
 class ReviewViewModel @Inject constructor(
     private val session: ReviewSession,
     private val folderRepository: RomFolderRepository,
-    private val archiveMover: ArchiveMover,
+    private val romExtractor: RomExtractor,
     private val logRepository: LogRepository,
     val registry: SystemRegistry,
 ) : ViewModel() {
@@ -116,6 +96,7 @@ class ReviewViewModel @Inject constructor(
                     id = "${analysis.archive.path}::${rom.group.primary}",
                     archiveFileName = analysis.archive.fileName,
                     archivePath = analysis.archive.path,
+                    archiveType = analysis.archive.type,
                     rom = rom,
                 )
             }
@@ -207,45 +188,68 @@ class ReviewViewModel @Inject constructor(
     }
 
     /**
-     * Moves all movable archives into their system folders. Every outcome
-     * is written to the persistent log; the UI navigates to the log screen
-     * when the run finished.
+     * Extracts every assigned ROM group from its archive into the target
+     * system folder — per group, so mixed archives are no problem. An
+     * archive whose groups were ALL extracted successfully is deleted
+     * afterwards (that is the "move" the user expects: the download folder
+     * gets cleaned up). Every outcome is written to the persistent log.
      */
-    fun moveAssigned() {
+    fun extractAssigned() {
         val state = _uiState.value
-        val plan = state.movableArchivePaths.mapNotNull { path ->
-            val item = state.items.first { it.archivePath == path }
-            val system = registry.byId(item.selectedSystemId ?: return@mapNotNull null)
-                ?: return@mapNotNull null
-            Triple(path, item.archiveFileName, system)
-        }
-        if (plan.isEmpty() || state.moving) return
+        val assigned = state.items.filter { it.selectedSystemId != null }
+        if (assigned.isEmpty() || state.moving) return
 
         _uiState.update { it.copy(moving = true, moveSummary = null) }
         viewModelScope.launch {
-            var moved = 0
+            var extracted = 0
             var failed = 0
-            for ((path, fileName, system) in plan) {
+            val extractedIds = mutableSetOf<String>()
+
+            for (item in assigned) {
+                val system = registry.byId(item.selectedSystemId ?: continue) ?: continue
                 val targetDir = folderRepository.targetPathFor(system)
-                archiveMover.move(path, targetDir)
-                    .onSuccess { newPath ->
-                        moved++
-                        logRepository.append(LogLevel.SUCCESS, "$fileName → $newPath")
-                        // Remove the archive's items from the review list
-                        _uiState.update { s ->
-                            s.copy(items = s.items.filterNot { it.archivePath == path })
-                        }
-                    }
-                    .onFailure { error ->
-                        failed++
+                romExtractor.extractGroup(
+                    archivePath = item.archivePath,
+                    archiveType = item.archiveType,
+                    entryPaths = item.rom.memberEntryPaths,
+                    targetDir = targetDir,
+                ).onSuccess { files ->
+                    extracted++
+                    extractedIds += item.id
+                    logRepository.append(
+                        LogLevel.SUCCESS,
+                        "${item.rom.group.primary} → $targetDir (${files.size} Datei(en))",
+                    )
+                }.onFailure { error ->
+                    failed++
+                    logRepository.append(
+                        LogLevel.ERROR,
+                        "${item.rom.group.primary}: ${error.message ?: "Unbekannter Fehler"}",
+                    )
+                }
+            }
+
+            // Clean up archives whose ROMs are now all in place
+            for ((path, archiveItems) in state.items.groupBy { it.archivePath }) {
+                if (archiveItems.all { it.id in extractedIds }) {
+                    val name = archiveItems.first().archiveFileName
+                    if (romExtractor.deleteArchive(path)) {
+                        logRepository.append(LogLevel.INFO, "Quellarchiv gelöscht: $name")
+                    } else {
                         logRepository.append(
                             LogLevel.ERROR,
-                            "$fileName: ${error.message ?: "Unbekannter Fehler"}",
+                            "Quellarchiv konnte nicht gelöscht werden: $name",
                         )
                     }
+                }
             }
-            _uiState.update {
-                it.copy(moving = false, moveSummary = MoveSummary(moved = moved, failed = failed))
+
+            _uiState.update { s ->
+                s.copy(
+                    moving = false,
+                    items = s.items.filterNot { it.id in extractedIds },
+                    moveSummary = MoveSummary(moved = extracted, failed = failed),
+                )
             }
         }
     }

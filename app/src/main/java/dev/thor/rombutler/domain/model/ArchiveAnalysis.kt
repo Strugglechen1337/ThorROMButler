@@ -5,12 +5,16 @@ import dev.thor.rombutler.domain.detection.RomFileGroup
 /**
  * One detected ROM (single file or multi-file group) inside an archive.
  *
- * @property group the files that belong together (bin+cue, m3u, ...).
+ * @property group the files that belong together (bin+cue, m3u, ...);
+ *   member values are plain file names.
+ * @property memberEntryPaths full archive-internal paths of the group
+ *   members (incl. subfolders) — needed to extract them later.
  * @property detection system assignment with confidence.
  * @property totalSizeBytes uncompressed size of all group members.
  */
 data class DetectedRom(
     val group: RomFileGroup,
+    val memberEntryPaths: List<String>,
     val detection: DetectionResult,
     val totalSizeBytes: Long,
 )

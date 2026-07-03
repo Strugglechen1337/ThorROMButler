@@ -71,11 +71,10 @@
     <string name="review_folders_created">%d Ordner angelegt</string>
     <string name="review_folders_partly_failed">%1$d Ordner angelegt, %2$d fehlgeschlagen</string>
     <string name="system_picker_title">Zielsystem wählen</string>
-    <string name="review_blocked_hint">%d Archive blockiert (gemischte oder unvollständige Zuordnung)</string>
-    <string name="review_moving">Verschiebe …</string>
+    <string name="review_moving">Entpacke …</string>
     <plurals name="review_move_button">
-        <item quantity="one">1 Archiv verschieben</item>
-        <item quantity="other">%d Archive verschieben</item>
+        <item quantity="one">1 ROM einsortieren</item>
+        <item quantity="other">%d ROMs einsortieren</item>
     </plurals>
 
     <!-- Log screen -->

@@ -18,6 +18,8 @@ läuft aber auf jedem Android-Smartphone ab Android 13.
 - 🛡️ **Keine Automatik bei Unklarheit**: Nur eindeutig erkannte ROMs bekommen einen
   Zielordner-Vorschlag. Du entscheidest immer selbst, was verschoben wird.
 - 📦 **Archiv-Analyse ohne Entpacken**: Inhalte werden direkt im Archiv gelesen
+- 🚚 **Einsortieren**: erkannte ROMs werden aus dem Archiv in den Zielordner
+  entpackt; vollständig verarbeitete Archive werden aus dem Download-Ordner entfernt
 - 🗂️ **ES-DE-Ordnerkonvention**: `roms/nes`, `roms/snes`, `roms/gba`, `roms/ps2`, …
 - 🌙 **Thor-Design**: Dark Mode only, Neonblau & Gold, dezente Glow-Effekte
 
