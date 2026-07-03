@@ -44,7 +44,10 @@ Die App benötigt **„Verwaltung aller Dateien"** (`MANAGE_EXTERNAL_STORAGE`).
 Das ist eine bewusste Entscheidung: ROM-Archive sind oft mehrere Gigabyte groß,
 und die Analyse ohne Entpacken braucht schnellen wahlfreien Zugriff auf die
 Archivdateien – das Storage Access Framework ist dafür zu langsam.
-Die App sendet keinerlei Daten ins Internet.
+
+Internet nutzt die App ausschließlich für den **manuellen Update-Check**
+(Einstellungen → „Auf Updates prüfen", fragt die GitHub-Releases-API ab).
+Es werden keinerlei Nutzungsdaten gesendet.
 
 ## Installation
 

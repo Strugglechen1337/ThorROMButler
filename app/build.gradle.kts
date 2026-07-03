@@ -1,10 +1,22 @@
 // No org.jetbrains.kotlin.android plugin: AGP 9 ships built-in Kotlin support.
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
 }
+
+// Release signing: local builds read signing/keystore.properties (gitignored),
+// CI provides the same values via environment variables (GitHub secrets).
+val keystoreProps = Properties().apply {
+    val f = rootProject.file("signing/keystore.properties")
+    if (f.exists()) f.inputStream().use { load(it) }
+}
+
+fun signingValue(propKey: String, envKey: String): String? =
+    keystoreProps.getProperty(propKey) ?: System.getenv(envKey)
 
 android {
     namespace = "dev.thor.rombutler"
@@ -14,10 +26,23 @@ android {
         applicationId = "dev.thor.rombutler"
         minSdk = 33
         targetSdk = 37
-        versionCode = 1
-        versionName = "0.1.0"
+        versionCode = 2
+        versionName = "0.2.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    signingConfigs {
+        create("release") {
+            val storePath = signingValue("storeFile", "SIGNING_STORE_FILE")
+            if (storePath != null) {
+                storeFile = rootProject.file("signing/$storePath").takeIf { it.exists() }
+                    ?: rootProject.file(storePath)
+                storePassword = signingValue("storePassword", "SIGNING_STORE_PASSWORD")
+                keyAlias = signingValue("keyAlias", "SIGNING_KEY_ALIAS")
+                keyPassword = signingValue("keyPassword", "SIGNING_KEY_PASSWORD")
+            }
+        }
     }
 
     buildTypes {
@@ -28,6 +53,9 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            if (signingValue("storeFile", "SIGNING_STORE_FILE") != null) {
+                signingConfig = signingConfigs.getByName("release")
+            }
         }
     }
 

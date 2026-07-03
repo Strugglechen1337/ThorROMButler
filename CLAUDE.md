@@ -37,6 +37,19 @@ $env:JAVA_HOME = "D:\Dev\tools\jdk-21"; .\gradlew.bat assembleDebug
 
 Android SDK: `C:\Users\malle\AppData\Local\Android\Sdk` (via `local.properties`).
 
+### Release & Signing
+
+- Keystore: `signing/thor-release.jks` + `signing/keystore.properties`
+  (BEIDE gitignored — Keystore unbedingt extern sichern, sonst sind keine
+  App-Updates mehr möglich!)
+- Lokal: `gradlew assembleRelease` liest `signing/keystore.properties`
+- CI: `.github/workflows/release.yml` baut bei `v*`-Tags eine signierte APK
+  und hängt sie ans GitHub-Release (Secrets: `SIGNING_KEYSTORE_BASE64`,
+  `SIGNING_STORE_PASSWORD`, `SIGNING_KEY_ALIAS`, `SIGNING_KEY_PASSWORD`)
+- Update-Check in der App: `GitHubUpdateChecker` (REPO_OWNER/REPO_NAME
+  müssen zum GitHub-Repo passen)
+- GitHub CLI: `D:\Dev\tools\gh\bin\gh.exe`
+
 ## Kern-Design der Detection Engine
 
 - **SystemRegistry**: pro System ein Eintrag (Name, ES-DE-Ordnername, Extensions,

@@ -15,7 +15,8 @@ local.properties
 .DS_Store
 Thumbs.db
 
-# Signing
+# Signing (NIE einchecken! Keystore sichern, sonst keine App-Updates möglich)
+signing/
 *.jks
 *.keystore
 

@@ -1,0 +1,59 @@
+# Builds a signed release APK and attaches it to the GitHub release
+# whenever a version tag (v*) is pushed.
+#
+# Required repository secrets:
+#   SIGNING_KEYSTORE_BASE64   – base64 of signing/thor-release.jks
+#   SIGNING_STORE_PASSWORD    – keystore password
+#   SIGNING_KEY_ALIAS         – key alias (thor)
+#   SIGNING_KEY_PASSWORD      – key password
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Decode keystore
+        run: |
+          mkdir -p signing
+          echo "$SIGNING_KEYSTORE_BASE64" | base64 -d > signing/thor-release.jks
+        env:
+          SIGNING_KEYSTORE_BASE64: ${{ secrets.SIGNING_KEYSTORE_BASE64 }}
+
+      - name: Run unit tests
+        run: ./gradlew testDebugUnitTest
+
+      - name: Build signed release APK
+        run: ./gradlew assembleRelease
+        env:
+          SIGNING_STORE_FILE: thor-release.jks
+          SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
+          SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
+          SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
+
+      - name: Rename APK
+        run: |
+          cp app/build/outputs/apk/release/app-release.apk \
+             ThorRomButler-${{ github.ref_name }}.apk
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ThorRomButler-${{ github.ref_name }}.apk
+          generate_release_notes: true
