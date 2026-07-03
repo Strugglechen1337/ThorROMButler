@@ -10,24 +10,38 @@ läuft aber auf jedem Android-Smartphone ab Android 13.
 
 > Kostenlos & Open Source. Distribution über GitHub Releases – nicht im Play Store.
 
-## Features (v0.1)
+## Features
 
-- 🔍 **Download-Scanner**: findet ROM-Archive (ZIP, 7z, RAR4) im Download-Ordner
-- 🧠 **Detection Engine**: bestimmt das Zielsystem über Dateiendungen und Magic Bytes
-  – mit ehrlichen Confidence-Leveln (*sicher* / *wahrscheinlich* / *unbekannt*)
-- 🛡️ **Keine Automatik bei Unklarheit**: Nur eindeutig erkannte ROMs bekommen einen
-  Zielordner-Vorschlag. Du entscheidest immer selbst, was verschoben wird.
-- 📦 **Archiv-Analyse ohne Entpacken**: Inhalte werden direkt im Archiv gelesen
-- 🚚 **Einsortieren**: erkannte ROMs werden aus dem Archiv in den Zielordner
-  entpackt; vollständig verarbeitete Archive werden aus dem Download-Ordner entfernt
-- 🗂️ **ES-DE-Ordnerkonvention**: `roms/nes`, `roms/snes`, `roms/gba`, `roms/ps2`, …
-- 🌙 **Thor-Design**: Dark Mode only, Neonblau & Gold, dezente Glow-Effekte
+- 🔍 **Scanner**: findet ROM-Archive (ZIP, 7z, RAR4) **und lose ROM-Dateien**
+  im Download-Ordner
+- 🧠 **Detection Engine**: bestimmt das Zielsystem über Dateiendungen und Magic
+  Bytes (inkl. ISO-, RVZ- und CHD-Header) – mit ehrlichen Confidence-Leveln
+  (*sicher* / *wahrscheinlich* / *unbekannt*)
+- 🛡️ **Keine Automatik bei Unklarheit**: Nur eindeutig erkannte ROMs bekommen
+  einen Zielordner-Vorschlag. Du entscheidest immer selbst – einzeln oder mit
+  „Alle übernehmen".
+- 📦 **Archiv-Analyse ohne Entpacken**: Inhalte werden direkt im Archiv gelesen;
+  `.bin`+`.cue` und `.m3u` werden als Einheit behandelt, BIOS-Dateien erkannt
+  und ignoriert
+- 🚚 **Einsortieren**: entpackt ROMs mit Fortschrittsbalken, Abbrechen-Option
+  und CRC-Prüfung in den richtigen Systemordner – als Foreground-Service, der
+  auch ausgeschaltete Displays übersteht. Duplikate werden erkannt (Ersetzen
+  nur auf Wunsch), Speicherplatz wird vorab geprüft, vollständig verarbeitete
+  Archive werden optional gelöscht.
+- 🕹️ **Arcade-Sets bleiben gepackt**: MAME-/Neo-Geo-ZIPs werden als Ganzes
+  nach `roms/arcade` bzw. `roms/neogeo` verschoben
+- 🗂️ **ES-DE-Ordnerkonvention**: `roms/nes`, `roms/psx`, `roms/dreamcast/<Spiel>/`, …
+- 🔄 **Update-Check & In-App-Download** direkt aus den Einstellungen
+- 📜 **Aktions-Log**: jede Bewegung wird protokolliert
+- 🌍 Deutsch & Englisch · 🌙 **Thor-Design**: Dark Mode only, Neonblau & Gold,
+  dezente Glow-Effekte
 
-## Unterstützte Systeme (v0.1)
+## Unterstützte Systeme
 
 NES · SNES · Game Boy · Game Boy Color · Game Boy Advance · Nintendo 64 ·
 Nintendo DS · Nintendo 3DS · PlayStation 1 · PlayStation 2 · PSP · GameCube ·
-Wii · Wii U · Dreamcast · Switch
+Wii · Wii U · Dreamcast · Switch · Amiga · C64 · Mega Drive · Master System ·
+Game Gear · Saturn · Atari 2600 · Arcade (MAME) · Neo Geo
 
 ## Unterstützte Archive
 
