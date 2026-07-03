@@ -1,6 +1,7 @@
 package dev.thor.rombutler.data.archive
 
 import dev.thor.rombutler.di.IoDispatcher
+import dev.thor.rombutler.domain.detection.BiosDetector
 import dev.thor.rombutler.domain.detection.DetectionEngine
 import dev.thor.rombutler.domain.detection.RomFileGrouper
 import dev.thor.rombutler.domain.model.ArchiveAnalysis
@@ -28,6 +29,7 @@ class CommonsArchiveAnalyzer @Inject constructor(
     private val sourceFactory: ArchiveEntrySourceFactory,
     private val grouper: RomFileGrouper,
     private val engine: DetectionEngine,
+    private val biosDetector: BiosDetector,
     @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ArchiveAnalyzer {
 
@@ -40,7 +42,18 @@ class CommonsArchiveAnalyzer @Inject constructor(
 
         try {
             val entries = source.listEntries(file)
-            val romEntries = entries.filter { engine.isRomFileName(it.path) }
+
+            // BIOS/firmware files are not games — keep them out of review.
+            val (biosEntries, gameCandidates) = entries.partition { biosDetector.isBios(it.path) }
+            val romEntries = gameCandidates.filter { engine.isRomFileName(it.path) }
+
+            // Extensions nobody claims — surfaced when nothing is detected.
+            val otherExtensions = gameCandidates
+                .filterNot { engine.isRomFileName(it.path) }
+                .map { it.path.substringAfterLast('.', "").lowercase() }
+                .filter { it.isNotEmpty() }
+                .distinct()
+                .sorted()
 
             // Group per archive-internal directory: two discs in different
             // subfolders must not be merged, and equal file names in
@@ -73,7 +86,12 @@ class CommonsArchiveAnalyzer @Inject constructor(
                 }
                 .sortedBy { it.group.primary.lowercase() }
 
-            ArchiveAnalysis.Success(archive, roms)
+            ArchiveAnalysis.Success(
+                archive = archive,
+                roms = roms,
+                ignoredBiosCount = biosEntries.size,
+                otherExtensions = otherExtensions,
+            )
         } catch (e: Exception) {
             ArchiveAnalysis.Failed(archive, e.message ?: e.javaClass.simpleName)
         }

@@ -1,6 +1,7 @@
 package dev.thor.rombutler.data.archive
 
 import com.google.common.truth.Truth.assertThat
+import dev.thor.rombutler.domain.detection.BiosDetector
 import dev.thor.rombutler.domain.detection.DetectionEngine
 import dev.thor.rombutler.domain.detection.RomFileGrouper
 import dev.thor.rombutler.domain.detection.SystemRegistry
@@ -36,6 +37,7 @@ class CommonsArchiveAnalyzerTest {
             ),
             grouper = RomFileGrouper(),
             engine = DetectionEngine(SystemRegistry()),
+            biosDetector = BiosDetector(),
             ioDispatcher = dispatcher,
         )
 
@@ -155,6 +157,68 @@ class CommonsArchiveAnalyzerTest {
             .analyze(romArchive(corrupt))
 
         assertThat(analysis).isInstanceOf(ArchiveAnalysis.Failed::class.java)
+    }
+
+    @Test
+    fun `analyzes a real 7z archive`() = runTest {
+        // Regression guard: 7z support must work end to end (LZMA2 via XZ).
+        val sevenZipFile = tempFolder.newFile("roms.7z")
+        org.apache.commons.compress.archivers.sevenz.SevenZOutputFile(sevenZipFile).use { out ->
+            val entry = out.createArchiveEntry(tempFolder.newFile("ignored"), "Metroid Fusion.gba")
+            out.putArchiveEntry(entry)
+            out.write(ByteArray(64))
+            out.closeArchiveEntry()
+        }
+
+        val analysis = buildAnalyzer(StandardTestDispatcher(testScheduler)).analyze(
+            romArchive(sevenZipFile).copy(type = ArchiveType.SEVEN_ZIP),
+        )
+
+        val success = analysis as ArchiveAnalysis.Success
+        val rom = success.roms.single()
+        assertThat(rom.detection.system?.id).isEqualTo("gba")
+        assertThat(rom.detection.confidence).isEqualTo(Confidence.CERTAIN)
+    }
+
+    @Test
+    fun `bios files are ignored and counted`() = runTest {
+        val zipFile = tempFolder.newFile("bios-pack.zip")
+        writeZip(
+            zipFile,
+            mapOf(
+                "scph1001.bin" to ByteArray(512),
+                "gba_bios.bin" to ByteArray(16),
+                "[BIOS] Nintendo Game Boy Boot ROM (World).gb" to ByteArray(256),
+                "Metroid Fusion.gba" to ByteArray(64), // the only real game
+            ),
+        )
+
+        val analysis = buildAnalyzer(StandardTestDispatcher(testScheduler))
+            .analyze(romArchive(zipFile))
+
+        val success = analysis as ArchiveAnalysis.Success
+        assertThat(success.ignoredBiosCount).isEqualTo(3)
+        assertThat(success.roms).hasSize(1)
+        assertThat(success.roms.single().detection.system?.id).isEqualTo("gba")
+    }
+
+    @Test
+    fun `unclaimed extensions are reported when no roms are found`() = runTest {
+        val zipFile = tempFolder.newFile("amiga.zip")
+        writeZip(
+            zipFile,
+            mapOf(
+                "Turrican II.adf" to ByteArray(128),
+                "Turrican II.ipf" to ByteArray(128),
+            ),
+        )
+
+        val analysis = buildAnalyzer(StandardTestDispatcher(testScheduler))
+            .analyze(romArchive(zipFile))
+
+        val success = analysis as ArchiveAnalysis.Success
+        assertThat(success.roms).isEmpty()
+        assertThat(success.otherExtensions).containsExactly("adf", "ipf").inOrder()
     }
 
     @Test

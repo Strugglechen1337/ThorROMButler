@@ -22,10 +22,20 @@ sealed interface ArchiveAnalysis {
 
     val archive: RomArchive
 
-    /** Archive was readable; [roms] lists all detected ROM groups. */
+    /**
+     * Archive was readable; [roms] lists all detected ROM groups.
+     *
+     * @property ignoredBiosCount BIOS/firmware files that were deliberately
+     *   skipped (they are not games and must not reach the review list).
+     * @property otherExtensions distinct extensions of remaining entries no
+     *   system claims — shown when [roms] is empty so users see WHY nothing
+     *   was detected (e.g. an Amiga archive on a v0.1 system list).
+     */
     data class Success(
         override val archive: RomArchive,
         val roms: List<DetectedRom>,
+        val ignoredBiosCount: Int = 0,
+        val otherExtensions: List<String> = emptyList(),
     ) : ArchiveAnalysis
 
     /** Container format is recognized but not readable (RAR5). */

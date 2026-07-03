@@ -43,6 +43,11 @@
     <string name="analysis_running">Analysiere Inhalt …</string>
     <string name="analysis_failed">Analyse fehlgeschlagen: %s</string>
     <string name="analysis_no_roms">Keine ROMs im Archiv erkannt.</string>
+    <string name="analysis_no_roms_with_types">Keine ROMs erkannt – enthaltene Dateitypen: %s</string>
+    <plurals name="analysis_bios_ignored">
+        <item quantity="one">1 BIOS-Datei ignoriert</item>
+        <item quantity="other">%d BIOS-Dateien ignoriert</item>
+    </plurals>
     <string name="analysis_more_roms">+ %d weitere</string>
 
     <!-- Confidence labels -->

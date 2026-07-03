@@ -44,6 +44,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -330,27 +331,45 @@ private fun AnalysisSection(analysis: ArchiveAnalysis?) {
             tint = MaterialTheme.colorScheme.error,
         )
 
-        is ArchiveAnalysis.Success -> {
+        is ArchiveAnalysis.Success -> Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
             if (analysis.roms.isEmpty()) {
                 Text(
-                    text = stringResource(R.string.analysis_no_roms),
+                    text = if (analysis.otherExtensions.isEmpty()) {
+                        stringResource(R.string.analysis_no_roms)
+                    } else {
+                        // Show WHAT was in there so "no ROMs" is explainable
+                        // (e.g. .adf = Amiga, not on the v0.1 system list)
+                        stringResource(
+                            R.string.analysis_no_roms_with_types,
+                            analysis.otherExtensions.joinToString(", ") { ".$it" },
+                        )
+                    },
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             } else {
-                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    for (rom in analysis.roms.take(MAX_ROM_ROWS)) {
-                        DetectedRomRow(rom)
-                    }
-                    val more = analysis.roms.size - MAX_ROM_ROWS
-                    if (more > 0) {
-                        Text(
-                            text = stringResource(R.string.analysis_more_roms, more),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                    }
+                for (rom in analysis.roms.take(MAX_ROM_ROWS)) {
+                    DetectedRomRow(rom)
                 }
+                val more = analysis.roms.size - MAX_ROM_ROWS
+                if (more > 0) {
+                    Text(
+                        text = stringResource(R.string.analysis_more_roms, more),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
+            if (analysis.ignoredBiosCount > 0) {
+                Text(
+                    text = pluralStringResource(
+                        R.plurals.analysis_bios_ignored,
+                        analysis.ignoredBiosCount,
+                        analysis.ignoredBiosCount,
+                    ),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
             }
         }
     }
