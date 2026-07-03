@@ -6,6 +6,7 @@
     <string name="action_cancel">Abbrechen</string>
     <string name="action_back">Zurück</string>
     <string name="action_create">Anlegen</string>
+    <string name="action_save">Speichern</string>
 
     <!-- Setup screen -->
     <string name="setup_title">Einrichtung</string>
@@ -82,6 +83,7 @@
     <string name="system_picker_title">Zielsystem wählen</string>
     <string name="review_moving">Entpacke …</string>
     <string name="review_extract_progress">ROM %1$d von %2$d: %3$s</string>
+    <string name="review_legend">Blau = sicher erkannt · Gold = Vorschlag bestätigen · Grau = System manuell wählen</string>
     <string name="review_preflight_storage">Benötigt ca. %1$s · frei: %2$s</string>
     <string name="review_preflight_storage_unknown">Benötigt ca. %s · freier Speicher wird vor dem Schreiben geprüft</string>
     <string name="review_preflight_7z_warning">7z-Archive können je nach Kompression extra RAM brauchen. ZIP ist für sehr große ROMs am sichersten.</string>
@@ -111,6 +113,16 @@
     <string name="settings_delete_archives_hint">Vollständig einsortierte Archive aus dem Download-Ordner entfernen.</string>
     <string name="settings_auto_update">Beim Start auf Updates prüfen</string>
     <string name="settings_auto_update_hint">Fragt beim App-Start die GitHub-Releases-API ab und zeigt einen Punkt am Zahnrad-Symbol, wenn es eine neue Version gibt.</string>
+    <string name="settings_folder_overrides">Systemordner anpassen</string>
+    <string name="settings_folder_overrides_hint">Ordnernamen pro System überschreiben (z. B. ps1 statt psx) · %d angepasst</string>
+    <string name="settings_folder_override_label">Ordnername</string>
+    <string name="settings_folder_override_default">Standard (ES-DE): %s</string>
+    <string name="settings_folder_override_reset">Standard</string>
+    <string name="settings_battery_hint">Bei sehr langen Einsortier-Läufen kann aggressive Akku-Optimierung den Vorgang unterbrechen. Bei Problemen die App von der Optimierung ausnehmen:</string>
+    <string name="settings_battery_button">Akku-Optimierung öffnen</string>
+    <string name="settings_crash_title">Absturzbericht vorhanden</string>
+    <string name="settings_crash_hint">Die App ist zuvor abgestürzt. Der Bericht liegt nur lokal auf dem Gerät – du kannst ihn freiwillig für ein GitHub-Issue teilen.</string>
+    <string name="settings_crash_share">Fehlerbericht teilen</string>
     <string name="settings_version">Thor ROM Butler %s</string>
     <string name="settings_check_updates">Auf Updates prüfen</string>
     <string name="settings_up_to_date">Du hast die neueste Version.</string>

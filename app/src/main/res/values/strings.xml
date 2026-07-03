@@ -7,6 +7,7 @@
     <string name="action_cancel">Cancel</string>
     <string name="action_back">Back</string>
     <string name="action_create">Create</string>
+    <string name="action_save">Save</string>
 
     <!-- Setup screen -->
     <string name="setup_title">Setup</string>
@@ -83,6 +84,7 @@
     <string name="system_picker_title">Choose target system</string>
     <string name="review_moving">Extracting …</string>
     <string name="review_extract_progress">ROM %1$d of %2$d: %3$s</string>
+    <string name="review_legend">Blue = detected for sure · Gold = confirm suggestion · Gray = pick system manually</string>
     <string name="review_preflight_storage">Needs about %1$s · free: %2$s</string>
     <string name="review_preflight_storage_unknown">Needs about %s · free space will be checked before writing</string>
     <string name="review_preflight_7z_warning">7z archives can need extra RAM depending on compression. ZIP is safest for very large ROMs.</string>
@@ -112,6 +114,16 @@
     <string name="settings_delete_archives_hint">Remove fully sorted archives from the download folder.</string>
     <string name="settings_auto_update">Check for updates on start</string>
     <string name="settings_auto_update_hint">Queries the GitHub releases API on app start and shows a dot on the gear icon when a new version exists.</string>
+    <string name="settings_folder_overrides">Customize system folders</string>
+    <string name="settings_folder_overrides_hint">Override folder names per system (e.g. ps1 instead of psx) · %d customized</string>
+    <string name="settings_folder_override_label">Folder name</string>
+    <string name="settings_folder_override_default">Default (ES-DE): %s</string>
+    <string name="settings_folder_override_reset">Default</string>
+    <string name="settings_battery_hint">Aggressive battery optimization can interrupt very long sorting runs. If that happens, exempt the app from optimization:</string>
+    <string name="settings_battery_button">Open battery optimization</string>
+    <string name="settings_crash_title">Crash report available</string>
+    <string name="settings_crash_hint">The app crashed earlier. The report is stored locally only – you can share it voluntarily for a GitHub issue.</string>
+    <string name="settings_crash_share">Share crash report</string>
     <string name="settings_version">Thor ROM Butler %s</string>
     <string name="settings_check_updates">Check for updates</string>
     <string name="settings_up_to_date">You have the latest version.</string>

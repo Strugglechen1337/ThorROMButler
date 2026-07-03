@@ -184,6 +184,15 @@ fun ReviewScreen(
             ),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
+            item(key = "legend") {
+                // One-line legend for the confidence colors
+                Text(
+                    text = stringResource(R.string.review_legend),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(bottom = 4.dp),
+                )
+            }
             items(state.items, key = { it.id }) { item ->
                 ReviewItemCard(
                     modifier = Modifier.animateItem(),

@@ -18,6 +18,12 @@ data class AppSettings(
     val deleteArchivesAfterExtract: Boolean = true,
     /** Opt-in: query GitHub for a newer release on app start (default OFF). */
     val autoUpdateCheck: Boolean = false,
+    /**
+     * Per-system folder overrides (systemId -> folder name) for users whose
+     * frontend does not follow the ES-DE convention (e.g. `roms/ps1`).
+     * Missing entries fall back to [dev.thor.rombutler.domain.model.SystemDefinition.esdeFolder].
+     */
+    val folderOverrides: Map<String, String> = emptyMap(),
 ) {
     /** Setup is complete once both folders are configured. */
     val isSetupComplete: Boolean

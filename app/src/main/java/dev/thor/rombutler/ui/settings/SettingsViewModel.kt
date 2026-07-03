@@ -8,8 +8,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import dev.thor.rombutler.data.log.CrashLog
 import dev.thor.rombutler.data.update.GitHubUpdateChecker
 import dev.thor.rombutler.data.update.UpdateInfo
+import dev.thor.rombutler.domain.detection.SystemRegistry
 import dev.thor.rombutler.domain.model.AppSettings
 import dev.thor.rombutler.domain.repository.SettingsRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -33,7 +35,17 @@ class SettingsViewModel @Inject constructor(
     @param:ApplicationContext private val context: Context,
     private val settingsRepository: SettingsRepository,
     private val updateChecker: GitHubUpdateChecker,
+    private val crashLog: CrashLog,
+    val registry: SystemRegistry,
 ) : ViewModel() {
+
+    /** True when a crash was recorded — shows the share row in settings. */
+    val hasCrashReport: Boolean = crashLog.exists()
+
+    /** Crash text for the share sheet (last ~100 KB). */
+    fun crashReportText(): String? = crashLog.read()
+
+    fun clearCrashReport() = crashLog.clear()
 
     val settings: StateFlow<AppSettings> = settingsRepository.settings
         .stateIn(
@@ -64,6 +76,11 @@ class SettingsViewModel @Inject constructor(
 
     fun setAutoUpdateCheck(enabled: Boolean) {
         viewModelScope.launch { settingsRepository.setAutoUpdateCheck(enabled) }
+    }
+
+    /** Blank/empty restores the ES-DE default for that system. */
+    fun setFolderOverride(systemId: String, folder: String?) {
+        viewModelScope.launch { settingsRepository.setFolderOverride(systemId, folder) }
     }
 
     /** Manual update check — the app's only network access. */

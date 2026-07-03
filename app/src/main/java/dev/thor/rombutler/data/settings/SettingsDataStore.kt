@@ -25,6 +25,7 @@ class SettingsDataStore @Inject constructor(
         val DOWNLOAD_PATH = stringPreferencesKey("download_path")
         val DELETE_ARCHIVES = booleanPreferencesKey("delete_archives_after_extract")
         val AUTO_UPDATE_CHECK = booleanPreferencesKey("auto_update_check")
+        val FOLDER_OVERRIDES = stringPreferencesKey("folder_overrides") // JSON object
     }
 
     override val settings: Flow<AppSettings> = dataStore.data.map { prefs ->
@@ -33,6 +34,7 @@ class SettingsDataStore @Inject constructor(
             downloadPath = prefs[Keys.DOWNLOAD_PATH],
             deleteArchivesAfterExtract = prefs[Keys.DELETE_ARCHIVES] ?: true,
             autoUpdateCheck = prefs[Keys.AUTO_UPDATE_CHECK] ?: false,
+            folderOverrides = prefs[Keys.FOLDER_OVERRIDES].parseOverrides(),
         )
     }
 
@@ -50,5 +52,28 @@ class SettingsDataStore @Inject constructor(
 
     override suspend fun setAutoUpdateCheck(enabled: Boolean) {
         dataStore.edit { it[Keys.AUTO_UPDATE_CHECK] = enabled }
+    }
+
+    override suspend fun setFolderOverride(systemId: String, folder: String?) {
+        dataStore.edit { prefs ->
+            val current = prefs[Keys.FOLDER_OVERRIDES].parseOverrides().toMutableMap()
+            val trimmed = folder?.trim()?.trim('/')
+            if (trimmed.isNullOrEmpty()) current.remove(systemId) else current[systemId] = trimmed
+            prefs[Keys.FOLDER_OVERRIDES] = org.json.JSONObject(current as Map<*, *>).toString()
+        }
+    }
+
+    private companion object {
+        fun String?.parseOverrides(): Map<String, String> {
+            if (this.isNullOrBlank()) return emptyMap()
+            return runCatching {
+                val obj = org.json.JSONObject(this)
+                buildMap {
+                    for (key in obj.keys()) {
+                        put(key, obj.getString(key))
+                    }
+                }
+            }.getOrDefault(emptyMap())
+        }
     }
 }

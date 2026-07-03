@@ -28,20 +28,24 @@ class RomFolderManager @Inject constructor(
         return File(base)
     }
 
+    /** Effective folder name: user override beats the ES-DE default. */
+    private suspend fun folderNameFor(system: SystemDefinition): String =
+        settingsRepository.settings.first().folderOverrides[system.id] ?: system.esdeFolder
+
     override suspend fun targetPathFor(system: SystemDefinition): String =
         withContext(ioDispatcher) {
-            File(baseDir(), system.esdeFolder).absolutePath
+            File(baseDir(), folderNameFor(system)).absolutePath
         }
 
     override suspend fun folderExists(system: SystemDefinition): Boolean =
         withContext(ioDispatcher) {
-            File(baseDir(), system.esdeFolder).isDirectory
+            File(baseDir(), folderNameFor(system)).isDirectory
         }
 
     override suspend fun ensureFolder(system: SystemDefinition): Result<String> =
         withContext(ioDispatcher) {
             runCatching {
-                val folder = File(baseDir(), system.esdeFolder)
+                val folder = File(baseDir(), folderNameFor(system))
                 if (!folder.isDirectory && !folder.mkdirs()) {
                     throw IOException("Ordner konnte nicht angelegt werden: ${folder.absolutePath}")
                 }

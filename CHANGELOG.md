@@ -2,6 +2,19 @@
 
 All notable user-facing changes are documented here.
 
+## 0.6.0
+
+- Added undo for sorted ROMs directly from the log (extracted files are
+  removed while the source archive still exists; moved files go back).
+- Added per-system folder overrides in Settings for non-ES-DE frontends
+  (e.g. `roms/ps1` instead of `roms/psx`).
+- Added folder-name detection hints: ambiguous files inside folders like
+  `SNES/` or `PS2/` now get a "probable" suggestion.
+- Added a local, privacy-friendly crash report that can be shared manually.
+- Review list now sorts items needing decisions first and shows a
+  confidence color legend.
+- Added a battery-optimization shortcut in Settings for long sorting runs.
+
 ## 0.5.0
 
 - Added 8 systems: Atari 7800, Atari Lynx, PC Engine/TurboGrafx-16, Sega 32X,

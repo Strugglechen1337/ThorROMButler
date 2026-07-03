@@ -47,7 +47,10 @@ läuft aber auf jedem Android-Smartphone ab Android 13.
   nach `roms/arcade` bzw. `roms/neogeo` verschoben
 - 🗂️ **ES-DE-Ordnerkonvention**: `roms/nes`, `roms/psx`, `roms/dreamcast/<Spiel>/`, ...
 - 🔄 **Update-Check & In-App-Download** direkt aus den Einstellungen
-- 📜 **Aktions-Log**: jede Bewegung wird protokolliert
+- 📜 **Aktions-Log mit Rückgängig**: jede Bewegung wird protokolliert und
+  lässt sich direkt aus dem Log zurücknehmen
+- 🧩 **Anpassbare Systemordner**: Ordnernamen pro System überschreibbar
+  (z. B. `roms/ps1` statt `roms/psx` für Nicht-ES-DE-Frontends)
 - 🌍 Deutsch & Englisch · 🌙 **Thor-Design**: Dark Mode only, Neonblau & Gold,
   dezente Glow-Effekte
 
@@ -97,6 +100,10 @@ gesendet.
 1. Neueste APK von den [GitHub Releases](../../releases) herunterladen
 2. APK installieren ("Unbekannte Quellen" erlauben)
 3. Beim ersten Start den Berechtigungs-Dialog bestätigen und ROM-Basisordner wählen
+
+Updates: direkt in der App (Einstellungen → „Auf Updates prüfen") oder über
+[Obtainium](https://github.com/ImranR98/Obtainium) — einfach dieses Repo als
+Quelle hinzufügen.
 
 Änderungen je Version stehen im [Changelog](CHANGELOG.md).
 
@@ -156,7 +163,10 @@ newer.
   sets to `roms/arcade` or `roms/neogeo`
 - 🗂️ **ES-DE folder convention**: `roms/nes`, `roms/psx`, `roms/dreamcast/<game>/`, ...
 - 🔄 **Update check & in-app download** directly from Settings
-- 📜 **Action log**: every move is recorded
+- 📜 **Action log with undo**: every move is recorded and can be reverted
+  right from the log
+- 🧩 **Customizable system folders**: override folder names per system
+  (e.g. `roms/ps1` instead of `roms/psx` for non-ES-DE frontends)
 - 🌍 German & English · 🌙 **Thor design**: dark mode only, neon blue and gold,
   subtle glow effects
 
@@ -205,6 +215,10 @@ automatically on app start. The app does not send analytics or user data.
 1. Download the latest APK from [GitHub Releases](../../releases)
 2. Install the APK and allow installation from unknown sources when Android asks
 3. On first launch, grant the file permission and choose your ROM base folder
+
+Updates: directly in the app (Settings → "Check for updates") or via
+[Obtainium](https://github.com/ImranR98/Obtainium) — just add this repository
+as a source.
 
 Version-by-version changes are listed in the [changelog](CHANGELOG.md).
 

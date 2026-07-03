@@ -65,6 +65,7 @@ fun SettingsScreen(
 
     var showDownloadPicker by remember { mutableStateOf(false) }
     var showRomBasePicker by remember { mutableStateOf(false) }
+    var showFolderOverrides by remember { mutableStateOf(false) }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -153,6 +154,87 @@ fun SettingsScreen(
                 }
             }
 
+            // System folder overrides (non-ES-DE frontends) + battery hint
+            SettingsCard {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { showFolderOverrides = true },
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Folder,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(24.dp),
+                    )
+                    Spacer(Modifier.width(12.dp))
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = stringResource(R.string.settings_folder_overrides),
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onSurface,
+                        )
+                        Text(
+                            text = stringResource(
+                                R.string.settings_folder_overrides_hint,
+                                settings.folderOverrides.size,
+                            ),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                }
+                Spacer(Modifier.size(14.dp))
+                Text(
+                    text = stringResource(R.string.settings_battery_hint),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Spacer(Modifier.size(6.dp))
+                OutlinedButton(
+                    onClick = {
+                        context.startActivity(
+                            Intent(android.provider.Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS),
+                        )
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Text(stringResource(R.string.settings_battery_button))
+                }
+            }
+
+            // Crash report (only when one was recorded)
+            if (viewModel.hasCrashReport) {
+                SettingsCard {
+                    Text(
+                        text = stringResource(R.string.settings_crash_title),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurface,
+                    )
+                    Text(
+                        text = stringResource(R.string.settings_crash_hint),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    Spacer(Modifier.size(10.dp))
+                    OutlinedButton(
+                        onClick = {
+                            viewModel.crashReportText()?.let { text ->
+                                val send = Intent(Intent.ACTION_SEND)
+                                    .setType("text/plain")
+                                    .putExtra(Intent.EXTRA_SUBJECT, "Thor ROM Butler crash report")
+                                    .putExtra(Intent.EXTRA_TEXT, text)
+                                context.startActivity(Intent.createChooser(send, null))
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        Text(stringResource(R.string.settings_crash_share))
+                    }
+                }
+            }
+
             // Version + update check
             SettingsCard {
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -219,6 +301,14 @@ fun SettingsScreen(
         }
     }
 
+    if (showFolderOverrides) {
+        FolderOverridesDialog(
+            systems = viewModel.registry.systems,
+            overrides = settings.folderOverrides,
+            onSave = viewModel::setFolderOverride,
+            onDismiss = { showFolderOverrides = false },
+        )
+    }
     if (showDownloadPicker) {
         FolderPickerDialog(
             title = stringResource(R.string.setup_download_title),
@@ -244,6 +334,109 @@ fun SettingsScreen(
 }
 
 private const val SUPPORT_URL = "https://paypal.me/marcelstrohmeyer"
+
+/**
+ * Per-system folder editor: tap a system, type the folder name your
+ * frontend expects; empty restores the ES-DE default.
+ */
+@Composable
+private fun FolderOverridesDialog(
+    systems: List<dev.thor.rombutler.domain.model.SystemDefinition>,
+    overrides: Map<String, String>,
+    onSave: (systemId: String, folder: String?) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    var editing by remember { mutableStateOf<dev.thor.rombutler.domain.model.SystemDefinition?>(null) }
+
+    editing?.let { system ->
+        var value by remember(system.id) {
+            mutableStateOf(overrides[system.id] ?: system.esdeFolder)
+        }
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { editing = null },
+            title = { Text(system.displayName) },
+            text = {
+                androidx.compose.material3.OutlinedTextField(
+                    value = value,
+                    onValueChange = { value = it },
+                    singleLine = true,
+                    label = { Text(stringResource(R.string.settings_folder_override_label)) },
+                    supportingText = {
+                        Text(stringResource(R.string.settings_folder_override_default, system.esdeFolder))
+                    },
+                )
+            },
+            confirmButton = {
+                androidx.compose.material3.Button(onClick = {
+                    onSave(system.id, value.takeIf { it.isNotBlank() && it != system.esdeFolder })
+                    editing = null
+                }) { Text(stringResource(R.string.action_save)) }
+            },
+            dismissButton = {
+                androidx.compose.material3.TextButton(onClick = {
+                    onSave(system.id, null) // restore default
+                    editing = null
+                }) { Text(stringResource(R.string.settings_folder_override_reset)) }
+            },
+        )
+    }
+
+    androidx.compose.ui.window.Dialog(onDismissRequest = onDismiss) {
+        androidx.compose.material3.Surface(
+            modifier = Modifier.fillMaxWidth(),
+            shape = MaterialTheme.shapes.large,
+            color = MaterialTheme.colorScheme.surfaceContainerHigh,
+        ) {
+            Column(modifier = Modifier.padding(vertical = 16.dp)) {
+                Text(
+                    text = stringResource(R.string.settings_folder_overrides),
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp),
+                )
+                androidx.compose.foundation.lazy.LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f, fill = false),
+                ) {
+                    items(systems.size) { index ->
+                        val system = systems[index]
+                        val override = overrides[system.id]
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { editing = system }
+                                .padding(horizontal = 24.dp, vertical = 12.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Text(
+                                text = system.displayName,
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = MaterialTheme.colorScheme.onSurface,
+                                modifier = Modifier.weight(1f),
+                            )
+                            Text(
+                                text = override ?: system.esdeFolder,
+                                style = MaterialTheme.typography.labelMedium,
+                                color = if (override != null) {
+                                    MaterialTheme.colorScheme.secondary
+                                } else {
+                                    MaterialTheme.colorScheme.primary
+                                },
+                            )
+                        }
+                    }
+                }
+                androidx.compose.material3.TextButton(
+                    onClick = onDismiss,
+                    modifier = Modifier
+                        .align(Alignment.End)
+                        .padding(horizontal = 16.dp),
+                ) { Text(stringResource(R.string.action_back)) }
+            }
+        }
+    }
+}
 
 @Composable
 private fun SettingsCard(content: @Composable () -> Unit) {

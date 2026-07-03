@@ -187,7 +187,9 @@ class ReviewViewModel @Inject constructor(
                 rom = rom,
             )
         }
-        val items = archiveItems + looseItems
+        // Items needing a decision come first (UNKNOWN > PROBABLE > CERTAIN)
+        val items = (archiveItems + looseItems)
+            .sortedByDescending { it.rom.detection.confidence.ordinal }
         _uiState.value = ReviewUiState(items = items)
 
         // Core rule: only CERTAIN detections get their target prefilled.
