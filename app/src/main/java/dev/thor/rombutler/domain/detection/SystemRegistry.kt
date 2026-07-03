@@ -191,6 +191,8 @@ class SystemRegistry @Inject constructor() {
             displayName = "Dreamcast",
             esdeFolder = "dreamcast",
             extensions = mapOf("cdi" to CERTAIN, "gdi" to CERTAIN, "chd" to UNKNOWN),
+            // GDI games (gdi + track files) must sit in one folder per game
+            gameSubfolder = true,
         ),
 
         SystemDefinition(

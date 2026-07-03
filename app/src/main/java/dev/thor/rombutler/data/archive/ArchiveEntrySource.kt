@@ -42,9 +42,34 @@ interface ArchiveEntrySource {
      * in ONE pass over the archive — important for solid 7z blocks.
      * Destination files are created; parent dirs must already exist.
      *
+     * @param onBytesWritten called with the DELTA of decompressed bytes
+     *   written since the last call (drives the extraction progress bar).
      * @throws java.io.IOException when an entry is missing or writing fails.
      */
-    fun extractEntries(archiveFile: File, targets: Map<String, File>)
+    fun extractEntries(
+        archiveFile: File,
+        targets: Map<String, File>,
+        onBytesWritten: (Long) -> Unit = {},
+    )
+}
+
+/** Output stream wrapper reporting written byte deltas to [onBytes]. */
+internal class ProgressOutputStream(
+    private val delegate: java.io.OutputStream,
+    private val onBytes: (Long) -> Unit,
+) : java.io.OutputStream() {
+    override fun write(b: Int) {
+        delegate.write(b)
+        onBytes(1L)
+    }
+
+    override fun write(b: ByteArray, off: Int, len: Int) {
+        delegate.write(b, off, len)
+        onBytes(len.toLong())
+    }
+
+    override fun flush() = delegate.flush()
+    override fun close() = delegate.close()
 }
 
 /** Reads an [InputStream] up to [maxBytes] into a right-sized array. */
@@ -83,13 +108,19 @@ class ZipEntrySource @Inject constructor() : ArchiveEntrySource {
             zip.getInputStream(entry).use { it.readPrefix(maxBytes) }
         }
 
-    override fun extractEntries(archiveFile: File, targets: Map<String, File>) {
+    override fun extractEntries(
+        archiveFile: File,
+        targets: Map<String, File>,
+        onBytesWritten: (Long) -> Unit,
+    ) {
         ZipFile.builder().setFile(archiveFile).get().use { zip ->
             for ((entryPath, targetFile) in targets) {
                 val entry = zip.getEntry(entryPath)
                     ?: throw java.io.IOException("Eintrag nicht gefunden: $entryPath")
                 zip.getInputStream(entry).use { input ->
-                    targetFile.outputStream().use { output -> input.copyTo(output) }
+                    ProgressOutputStream(targetFile.outputStream(), onBytesWritten).use { output ->
+                        input.copyTo(output, bufferSize = 256 * 1024)
+                    }
                 }
             }
         }
@@ -130,7 +161,11 @@ class SevenZEntrySource @Inject constructor() : ArchiveEntrySource {
             null
         }
 
-    override fun extractEntries(archiveFile: File, targets: Map<String, File>) {
+    override fun extractEntries(
+        archiveFile: File,
+        targets: Map<String, File>,
+        onBytesWritten: (Long) -> Unit,
+    ) {
         var remaining = targets.size
         SevenZFile.builder().setFile(archiveFile).get().use { sevenZ ->
             var entry = sevenZ.nextEntry
@@ -138,11 +173,12 @@ class SevenZEntrySource @Inject constructor() : ArchiveEntrySource {
                 val targetFile = targets[entry.name]
                 if (targetFile != null && !entry.isDirectory) {
                     targetFile.outputStream().use { output ->
-                        val buffer = ByteArray(64 * 1024)
+                        val buffer = ByteArray(256 * 1024)
                         while (true) {
                             val read = sevenZ.read(buffer)
                             if (read < 0) break
                             output.write(buffer, 0, read)
+                            onBytesWritten(read.toLong())
                         }
                     }
                     remaining--
@@ -183,13 +219,17 @@ class RarEntrySource @Inject constructor() : ArchiveEntrySource {
             rar.getInputStream(header).use { it.readPrefix(maxBytes) }
         }
 
-    override fun extractEntries(archiveFile: File, targets: Map<String, File>) {
+    override fun extractEntries(
+        archiveFile: File,
+        targets: Map<String, File>,
+        onBytesWritten: (Long) -> Unit,
+    ) {
         var remaining = targets.size
         Archive(archiveFile).use { rar ->
             for (header in rar.fileHeaders) {
                 if (header.isDirectory) continue
                 val targetFile = targets[header.fileName.replace('\\', '/')] ?: continue
-                targetFile.outputStream().use { output ->
+                ProgressOutputStream(targetFile.outputStream(), onBytesWritten).use { output ->
                     rar.extractFile(header, output)
                 }
                 remaining--

@@ -54,12 +54,28 @@ data class FolderCreationResult(val created: Int, val failed: Int)
 data class MoveSummary(val moved: Int, val failed: Int)
 
 /**
+ * Live progress of an extraction run.
+ *
+ * @property currentIndex 1-based index of the ROM being extracted.
+ * @property totalCount number of ROMs in this run.
+ * @property currentName primary file name currently being extracted.
+ * @property fraction overall progress 0..1, byte-based across the whole run.
+ */
+data class ExtractionProgress(
+    val currentIndex: Int,
+    val totalCount: Int,
+    val currentName: String,
+    val fraction: Float,
+)
+
+/**
  * UI state of the review screen.
  *
  * @property items all ROMs of the current scan session.
  * @property creatingFolders folder creation in progress.
  * @property folderResult one-shot feedback after creating folders.
  * @property moving extraction run in progress.
+ * @property progress live progress while [moving] (null otherwise).
  * @property moveSummary one-shot feedback after extracting (UI opens log).
  */
 data class ReviewUiState(
@@ -67,6 +83,7 @@ data class ReviewUiState(
     val creatingFolders: Boolean = false,
     val folderResult: FolderCreationResult? = null,
     val moving: Boolean = false,
+    val progress: ExtractionProgress? = null,
     val moveSummary: MoveSummary? = null,
 ) {
     val assignedCount: Int get() = items.count { it.selectedSystemId != null }
@@ -112,11 +129,23 @@ class ReviewViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Full target directory for one ROM: the system folder, plus a
+     * per-game subfolder for systems that need it (Dreamcast GDI dumps).
+     */
+    private suspend fun targetDirFor(item: ReviewItem, system: SystemDefinition): String {
+        val base = folderRepository.targetPathFor(system)
+        if (!system.gameSubfolder) return base
+        val gameName = item.rom.group.primary.substringBeforeLast('.')
+        return "$base/$gameName"
+    }
+
     /** Applies the user's (or the CERTAIN prefill's) system choice. */
     fun selectSystem(itemId: String, systemId: String) {
         val system = registry.byId(systemId) ?: return
         viewModelScope.launch {
-            val path = folderRepository.targetPathFor(system)
+            val item = _uiState.value.items.find { it.id == itemId } ?: return@launch
+            val path = targetDirFor(item, system)
             val exists = folderRepository.folderExists(system)
             _uiState.update { state ->
                 state.copy(
@@ -205,14 +234,43 @@ class ReviewViewModel @Inject constructor(
             var failed = 0
             val extractedIds = mutableSetOf<String>()
 
-            for (item in assigned) {
+            // Byte-based progress across the whole run, throttled so a
+            // 4-GB ISO does not trigger thousands of recompositions.
+            val totalBytes = assigned.sumOf { it.rom.totalSizeBytes }.coerceAtLeast(1)
+            var doneBytes = 0L
+            var lastShownFraction = -1f
+
+            for ((index, item) in assigned.withIndex()) {
                 val system = registry.byId(item.selectedSystemId ?: continue) ?: continue
-                val targetDir = folderRepository.targetPathFor(system)
+                val targetDir = targetDirFor(item, system)
+
+                fun publishProgress() {
+                    val fraction = (doneBytes.toFloat() / totalBytes).coerceIn(0f, 1f)
+                    if (fraction - lastShownFraction < 0.005f) return
+                    lastShownFraction = fraction
+                    _uiState.update {
+                        it.copy(
+                            progress = ExtractionProgress(
+                                currentIndex = index + 1,
+                                totalCount = assigned.size,
+                                currentName = item.rom.group.primary,
+                                fraction = fraction,
+                            ),
+                        )
+                    }
+                }
+                lastShownFraction = -1f // always show the new ROM's name
+                publishProgress()
+
                 romExtractor.extractGroup(
                     archivePath = item.archivePath,
                     archiveType = item.archiveType,
                     entryPaths = item.rom.memberEntryPaths,
                     targetDir = targetDir,
+                    onBytesWritten = { delta ->
+                        doneBytes += delta
+                        publishProgress()
+                    },
                 ).onSuccess { files ->
                     extracted++
                     extractedIds += item.id
@@ -247,6 +305,7 @@ class ReviewViewModel @Inject constructor(
             _uiState.update { s ->
                 s.copy(
                     moving = false,
+                    progress = null,
                     items = s.items.filterNot { it.id in extractedIds },
                     moveSummary = MoveSummary(moved = extracted, failed = failed),
                 )

@@ -14,6 +14,8 @@ interface RomExtractor {
      * overwritten. On any failure, files already written by this call are
      * removed again — no half-extracted groups remain.
      *
+     * @param onBytesWritten delta of decompressed bytes since the last
+     *   call — drives the progress bar in the UI.
      * @return absolute paths of the extracted files on success.
      */
     suspend fun extractGroup(
@@ -21,6 +23,7 @@ interface RomExtractor {
         archiveType: ArchiveType,
         entryPaths: List<String>,
         targetDir: String,
+        onBytesWritten: (Long) -> Unit = {},
     ): Result<List<String>>
 
     /** Deletes a fully processed archive. @return true when gone. */

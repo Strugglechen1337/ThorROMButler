@@ -27,6 +27,7 @@ class ArchiveRomExtractor @Inject constructor(
         archiveType: ArchiveType,
         entryPaths: List<String>,
         targetDir: String,
+        onBytesWritten: (Long) -> Unit,
     ): Result<List<String>> = withContext(ioDispatcher) {
         runCatching {
             val archiveFile = File(archivePath)
@@ -49,7 +50,7 @@ class ArchiveRomExtractor @Inject constructor(
             }
 
             try {
-                sourceFactory.forType(archiveType).extractEntries(archiveFile, targets)
+                sourceFactory.forType(archiveType).extractEntries(archiveFile, targets, onBytesWritten)
             } catch (e: Exception) {
                 // No half-extracted groups: remove everything from this run
                 targets.values.forEach { it.delete() }

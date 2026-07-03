@@ -72,6 +72,7 @@
     <string name="review_folders_partly_failed">%1$d Ordner angelegt, %2$d fehlgeschlagen</string>
     <string name="system_picker_title">Zielsystem wählen</string>
     <string name="review_moving">Entpacke …</string>
+    <string name="review_extract_progress">ROM %1$d von %2$d: %3$s</string>
     <plurals name="review_move_button">
         <item quantity="one">1 ROM einsortieren</item>
         <item quantity="other">%d ROMs einsortieren</item>

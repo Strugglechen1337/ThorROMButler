@@ -104,6 +104,9 @@ sealed interface MagicRule {
  *   that exist for exactly this system (e.g. `nes`); `PROBABLE`/`UNKNOWN` for
  *   generic ones (`cue`, `bin`).
  * @property magicRules positive identification rules for ambiguous extensions.
+ * @property gameSubfolder when true, every ROM group gets its own subfolder
+ *   below the system folder (`roms/dreamcast/<Spielname>/...`) — GDI dumps
+ *   consist of a `.gdi` plus track files that emulators expect per game.
  */
 data class SystemDefinition(
     val id: String,
@@ -111,4 +114,5 @@ data class SystemDefinition(
     val esdeFolder: String,
     val extensions: Map<String, Confidence>,
     val magicRules: List<MagicRule> = emptyList(),
+    val gameSubfolder: Boolean = false,
 )

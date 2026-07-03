@@ -27,6 +27,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
@@ -204,40 +205,57 @@ private fun ReviewBottomBar(
                 }
             }
             val movableCount = state.assignedCount
-            if (movableCount > 0 || state.moving) {
+            if (state.moving) {
+                // Live progress: bar (byte-based) + "ROM x von y: name"
+                Spacer(Modifier.height(12.dp))
+                val progress = state.progress
+                LinearProgressIndicator(
+                    progress = { progress?.fraction ?: 0f },
+                    modifier = Modifier.fillMaxWidth(),
+                    color = MaterialTheme.colorScheme.primary,
+                    trackColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+                )
+                Spacer(Modifier.height(6.dp))
+                Text(
+                    text = if (progress != null) {
+                        stringResource(
+                            R.string.review_extract_progress,
+                            progress.currentIndex,
+                            progress.totalCount,
+                            progress.currentName,
+                        )
+                    } else {
+                        stringResource(R.string.review_moving)
+                    },
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            } else if (movableCount > 0) {
                 Spacer(Modifier.height(10.dp))
                 Button(
                     onClick = onMove,
-                    enabled = !state.moving && !state.creatingFolders,
+                    enabled = !state.creatingFolders,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(52.dp)
-                        .then(if (!state.moving) Modifier.goldGlow() else Modifier),
+                        .goldGlow(),
                 ) {
-                    if (state.moving) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(18.dp),
-                            strokeWidth = 2.dp,
-                            color = MaterialTheme.colorScheme.onPrimary,
-                        )
-                        Spacer(Modifier.width(10.dp))
-                        Text(stringResource(R.string.review_moving))
-                    } else {
-                        Icon(
-                            imageVector = Icons.Filled.DriveFileMove,
-                            contentDescription = null,
-                            modifier = Modifier.size(20.dp),
-                        )
-                        Spacer(Modifier.width(8.dp))
-                        Text(
-                            text = pluralStringResource(
-                                R.plurals.review_move_button,
-                                movableCount,
-                                movableCount,
-                            ),
-                            style = MaterialTheme.typography.labelLarge,
-                        )
-                    }
+                    Icon(
+                        imageVector = Icons.Filled.DriveFileMove,
+                        contentDescription = null,
+                        modifier = Modifier.size(20.dp),
+                    )
+                    Spacer(Modifier.width(8.dp))
+                    Text(
+                        text = pluralStringResource(
+                            R.plurals.review_move_button,
+                            movableCount,
+                            movableCount,
+                        ),
+                        style = MaterialTheme.typography.labelLarge,
+                    )
                 }
             }
         }

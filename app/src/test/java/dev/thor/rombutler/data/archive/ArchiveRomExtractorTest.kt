@@ -49,15 +49,20 @@ class ArchiveRomExtractorTest {
         )
         val targetDir = tempFolder.newFolder("roms", "psx")
 
+        var reportedBytes = 0L
         val result = buildExtractor(StandardTestDispatcher(testScheduler)).extractGroup(
             archivePath = zipFile.absolutePath,
             archiveType = ArchiveType.ZIP,
             entryPaths = listOf("PS1/game.cue", "PS1/game.bin"),
             targetDir = targetDir.absolutePath,
+            onBytesWritten = { reportedBytes += it },
         )
 
         val files = result.getOrThrow()
         assertThat(files).hasSize(2)
+        // Progress callback must account for every decompressed byte
+        assertThat(reportedBytes)
+            .isEqualTo(2352L + "FILE \"game.bin\" BINARY".length)
         // Subfolder "PS1/" is flattened away
         assertThat(File(targetDir, "game.cue").isFile).isTrue()
         assertThat(File(targetDir, "game.bin").length()).isEqualTo(2352)
