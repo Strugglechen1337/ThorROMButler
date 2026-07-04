@@ -25,6 +25,8 @@ läuft aber auf jedem Android-Smartphone ab Android 13.
 
 > Kostenlos & Open Source. Distribution über GitHub Releases - nicht im Play Store.
 
+📖 **Neu hier? → [Schritt-für-Schritt-Anleitung](docs/HOWTO.md)**
+
 ### Features
 
 - 🔍 **Scanner**: findet ROM-Archive (ZIP, 7z, RAR4) **und lose ROM-Dateien**
@@ -153,6 +155,8 @@ Built for retro gaming handhelds such as **AYN Thor / Odin** and
 newer.
 
 > Free & open source. Distributed through GitHub Releases - not through the Play Store.
+
+📖 **New here? → [Step-by-step guide](docs/HOWTO.md#english)**
 
 ### Features
 
