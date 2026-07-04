@@ -1,9 +1,5 @@
 package dev.thor.rombutler.extraction
 
-import android.content.Context
-import android.content.Intent
-import androidx.core.content.ContextCompat
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dev.thor.rombutler.di.IoDispatcher
 import dev.thor.rombutler.domain.model.ArchiveType
 import dev.thor.rombutler.domain.model.LogLevel
@@ -90,7 +86,7 @@ sealed interface ExtractionRunState {
  */
 @Singleton
 class ExtractionManager @Inject constructor(
-    @param:ApplicationContext private val context: Context,
+    private val serviceLauncher: ExtractionServiceLauncher,
     private val romExtractor: RomExtractor,
     private val logRepository: LogRepository,
     @IoDispatcher ioDispatcher: CoroutineDispatcher,
@@ -117,10 +113,7 @@ class ExtractionManager @Inject constructor(
             ExtractionProgress(1, tasks.size, tasks.first().primaryName, 0f),
         )
         // Keep the process alive + show the progress notification
-        ContextCompat.startForegroundService(
-            context,
-            Intent(context, ExtractionService::class.java),
-        )
+        serviceLauncher.launch()
 
         runJob = scope.launch {
             var processed = 0
