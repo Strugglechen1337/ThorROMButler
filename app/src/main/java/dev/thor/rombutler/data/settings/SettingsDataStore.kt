@@ -32,6 +32,7 @@ class SettingsDataStore @Inject constructor(
         val EXTRA_SOURCES = stringPreferencesKey("extra_source_paths") // JSON array
         val TRASH_MODE = booleanPreferencesKey("trash_instead_of_delete")
         val LAST_SEEN_VERSION = intPreferencesKey("last_seen_version_code")
+        val DAT_FOLDER = stringPreferencesKey("dat_folder_path")
     }
 
     override val settings: Flow<AppSettings> = dataStore.data.map { prefs ->
@@ -44,6 +45,7 @@ class SettingsDataStore @Inject constructor(
             folderOverrides = prefs[Keys.FOLDER_OVERRIDES].parseOverrides(),
             additionalSourcePaths = prefs[Keys.EXTRA_SOURCES].parseStringList(),
             trashInsteadOfDelete = prefs[Keys.TRASH_MODE] ?: false,
+            datFolderPath = prefs[Keys.DAT_FOLDER],
         )
     }
 
@@ -85,6 +87,12 @@ class SettingsDataStore @Inject constructor(
 
     override suspend fun setTrashInsteadOfDelete(enabled: Boolean) {
         dataStore.edit { it[Keys.TRASH_MODE] = enabled }
+    }
+
+    override suspend fun setDatFolderPath(path: String?) {
+        dataStore.edit { prefs ->
+            if (path.isNullOrBlank()) prefs.remove(Keys.DAT_FOLDER) else prefs[Keys.DAT_FOLDER] = path
+        }
     }
 
     override suspend fun lastSeenVersionCode(): Int =

@@ -60,4 +60,10 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindLibraryRepository(impl: LibraryChecker): LibraryRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindVerificationRepository(
+        impl: dev.thor.rombutler.data.verification.DatRepository,
+    ): dev.thor.rombutler.domain.verification.VerificationRepository
 }

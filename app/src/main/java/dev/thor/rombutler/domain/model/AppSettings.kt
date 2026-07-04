@@ -33,6 +33,8 @@ data class AppSettings(
      * Missing entries fall back to [dev.thor.rombutler.domain.model.SystemDefinition.esdeFolder].
      */
     val folderOverrides: Map<String, String> = emptyMap(),
+    /** Folder containing No-Intro/Redump `.dat` files for verification. */
+    val datFolderPath: String? = null,
 ) {
     /** Setup is complete once both folders are configured. */
     val isSetupComplete: Boolean

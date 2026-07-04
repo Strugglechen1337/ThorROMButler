@@ -8,6 +8,7 @@ import dev.thor.rombutler.domain.model.UndoInfo
 import dev.thor.rombutler.domain.model.UndoKind
 import dev.thor.rombutler.domain.repository.LogRepository
 import dev.thor.rombutler.domain.repository.RomExtractor
+import dev.thor.rombutler.domain.verification.DatIndex
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -97,7 +98,7 @@ class ExtractionManagerTest {
     fun `successful run processes all tasks and cleans up the archive`() = runTest {
         val extractor = FakeExtractor()
         val log = FakeLog()
-        val manager = ExtractionManager({}, extractor, log, StandardTestDispatcher(testScheduler))
+        val manager = ExtractionManager({}, extractor, log, { DatIndex.EMPTY }, StandardTestDispatcher(testScheduler))
 
         manager.start(
             tasks = listOf(task("a", archive = "/dl/a.zip"), task("b")),
@@ -124,7 +125,7 @@ class ExtractionManagerTest {
     fun `failed task keeps the archive and is counted`() = runTest {
         val extractor = FakeExtractor().apply { failFor = setOf("/dl/a.zip") }
         val log = FakeLog()
-        val manager = ExtractionManager({}, extractor, log, StandardTestDispatcher(testScheduler))
+        val manager = ExtractionManager({}, extractor, log, { DatIndex.EMPTY }, StandardTestDispatcher(testScheduler))
 
         manager.start(
             tasks = listOf(task("a", archive = "/dl/a.zip"), task("b")),
@@ -146,7 +147,7 @@ class ExtractionManagerTest {
     fun `trash mode moves archives to trash instead of deleting`() = runTest {
         val extractor = FakeExtractor()
         val manager =
-            ExtractionManager({}, extractor, FakeLog(), StandardTestDispatcher(testScheduler))
+            ExtractionManager({}, extractor, FakeLog(), { DatIndex.EMPTY }, StandardTestDispatcher(testScheduler))
 
         manager.start(
             tasks = listOf(task("a", archive = "/dl/a.zip")),
@@ -164,7 +165,7 @@ class ExtractionManagerTest {
     fun `cancel mid-run finishes as cancelled without archive cleanup`() = runTest {
         val extractor = FakeExtractor().apply { gate = CompletableDeferred() }
         val log = FakeLog()
-        val manager = ExtractionManager({}, extractor, log, StandardTestDispatcher(testScheduler))
+        val manager = ExtractionManager({}, extractor, log, { DatIndex.EMPTY }, StandardTestDispatcher(testScheduler))
 
         manager.start(
             tasks = listOf(task("a", archive = "/dl/a.zip")),
@@ -189,7 +190,7 @@ class ExtractionManagerTest {
     fun `acknowledge resets to idle and allows the next run`() = runTest {
         val extractor = FakeExtractor()
         val manager =
-            ExtractionManager({}, extractor, FakeLog(), StandardTestDispatcher(testScheduler))
+            ExtractionManager({}, extractor, FakeLog(), { DatIndex.EMPTY }, StandardTestDispatcher(testScheduler))
 
         manager.start(listOf(task("a")), emptyList(), deleteArchives = false)
         advanceUntilIdle()

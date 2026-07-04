@@ -36,6 +36,9 @@ interface SettingsRepository {
     /** Persists the trash-instead-of-delete behavior for archives. */
     suspend fun setTrashInsteadOfDelete(enabled: Boolean)
 
+    /** Persists the folder containing `.dat` files (null/blank = disable). */
+    suspend fun setDatFolderPath(path: String?)
+
     /** Version code whose what's-new dialog was already shown (0 = never). */
     suspend fun lastSeenVersionCode(): Int
 

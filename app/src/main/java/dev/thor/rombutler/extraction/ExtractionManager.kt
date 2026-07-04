@@ -5,6 +5,8 @@ import dev.thor.rombutler.domain.model.ArchiveType
 import dev.thor.rombutler.domain.model.LogLevel
 import dev.thor.rombutler.domain.model.UndoInfo
 import dev.thor.rombutler.domain.model.UndoKind
+import dev.thor.rombutler.domain.verification.DatIndex
+import dev.thor.rombutler.domain.verification.VerificationRepository
 import dev.thor.rombutler.domain.repository.LogRepository
 import dev.thor.rombutler.domain.repository.RomExtractor
 import kotlinx.coroutines.CoroutineDispatcher
@@ -89,6 +91,7 @@ class ExtractionManager @Inject constructor(
     private val serviceLauncher: ExtractionServiceLauncher,
     private val romExtractor: RomExtractor,
     private val logRepository: LogRepository,
+    private val verificationRepository: VerificationRepository,
     @IoDispatcher ioDispatcher: CoroutineDispatcher,
 ) {
     private val scope = CoroutineScope(SupervisorJob() + ioDispatcher)
@@ -116,6 +119,9 @@ class ExtractionManager @Inject constructor(
         serviceLauncher.launch()
 
         runJob = scope.launch {
+            // DAT verification is optional: empty index = feature disabled
+            val datIndex = runCatching { verificationRepository.index() }
+                .getOrDefault(DatIndex.EMPTY)
             var processed = 0
             var failed = 0
             var cancelled = false
@@ -191,7 +197,8 @@ class ExtractionManager @Inject constructor(
                         }
                         logRepository.append(
                             LogLevel.SUCCESS,
-                            "${task.primaryName} → ${task.targetDir} (${files.size} Datei(en))",
+                            "${task.primaryName} → ${task.targetDir} (${files.size} Datei(en))" +
+                                verificationVerdict(datIndex, files),
                             undo = undo,
                         )
                     }.onFailure { error ->
@@ -260,6 +267,40 @@ class ExtractionManager @Inject constructor(
             }
         }
     }
+
+    /**
+     * DAT verdict for the just-written files, appended to the log message.
+     * The files are hot in the page cache, so re-hashing is cheap.
+     * Empty string when verification is disabled (no DATs configured).
+     */
+    private fun verificationVerdict(datIndex: DatIndex, files: List<String>): String {
+        if (datIndex.isEmpty()) return ""
+        var verified = 0
+        var unknown = 0
+        for (path in files) {
+            val crc = crc32Of(java.io.File(path)) ?: continue
+            if (datIndex.lookup(crc) != null) verified++ else unknown++
+        }
+        return when {
+            unknown == 0 && verified > 0 -> " · ✓ verifizierter Dump"
+            verified == 0 && unknown > 0 -> " · ⚠ nicht im DAT"
+            verified > 0 -> " · ✓ $verified/${verified + unknown} verifiziert"
+            else -> ""
+        }
+    }
+
+    private fun crc32Of(file: java.io.File): Long? = runCatching {
+        val crc = java.util.zip.CRC32()
+        file.inputStream().use { input ->
+            val buffer = ByteArray(256 * 1024)
+            while (true) {
+                val read = input.read(buffer)
+                if (read < 0) break
+                crc.update(buffer, 0, read)
+            }
+        }
+        crc.value
+    }.getOrNull()
 
     /** Requests cancellation; the current group is rolled back. */
     fun cancel() {
