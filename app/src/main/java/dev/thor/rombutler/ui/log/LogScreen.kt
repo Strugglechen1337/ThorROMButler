@@ -46,6 +46,7 @@ import dev.thor.rombutler.R
 import dev.thor.rombutler.domain.model.LogEntry
 import dev.thor.rombutler.domain.model.LogLevel
 import dev.thor.rombutler.ui.components.formatDateTime
+import dev.thor.rombutler.ui.components.thorFocusable
 
 /**
  * Persistent action log: what was moved where, what failed and why.
@@ -163,7 +164,9 @@ private fun LogEntryCard(entry: LogEntry, onUndo: (LogEntry) -> Unit) {
         LogLevel.INFO -> Icons.Filled.Info to MaterialTheme.colorScheme.onSurfaceVariant
     }
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .thorFocusable(MaterialTheme.shapes.medium),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
         ),

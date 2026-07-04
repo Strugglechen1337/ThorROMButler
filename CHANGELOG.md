@@ -2,6 +2,14 @@
 
 All notable user-facing changes are documented here.
 
+## 1.0.0
+
+- Added gamepad controls: D-pad/stick focus navigation across all screens,
+  A confirms, B goes back — fully additive, touch keeps working everywhere.
+- Added color themes: Thor (blue/gold), Odin (violet/silver) and
+  CRT (phosphor green/amber); glow effects follow the theme.
+- Accessibility audit: all interactive elements labeled for TalkBack.
+
 ## 0.10.0
 
 - Added LAN receive mode: a local upload page served by the app — open

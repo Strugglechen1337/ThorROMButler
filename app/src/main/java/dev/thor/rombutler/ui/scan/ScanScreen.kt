@@ -66,6 +66,7 @@ import dev.thor.rombutler.ui.components.formatDate
 import dev.thor.rombutler.ui.components.formatFileSize
 import dev.thor.rombutler.ui.components.goldGlow
 import dev.thor.rombutler.ui.components.neonGlow
+import dev.thor.rombutler.ui.components.thorFocusable
 
 /**
  * Lists all archive candidates found in the download folder as cards.
@@ -320,7 +321,8 @@ private fun LooseRomsCard(looseRoms: List<DetectedRom>, modifier: Modifier = Mod
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .neonGlow(elevation = 5.dp),
+            .neonGlow(elevation = 5.dp)
+            .thorFocusable(MaterialTheme.shapes.medium),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
         ),
@@ -359,7 +361,8 @@ private fun ArchiveCard(item: ArchiveListItem, modifier: Modifier = Modifier) {
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .neonGlow(elevation = 5.dp),
+            .neonGlow(elevation = 5.dp)
+            .thorFocusable(MaterialTheme.shapes.medium),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
         ),

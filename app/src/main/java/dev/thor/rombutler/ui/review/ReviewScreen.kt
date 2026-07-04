@@ -64,6 +64,7 @@ import dev.thor.rombutler.ui.components.SystemPickerDialog
 import dev.thor.rombutler.ui.components.formatFileSize
 import dev.thor.rombutler.ui.components.goldGlow
 import dev.thor.rombutler.ui.components.neonGlow
+import dev.thor.rombutler.ui.components.thorFocusable
 import java.io.File
 
 /**
@@ -430,7 +431,8 @@ private fun ReviewItemCard(
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .neonGlow(elevation = if (item.selectedSystemId != null) 8.dp else 3.dp),
+            .neonGlow(elevation = if (item.selectedSystemId != null) 8.dp else 3.dp)
+            .thorFocusable(MaterialTheme.shapes.medium),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
         ),

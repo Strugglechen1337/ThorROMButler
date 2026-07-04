@@ -91,4 +91,29 @@ class MainActivity : ComponentActivity() {
     private fun handleShareIntent(intent: android.content.Intent?) {
         intent?.sharedUris()?.takeIf { it.isNotEmpty() }?.let(viewModel::handleSharedUris)
     }
+
+    /**
+     * Gamepad mapping (additive to touch): A confirms like DPAD_CENTER,
+     * B navigates back. Everything else (D-pad, stick as D-pad) already
+     * drives Compose focus traversal natively.
+     */
+    override fun dispatchKeyEvent(event: android.view.KeyEvent): Boolean {
+        when (event.keyCode) {
+            android.view.KeyEvent.KEYCODE_BUTTON_A ->
+                return super.dispatchKeyEvent(
+                    android.view.KeyEvent(
+                        event.action,
+                        android.view.KeyEvent.KEYCODE_DPAD_CENTER,
+                    ),
+                )
+
+            android.view.KeyEvent.KEYCODE_BUTTON_B -> {
+                if (event.action == android.view.KeyEvent.ACTION_UP) {
+                    onBackPressedDispatcher.onBackPressed()
+                }
+                return true
+            }
+        }
+        return super.dispatchKeyEvent(event)
+    }
 }
