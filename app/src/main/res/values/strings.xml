@@ -9,6 +9,10 @@
     <string name="action_create">Create</string>
     <string name="action_save">Save</string>
     <string name="action_close">Close</string>
+    <plurals name="share_received">
+        <item quantity="one">1 file received – the butler will scan it shortly.</item>
+        <item quantity="other">%d files received – the butler will scan them shortly.</item>
+    </plurals>
 
     <!-- What's new (update every release!) -->
     <string name="whatsnew_title">New in version %s</string>

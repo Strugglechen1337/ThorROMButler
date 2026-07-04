@@ -12,6 +12,17 @@ import dagger.hilt.android.AndroidEntryPoint
 import dev.thor.rombutler.ui.navigation.AppNavHost
 import dev.thor.rombutler.ui.theme.ThorRomButlerTheme
 
+private fun android.content.Intent.sharedUris(): List<android.net.Uri> = when (action) {
+    android.content.Intent.ACTION_SEND ->
+        listOfNotNull(getParcelableExtra(android.content.Intent.EXTRA_STREAM, android.net.Uri::class.java))
+
+    android.content.Intent.ACTION_SEND_MULTIPLE ->
+        getParcelableArrayListExtra(android.content.Intent.EXTRA_STREAM, android.net.Uri::class.java)
+            .orEmpty()
+
+    else -> emptyList()
+}
+
 /**
  * Single activity hosting the whole Compose UI.
  * Navigation between screens is handled inside Compose (see ui/navigation).
@@ -24,6 +35,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        handleShareIntent(intent)
         setContent {
             ThorRomButlerTheme {
                 val startDestination by viewModel.startDestination.collectAsStateWithLifecycle()
@@ -34,6 +46,17 @@ class MainActivity : ComponentActivity() {
                         navController = rememberNavController(),
                         startDestination = destination,
                     )
+                }
+
+                // Toast after taking over shared files
+                val shareResult by viewModel.shareResult.collectAsStateWithLifecycle()
+                shareResult?.let { count ->
+                    android.widget.Toast.makeText(
+                        this,
+                        resources.getQuantityString(R.plurals.share_received, count, count),
+                        android.widget.Toast.LENGTH_LONG,
+                    ).show()
+                    viewModel.consumeShareResult()
                 }
 
                 // One-time what's-new dialog after an update
@@ -62,5 +85,9 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    private fun handleShareIntent(intent: android.content.Intent?) {
+        intent?.sharedUris()?.takeIf { it.isNotEmpty() }?.let(viewModel::handleSharedUris)
     }
 }

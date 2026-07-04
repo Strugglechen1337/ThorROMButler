@@ -8,6 +8,10 @@
     <string name="action_create">Anlegen</string>
     <string name="action_save">Speichern</string>
     <string name="action_close">Schließen</string>
+    <plurals name="share_received">
+        <item quantity="one">1 Datei übernommen – der Butler scannt sie gleich.</item>
+        <item quantity="other">%d Dateien übernommen – der Butler scannt sie gleich.</item>
+    </plurals>
 
     <!-- What's new (pro Release aktualisieren!) -->
     <string name="whatsnew_title">Neu in Version %s</string>

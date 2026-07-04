@@ -50,6 +50,45 @@ class MainViewModel @Inject constructor(
     /** Version name to show a one-time what's-new dialog for, or null. */
     val whatsNewVersion = MutableStateFlow<String?>(null)
 
+    /** Number of files taken over from a share intent (one-shot, for a toast). */
+    val shareResult = MutableStateFlow<Int?>(null)
+
+    fun consumeShareResult() {
+        shareResult.value = null
+    }
+
+    /**
+     * Copies files shared via ACTION_SEND(_MULTIPLE) into the download
+     * folder so the normal scan flow picks them up.
+     */
+    fun handleSharedUris(uris: List<android.net.Uri>) {
+        if (uris.isEmpty()) return
+        viewModelScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+            val downloadPath = settingsRepository.settings.first().downloadPath ?: return@launch
+            var copied = 0
+            for (uri in uris) {
+                runCatching {
+                    val name = queryDisplayName(uri) ?: uri.lastPathSegment ?: "geteilt.bin"
+                    val target = java.io.File(downloadPath, name)
+                    if (target.exists()) return@runCatching // never overwrite silently
+                    context.contentResolver.openInputStream(uri)?.use { input ->
+                        target.outputStream().use { output -> input.copyTo(output) }
+                        copied++
+                    }
+                }
+            }
+            shareResult.value = copied
+        }
+    }
+
+    private fun queryDisplayName(uri: android.net.Uri): String? =
+        runCatching {
+            context.contentResolver.query(uri, null, null, null, null)?.use { cursor ->
+                val index = cursor.getColumnIndex(android.provider.OpenableColumns.DISPLAY_NAME)
+                if (index >= 0 && cursor.moveToFirst()) cursor.getString(index) else null
+            }
+        }.getOrNull()
+
     /** Saves that the dialog was seen; called on dismiss. */
     fun dismissWhatsNew() {
         whatsNewVersion.value = null
