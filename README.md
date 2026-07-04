@@ -55,6 +55,8 @@ läuft aber auf jedem Android-Smartphone ab Android 13.
   einsortierter ROMs und Duplikat-Übersicht (Regionen/Revisionen)
 - 🏅 **DAT-Verifizierung** (optional): einsortierte ROMs per Prüfsumme
   gegen No-Intro/Redump-DAT-Dateien verifizieren
+- 📡 **LAN-Empfang**: ROMs kabellos vom PC-Browser direkt aufs Gerät
+  (Einstellungen → „Empfang starten", Adresse am PC öffnen, Dateien reinziehen)
 - 🔄 **Update-Check & In-App-Download** direkt aus den Einstellungen
 - 📜 **Aktions-Log mit Rückgängig**: jede Bewegung wird protokolliert und
   lässt sich direkt aus dem Log zurücknehmen
@@ -187,6 +189,8 @@ newer.
   ROMs and a duplicate overview (regions/revisions)
 - 🏅 **DAT verification** (optional): verify sorted ROMs by checksum
   against No-Intro/Redump DAT files
+- 📡 **LAN receive**: send ROMs wirelessly from your PC browser straight to
+  the device (Settings → "Start receiving", open the address, drop files)
 - 🔄 **Update check & in-app download** directly from Settings
 - 📜 **Action log with undo**: every move is recorded and can be reverted
   right from the log

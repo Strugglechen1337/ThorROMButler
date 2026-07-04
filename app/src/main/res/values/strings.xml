@@ -16,7 +16,7 @@
 
     <!-- What's new (update every release!) -->
     <string name="whatsnew_title">New in version %s</string>
-    <string name="whatsnew_body">• DAT verification: verify sorted ROMs by checksum against No-Intro/Redump DATs (Settings → DAT folder)\n• Duplicate overview: find the same game in multiple regions/revisions (library check)\n\nFull details in the changelog on GitHub.</string>
+    <string name="whatsnew_body">• LAN receive: send ROMs straight from your PC browser to the device – start receiving in Settings, open the address on the PC, drop files in. No cable needed.\n\nFull details in the changelog on GitHub.</string>
 
     <!-- Setup screen -->
     <string name="setup_title">Setup</string>
@@ -169,6 +169,18 @@
     <string name="settings_support_title">Optional support</string>
     <string name="settings_support_hint">Thor ROM Butler stays free. If you want to say thanks, you can buy me a coffee.</string>
     <string name="settings_support_button">Buy me a coffee</string>
+
+    <!-- LAN receive mode -->
+    <string name="receive_title">LAN receive</string>
+    <string name="receive_hint">Send ROMs straight from your PC: start receiving, open the shown address in a browser on the PC and drop files in. They land in the download folder.</string>
+    <string name="receive_running_hint">Open in a browser on your PC (same Wi-Fi):</string>
+    <string name="receive_start">Start receiving</string>
+    <string name="receive_stop">Stop receiving</string>
+    <string name="receive_count">%d file(s) received</string>
+    <string name="receive_failed">Start failed – is the device on Wi-Fi and the download folder set?</string>
+    <string name="notification_channel_receive">LAN receive</string>
+    <string name="notification_receive_title">Receive mode active</string>
+    <string name="notification_receive_text_count">%1$s · %2$d received</string>
 
     <!-- Extraction service notification -->
     <string name="notification_channel_extract">Sorting</string>

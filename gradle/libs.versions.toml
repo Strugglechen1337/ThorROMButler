@@ -22,6 +22,9 @@ errorproneAnnotations = "2.38.0"
 # Background work (watcher mode)
 workManager = "2.11.2"
 
+# LAN receive mode (tiny embedded HTTP server)
+nanohttpd = "2.3.1"
+
 # Archives
 commonsCompress = "1.28.0"
 xz = "1.10"
@@ -57,6 +60,7 @@ errorprone-annotations = { group = "com.google.errorprone", name = "error_prone_
 androidx-work-runtime = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "workManager" }
 androidx-hilt-work = { group = "androidx.hilt", name = "hilt-work", version.ref = "hiltAndroidx" }
 androidx-hilt-compiler = { group = "androidx.hilt", name = "hilt-compiler", version.ref = "hiltAndroidx" }
+nanohttpd = { group = "org.nanohttpd", name = "nanohttpd", version.ref = "nanohttpd" }
 
 commons-compress = { group = "org.apache.commons", name = "commons-compress", version.ref = "commonsCompress" }
 xz = { group = "org.tukaani", name = "xz", version.ref = "xz" }

@@ -65,6 +65,7 @@ fun SettingsScreen(
     val settings by viewModel.settings.collectAsStateWithLifecycle()
     val updateState by viewModel.updateState.collectAsStateWithLifecycle()
     val libraryState by viewModel.libraryState.collectAsStateWithLifecycle()
+    val receiveState by viewModel.receiveState.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
     var showDownloadPicker by remember { mutableStateOf(false) }
@@ -314,6 +315,63 @@ fun SettingsScreen(
                         },
                         modifier = Modifier.weight(1f),
                     ) { Text(stringResource(R.string.settings_backup_import)) }
+                }
+            }
+
+            // LAN receive mode
+            SettingsCard {
+                Text(
+                    text = stringResource(R.string.receive_title),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+                when (val rs = receiveState) {
+                    dev.thor.rombutler.receive.ReceiveState.Off -> {
+                        Text(
+                            text = stringResource(R.string.receive_hint),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                        Spacer(Modifier.size(10.dp))
+                        OutlinedButton(
+                            onClick = {
+                                viewModel.startReceive {
+                                    android.widget.Toast.makeText(
+                                        context,
+                                        context.getString(R.string.receive_failed),
+                                        android.widget.Toast.LENGTH_LONG,
+                                    ).show()
+                                }
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                        ) { Text(stringResource(R.string.receive_start)) }
+                    }
+
+                    is dev.thor.rombutler.receive.ReceiveState.Running -> {
+                        Text(
+                            text = stringResource(R.string.receive_running_hint),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                        Spacer(Modifier.size(8.dp))
+                        Text(
+                            text = rs.url,
+                            style = MaterialTheme.typography.headlineMedium,
+                            color = MaterialTheme.colorScheme.primary,
+                        )
+                        if (rs.receivedCount > 0) {
+                            Text(
+                                text = stringResource(R.string.receive_count, rs.receivedCount),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.secondary,
+                            )
+                        }
+                        Spacer(Modifier.size(10.dp))
+                        Button(
+                            onClick = viewModel::stopReceive,
+                            modifier = Modifier.fillMaxWidth(),
+                        ) { Text(stringResource(R.string.receive_stop)) }
+                    }
                 }
             }
 

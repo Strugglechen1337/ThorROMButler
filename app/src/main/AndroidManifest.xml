@@ -50,6 +50,11 @@
             android:exported="false"
             android:foregroundServiceType="dataSync" />
 
+        <service
+            android:name=".receive.ReceiveService"
+            android:exported="false"
+            android:foregroundServiceType="dataSync" />
+
         <!-- On-demand WorkManager init (Configuration.Provider in the App
              class provides the HiltWorkerFactory) -->
         <provider

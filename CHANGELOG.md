@@ -2,6 +2,13 @@
 
 All notable user-facing changes are documented here.
 
+## 0.10.0
+
+- Added LAN receive mode: a local upload page served by the app — open
+  the shown address in a PC browser (same Wi-Fi) and drop ROMs straight
+  into the download folder. Runs as a foreground service with a stop
+  action; files are never overwritten.
+
 ## 0.9.0
 
 - Added DAT verification: sorted ROMs are checked by CRC32 against

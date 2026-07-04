@@ -51,6 +51,7 @@ class SettingsViewModel @Inject constructor(
     private val watcherScheduler: WatcherScheduler,
     private val libraryRepository: LibraryRepository,
     private val reviewSession: ReviewSession,
+    private val receiveManager: dev.thor.rombutler.receive.ReceiveManager,
     val registry: SystemRegistry,
 ) : ViewModel() {
 
@@ -102,6 +103,17 @@ class SettingsViewModel @Inject constructor(
             watcherScheduler.setEnabled(enabled)
         }
     }
+
+    /** LAN receive mode (see [ReceiveManager]). */
+    val receiveState = receiveManager.state
+
+    fun startReceive(onFailed: () -> Unit) {
+        viewModelScope.launch {
+            if (!receiveManager.start()) onFailed()
+        }
+    }
+
+    fun stopReceive() = receiveManager.stop()
 
     fun setDatFolderPath(path: String?) {
         viewModelScope.launch { settingsRepository.setDatFolderPath(path) }

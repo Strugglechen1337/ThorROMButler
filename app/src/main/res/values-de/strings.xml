@@ -15,7 +15,7 @@
 
     <!-- What's new (pro Release aktualisieren!) -->
     <string name="whatsnew_title">Neu in Version %s</string>
-    <string name="whatsnew_body">• DAT-Verifizierung: ROMs beim Einsortieren per Prüfsumme gegen No-Intro/Redump-DATs prüfen (Einstellungen → DAT-Ordner)\n• Duplikat-Übersicht: gleiche Spiele in mehreren Regionen/Revisionen finden (Bibliotheks-Prüfung)\n\nAlle Details im Changelog auf GitHub.</string>
+    <string name="whatsnew_body">• LAN-Empfang: ROMs direkt vom PC-Browser aufs Gerät schicken – Empfang in den Einstellungen starten, Adresse am PC öffnen, Dateien hineinziehen. Kein Kabel nötig.\n\nAlle Details im Changelog auf GitHub.</string>
 
     <!-- Setup screen -->
     <string name="setup_title">Einrichtung</string>
@@ -168,6 +168,18 @@
     <string name="settings_support_title">Optional unterstützen</string>
     <string name="settings_support_hint">Thor ROM Butler bleibt kostenlos. Wenn du Danke sagen möchtest, kannst du mir freiwillig einen Kaffee ausgeben.</string>
     <string name="settings_support_button">Kaffee ausgeben</string>
+
+    <!-- LAN receive mode -->
+    <string name="receive_title">LAN-Empfang</string>
+    <string name="receive_hint">ROMs direkt vom PC schicken: Empfang starten, die angezeigte Adresse am PC im Browser öffnen und Dateien hineinziehen. Sie landen im Download-Ordner.</string>
+    <string name="receive_running_hint">Am PC im Browser öffnen (gleiches WLAN):</string>
+    <string name="receive_start">Empfang starten</string>
+    <string name="receive_stop">Empfang beenden</string>
+    <string name="receive_count">%d Datei(en) empfangen</string>
+    <string name="receive_failed">Start fehlgeschlagen – ist das Gerät im WLAN und der Download-Ordner gesetzt?</string>
+    <string name="notification_channel_receive">LAN-Empfang</string>
+    <string name="notification_receive_title">Empfangsmodus aktiv</string>
+    <string name="notification_receive_text_count">%1$s · %2$d empfangen</string>
 
     <!-- Extraction service notification -->
     <string name="notification_channel_extract">Einsortieren</string>
