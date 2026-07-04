@@ -304,11 +304,12 @@ private fun ReviewBottomBar(
                 }
             } else if (movableCount > 0) {
                 Spacer(Modifier.height(10.dp))
-                PreflightHint(state)
+                val preflight = computePreflight(state)
+                PreflightHint(preflight)
                 Spacer(Modifier.height(10.dp))
                 Button(
                     onClick = onMove,
-                    enabled = !state.creatingFolders,
+                    enabled = !state.creatingFolders && !preflight.insufficient,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(52.dp)
@@ -343,35 +344,37 @@ private fun ReviewBottomBar(
 }
 
 @Composable
-private fun PreflightHint(state: ReviewUiState) {
-    val processableItems = state.items.filter {
-        it.selectedSystemId != null && (!it.targetOccupied || it.overwrite)
-    }
-    val requiredBytes = processableItems.sumOf { it.rom.totalSizeBytes.coerceAtLeast(0L) }
-    val freeBytes = processableItems
-        .mapNotNull { it.targetPath }
-        .distinct()
-        .mapNotNull { usableSpaceForPath(it) }
-        .filter { it > 0L }
-        .minOrNull()
-    val hasSevenZ = processableItems.any { item ->
-        (item.source as? RomSource.ArchiveEntry)?.archiveType == ArchiveType.SEVEN_ZIP
-    }
-
+private fun PreflightHint(preflight: Preflight) {
     Text(
-        text = if (freeBytes != null) {
+        text = if (preflight.freeBytes != null) {
             stringResource(
                 R.string.review_preflight_storage,
-                formatFileSize(requiredBytes),
-                formatFileSize(freeBytes),
+                formatFileSize(preflight.requiredBytes),
+                formatFileSize(preflight.freeBytes),
             )
         } else {
-            stringResource(R.string.review_preflight_storage_unknown, formatFileSize(requiredBytes))
+            stringResource(
+                R.string.review_preflight_storage_unknown,
+                formatFileSize(preflight.requiredBytes),
+            )
         },
         style = MaterialTheme.typography.labelMedium,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        // Red when the run cannot fit — the numbers alone are easy to miss
+        color = if (preflight.insufficient) {
+            MaterialTheme.colorScheme.error
+        } else {
+            MaterialTheme.colorScheme.onSurfaceVariant
+        },
     )
-    if (hasSevenZ) {
+    if (preflight.insufficient) {
+        Spacer(Modifier.height(4.dp))
+        Text(
+            text = stringResource(R.string.review_preflight_insufficient),
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.error,
+        )
+    }
+    if (preflight.hasSevenZ) {
         Spacer(Modifier.height(4.dp))
         Text(
             text = stringResource(R.string.review_preflight_7z_warning),
@@ -379,6 +382,35 @@ private fun PreflightHint(state: ReviewUiState) {
             color = MaterialTheme.colorScheme.secondary,
         )
     }
+}
+
+/** Aggregated storage preflight of all processable items. */
+private data class Preflight(
+    val requiredBytes: Long,
+    val freeBytes: Long?,
+    val hasSevenZ: Boolean,
+) {
+    /** True when the run cannot fit (64-MB margin, like the extractor). */
+    val insufficient: Boolean
+        get() = freeBytes != null && requiredBytes + 64L * 1024 * 1024 > freeBytes
+}
+
+private fun computePreflight(state: ReviewUiState): Preflight {
+    val processableItems = state.items.filter {
+        it.selectedSystemId != null && (!it.targetOccupied || it.overwrite)
+    }
+    return Preflight(
+        requiredBytes = processableItems.sumOf { it.rom.totalSizeBytes.coerceAtLeast(0L) },
+        freeBytes = processableItems
+            .mapNotNull { it.targetPath }
+            .distinct()
+            .mapNotNull { usableSpaceForPath(it) }
+            .filter { it > 0L }
+            .minOrNull(),
+        hasSevenZ = processableItems.any { item ->
+            (item.source as? RomSource.ArchiveEntry)?.archiveType == ArchiveType.SEVEN_ZIP
+        },
+    )
 }
 
 /**

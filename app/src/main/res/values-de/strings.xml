@@ -89,6 +89,7 @@
     <string name="review_preflight_storage">Benötigt ca. %1$s · frei: %2$s</string>
     <string name="review_preflight_storage_unknown">Benötigt ca. %s · freier Speicher wird vor dem Schreiben geprüft</string>
     <string name="review_preflight_7z_warning">7z-Archive können je nach Kompression extra RAM brauchen. ZIP ist für sehr große ROMs am sichersten.</string>
+    <string name="review_preflight_insufficient">Zu wenig Speicherplatz – bitte Platz schaffen oder weniger ROMs auswählen.</string>
     <string name="review_move_failed_many">%d ROM(s) fehlgeschlagen. Sie bleiben in der Zuordnung und können erneut versucht werden.</string>
     <plurals name="review_move_button">
         <item quantity="one">1 ROM einsortieren</item>
