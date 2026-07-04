@@ -11,7 +11,7 @@
 
 | Archive / Archive | Zuordnung / Review | Einstellungen / Settings |
 |-------------------|--------------------|--------------------------|
-| <img src="docs/screenshots/archive-scan.png" alt="Thor ROM Butler archive scan screen" width="300"> | <img src="docs/screenshots/review.png" alt="Thor ROM Butler review screen" width="300"> | <img src="docs/screenshots/settings.png" alt="Thor ROM Butler settings screen" width="300"> |
+| <img src="docs/screenshots/scan.png" alt="Thor ROM Butler archive scan screen" width="300"> | <img src="docs/screenshots/assign.png" alt="Thor ROM Butler review screen" width="300"> | <img src="docs/screenshots/settings.png" alt="Thor ROM Butler settings screen" width="300"> |
 
 ## Deutsch
 

@@ -41,7 +41,7 @@ Die App durchsucht den Ordner und analysiert jeden Fund — bei Archiven
 **ohne sie zu entpacken**. Auf jeder Karte siehst du, welche ROMs erkannt
 wurden.
 
-<img src="screenshots/archive-scan.png" alt="Scan" width="600">
+<img src="screenshots/scan.png" alt="Scan" width="600">
 
 ### Schritt 4: Zuordnung prüfen
 
@@ -56,7 +56,7 @@ Jedes ROM bekommt eine Einschätzung:
 Mit „Alle übernehmen" bestätigst du alle gelben Vorschläge auf einmal.
 Duplikate werden erkannt und übersprungen, außer du wählst „Ersetzen".
 
-<img src="screenshots/review.png" alt="Zuordnung" width="600">
+<img src="screenshots/assign.png" alt="Zuordnung" width="600">
 
 ### Schritt 5: Einsortieren
 
@@ -122,7 +122,7 @@ settings.
 The app scans the folder and analyzes every find — archives are inspected
 **without extracting them**. Each card shows which ROMs were detected.
 
-<img src="screenshots/archive-scan.png" alt="Scan" width="600">
+<img src="screenshots/scan.png" alt="Scan" width="600">
 
 ### Step 4: Review
 
@@ -137,7 +137,7 @@ Every ROM gets an honest confidence rating:
 "Accept all" confirms every yellow suggestion at once. Duplicates are
 detected and skipped unless you opt into replacing them.
 
-<img src="screenshots/review.png" alt="Review" width="600">
+<img src="screenshots/assign.png" alt="Review" width="600">
 
 ### Step 5: Sort
 
