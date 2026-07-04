@@ -16,7 +16,7 @@
 
     <!-- What's new (update every release!) -->
     <string name="whatsnew_title">New in version %s</string>
-    <string name="whatsnew_body">🎉 Version 1.0!\n\n• Gamepad controls: D-pad/stick navigates, A confirms, B goes back – touch keeps working everywhere, of course\n• Color themes: Thor (blue), Odin (violet) and CRT (green) in Settings\n\nFull details in the changelog on GitHub.</string>
+    <string name="whatsnew_body">• Much faster analysis of large 7z archives\n• A broken archive no longer stalls the scan (90-second timeout, 2 analyses in parallel)\n\nFull details in the changelog on GitHub.</string>
 
     <!-- Setup screen -->
     <string name="setup_title">Setup</string>

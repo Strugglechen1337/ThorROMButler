@@ -181,6 +181,35 @@ class CommonsArchiveAnalyzerTest {
     }
 
     @Test
+    fun `single pass resolves multiple ambiguous entries in one 7z`() = runTest {
+        // Regression for the O(n^2) solid-7z prefix reads: two ambiguous
+        // .iso entries must both be magic-resolved from ONE archive pass.
+        val gcHeader = ByteArray(0x40).also {
+            it[0x1C] = 0xC2.toByte(); it[0x1D] = 0x33
+            it[0x1E] = 0x9F.toByte(); it[0x1F] = 0x3D
+        }
+        val ps2Header = ByteArray(0x9000).also {
+            "PLAYSTATION".toByteArray(Charsets.US_ASCII).copyInto(it, 0x8020)
+        }
+        val sevenZipFile = tempFolder.newFile("multi.7z")
+        org.apache.commons.compress.archivers.sevenz.SevenZOutputFile(sevenZipFile).use { out ->
+            for ((name, content) in listOf("aaa.iso" to gcHeader, "bbb.iso" to ps2Header)) {
+                val entry = out.createArchiveEntry(tempFolder.newFile("x-$name"), name)
+                out.putArchiveEntry(entry)
+                out.write(content)
+                out.closeArchiveEntry()
+            }
+        }
+
+        val analysis = buildAnalyzer(StandardTestDispatcher(testScheduler)).analyze(
+            romArchive(sevenZipFile).copy(type = ArchiveType.SEVEN_ZIP),
+        )
+
+        val roms = (analysis as ArchiveAnalysis.Success).roms
+        assertThat(roms.map { it.detection.system?.id }).containsExactly("gc", "ps2")
+    }
+
+    @Test
     fun `bios files are ignored and counted`() = runTest {
         val zipFile = tempFolder.newFile("bios-pack.zip")
         writeZip(

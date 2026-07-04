@@ -12,6 +12,11 @@ import dev.thor.rombutler.domain.repository.ArchiveRepository
 import dev.thor.rombutler.domain.repository.LooseRomRepository
 import dev.thor.rombutler.ui.review.ReviewSession
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.sync.withPermit
+import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -127,23 +132,53 @@ class ScanViewModel @Inject constructor(
                 looseRoms = looseRoms,
             )
 
-            // Sequential on purpose: archive I/O is disk-bound, and cards
-            // filling in one after another reads as pleasant progress.
-            for (archive in archives) {
-                val analysis = archiveAnalyzer.analyze(archive)
-                _uiState.update { state ->
-                    if (state !is ScanUiState.Found) return@update state
-                    state.copy(
-                        items = state.items.map { item ->
-                            if (item.archive.path == archive.path) {
-                                item.copy(analysis = analysis)
-                            } else {
-                                item
+            // Two analyses in parallel: disk-bound, but one slow/broken
+            // archive must not stall all the others. Each card fills in
+            // as soon as its analysis finishes.
+            val semaphore = Semaphore(2)
+            coroutineScope {
+                for (archive in archives) {
+                    launch {
+                        semaphore.withPermit {
+                            val analysis = analyzeWithTimeout(archive)
+                            _uiState.update { state ->
+                                if (state !is ScanUiState.Found) return@update state
+                                state.copy(
+                                    items = state.items.map { item ->
+                                        if (item.archive.path == archive.path) {
+                                            item.copy(analysis = analysis)
+                                        } else {
+                                            item
+                                        }
+                                    },
+                                )
                             }
-                        },
-                    )
+                        }
+                    }
                 }
             }
         }
+    }
+
+    /**
+     * Guards against broken/pathological archives: after [ANALYSIS_TIMEOUT_MS]
+     * the archive is reported as failed and the scan moves on. The blocked
+     * read may finish in the background (blocking I/O is not interruptible),
+     * but UI and remaining archives are no longer held hostage.
+     */
+    private suspend fun analyzeWithTimeout(archive: RomArchive): ArchiveAnalysis {
+        val deferred = viewModelScope.async { archiveAnalyzer.analyze(archive) }
+        return withTimeoutOrNull(ANALYSIS_TIMEOUT_MS) { deferred.await() }
+            ?: run {
+                deferred.cancel()
+                ArchiveAnalysis.Failed(
+                    archive,
+                    "Zeitlimit überschritten – Archiv beschädigt oder extrem komprimiert?",
+                )
+            }
+    }
+
+    private companion object {
+        const val ANALYSIS_TIMEOUT_MS = 90_000L
     }
 }

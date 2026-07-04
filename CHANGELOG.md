@@ -2,6 +2,14 @@
 
 All notable user-facing changes are documented here.
 
+## 1.0.1
+
+- Much faster analysis of solid 7z archives: header prefixes are now read
+  in a single pass instead of reopening (and re-decompressing) the archive
+  per entry.
+- Archives are analyzed two at a time, and a 90-second timeout per archive
+  ensures one broken/pathological file no longer stalls the whole scan.
+
 ## 1.0.0
 
 - Added gamepad controls: D-pad/stick focus navigation across all screens,

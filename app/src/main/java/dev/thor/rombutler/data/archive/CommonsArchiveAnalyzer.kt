@@ -55,6 +55,36 @@ class CommonsArchiveAnalyzer @Inject constructor(
                 .distinct()
                 .sorted()
 
+            // Name-based detection first; collect everything that needs
+            // bytes from the archive (cue/m3u texts + magic-byte headers).
+            val nameDetections = romEntries.associate { entry ->
+                val hint = entry.path.entryDirectory().substringAfterLast('/')
+                    .takeIf { it.isNotEmpty() }
+                entry.path to engine.detect(entry.path.entryFileName(), folderHint = hint)
+            }
+            val prefixRequests = buildMap {
+                for (entry in romEntries) {
+                    when {
+                        entry.path.hasAnyExtension("cue", "m3u") &&
+                            entry.sizeBytes in 1..MAX_TEXT_BYTES ->
+                            put(entry.path, entry.sizeBytes.toInt())
+
+                        nameDetections.getValue(entry.path).confidence != Confidence.CERTAIN ->
+                            put(
+                                entry.path,
+                                minOf(
+                                    DetectionEngine.MAX_HEADER_BYTES.toLong(),
+                                    entry.sizeBytes.takeIf { it > 0 }
+                                        ?: DetectionEngine.MAX_HEADER_BYTES.toLong(),
+                                ).toInt(),
+                            )
+                    }
+                }
+            }
+            // ONE pass over the archive — solid 7z blocks are decompressed
+            // exactly once instead of once per ambiguous entry.
+            val prefixes = source.readEntryPrefixes(file, prefixRequests)
+
             // Group per archive-internal directory: two discs in different
             // subfolders must not be merged, and equal file names in
             // different folders must not collide.
@@ -65,16 +95,20 @@ class CommonsArchiveAnalyzer @Inject constructor(
 
                     // Small text files steer grouping (exact cue/m3u references).
                     val textContents = dirEntries
-                        .filter { it.path.hasAnyExtension("cue", "m3u") && it.sizeBytes <= MAX_TEXT_BYTES }
+                        .filter { it.path.hasAnyExtension("cue", "m3u") }
                         .mapNotNull { entry ->
-                            source.readEntryPrefix(file, entry.path, entry.sizeBytes.toInt())
+                            prefixes[entry.path]
                                 ?.let { entry.path.entryFileName() to it.decodeToString() }
                         }
                         .toMap()
 
                     grouper.group(byName.keys.toList(), textContents).map { group ->
                         val primaryEntry = byName.getValue(group.primary)
-                        val detection = detectWithHeaderFallback(file, source, primaryEntry)
+                        val detection = resolveDetection(
+                            byName = nameDetections.getValue(primaryEntry.path),
+                            entry = primaryEntry,
+                            prefixes = prefixes,
+                        )
                         DetectedRom(
                             group = group,
                             memberEntryPaths = group.members.mapNotNull { byName[it]?.path },
@@ -114,22 +148,16 @@ class CommonsArchiveAnalyzer @Inject constructor(
      * Detects by name first; reads the entry's header only when that could
      * actually improve the result (ambiguous extension with magic rules).
      */
-    private fun detectWithHeaderFallback(
-        file: File,
-        source: ArchiveEntrySource,
+    /** Upgrades a name-based detection with a pre-fetched header prefix. */
+    private fun resolveDetection(
+        byName: dev.thor.rombutler.domain.model.DetectionResult,
         entry: ArchiveEntry,
+        prefixes: Map<String, ByteArray>,
     ): dev.thor.rombutler.domain.model.DetectionResult {
-        // Archive-internal folder name doubles as a hint ("SNES/game.bin")
+        if (byName.confidence == Confidence.CERTAIN) return byName
+        val header = prefixes[entry.path] ?: return byName
         val folderHint = entry.path.entryDirectory().substringAfterLast('/')
             .takeIf { it.isNotEmpty() }
-        val byName = engine.detect(entry.path.entryFileName(), folderHint = folderHint)
-        if (byName.confidence == Confidence.CERTAIN) return byName
-
-        val maxBytes = minOf(
-            DetectionEngine.MAX_HEADER_BYTES.toLong(),
-            entry.sizeBytes.takeIf { it > 0 } ?: DetectionEngine.MAX_HEADER_BYTES.toLong(),
-        ).toInt()
-        val header = source.readEntryPrefix(file, entry.path, maxBytes) ?: return byName
         val byMagic = engine.detect(entry.path.entryFileName(), header, folderHint)
 
         // Keep the better of the two (magic can only upgrade, not downgrade).

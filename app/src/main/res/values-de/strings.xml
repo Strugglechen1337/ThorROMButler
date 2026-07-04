@@ -15,7 +15,7 @@
 
     <!-- What's new (pro Release aktualisieren!) -->
     <string name="whatsnew_title">Neu in Version %s</string>
-    <string name="whatsnew_body">🎉 Version 1.0!\n\n• Gamepad-Bedienung: D-Pad/Stick navigiert, A bestätigt, B geht zurück – Touch funktioniert natürlich weiterhin überall\n• Farbwelten: Thor (blau), Odin (violett) und CRT (grün) in den Einstellungen\n\nAlle Details im Changelog auf GitHub.</string>
+    <string name="whatsnew_body">• Deutlich schnellere Analyse großer 7z-Archive\n• Ein defektes Archiv blockiert den Scan nicht mehr (90-s-Zeitlimit, 2 Analysen parallel)\n\nAlle Details im Changelog auf GitHub.</string>
 
     <!-- Setup screen -->
     <string name="setup_title">Einrichtung</string>

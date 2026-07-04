@@ -38,6 +38,14 @@ interface ArchiveEntrySource {
     fun readEntryPrefix(archiveFile: File, entryPath: String, maxBytes: Int): ByteArray?
 
     /**
+     * Batch variant: prefixes for several entries (path -> maxBytes) read
+     * in ONE pass over the archive. Crucial for solid 7z blocks, where
+     * every separate open decompresses everything again from the start.
+     * Missing/unreadable entries are simply absent from the result.
+     */
+    fun readEntryPrefixes(archiveFile: File, requests: Map<String, Int>): Map<String, ByteArray>
+
+    /**
      * Extracts the entries in [targets] (entry path -> destination file)
      * in ONE pass over the archive — important for solid 7z blocks.
      * Destination files are created; parent dirs must already exist.
@@ -108,6 +116,21 @@ class ZipEntrySource @Inject constructor() : ArchiveEntrySource {
             zip.getInputStream(entry).use { it.readPrefix(maxBytes) }
         }
 
+    override fun readEntryPrefixes(
+        archiveFile: File,
+        requests: Map<String, Int>,
+    ): Map<String, ByteArray> =
+        ZipFile.builder().setFile(archiveFile).get().use { zip ->
+            buildMap {
+                for ((entryPath, maxBytes) in requests) {
+                    val entry = zip.getEntry(entryPath) ?: continue
+                    runCatching {
+                        put(entryPath, zip.getInputStream(entry).use { it.readPrefix(maxBytes) })
+                    }
+                }
+            }
+        }
+
     override fun extractEntries(
         archiveFile: File,
         targets: Map<String, File>,
@@ -172,6 +195,35 @@ class SevenZEntrySource @Inject constructor() : ArchiveEntrySource {
             null
         }
 
+    override fun readEntryPrefixes(
+        archiveFile: File,
+        requests: Map<String, Int>,
+    ): Map<String, ByteArray> {
+        if (requests.isEmpty()) return emptyMap()
+        // Single sequential pass: solid blocks are decompressed exactly once
+        return SevenZFile.builder().setFile(archiveFile).get().use { sevenZ ->
+            buildMap {
+                var remaining = requests.size
+                var entry = sevenZ.nextEntry
+                while (entry != null && remaining > 0) {
+                    val maxBytes = requests[entry.name]
+                    if (maxBytes != null && !entry.isDirectory) {
+                        val buffer = ByteArray(minOf(maxBytes.toLong(), entry.size).toInt())
+                        var total = 0
+                        while (total < buffer.size) {
+                            val read = sevenZ.read(buffer, total, buffer.size - total)
+                            if (read < 0) break
+                            total += read
+                        }
+                        put(entry.name, if (total == buffer.size) buffer else buffer.copyOf(total))
+                        remaining--
+                    }
+                    entry = sevenZ.nextEntry
+                }
+            }
+        }
+    }
+
     override fun extractEntries(
         archiveFile: File,
         targets: Map<String, File>,
@@ -229,6 +281,25 @@ class RarEntrySource @Inject constructor() : ArchiveEntrySource {
             } ?: return null
             rar.getInputStream(header).use { it.readPrefix(maxBytes) }
         }
+
+    override fun readEntryPrefixes(
+        archiveFile: File,
+        requests: Map<String, Int>,
+    ): Map<String, ByteArray> {
+        if (requests.isEmpty()) return emptyMap()
+        return Archive(archiveFile).use { rar ->
+            buildMap {
+                for (header in rar.fileHeaders) {
+                    if (header.isDirectory) continue
+                    val path = header.fileName.replace('\\', '/')
+                    val maxBytes = requests[path] ?: continue
+                    runCatching {
+                        put(path, rar.getInputStream(header).use { it.readPrefix(maxBytes) })
+                    }
+                }
+            }
+        }
+    }
 
     override fun extractEntries(
         archiveFile: File,
