@@ -7,6 +7,11 @@
     <string name="action_back">Zurück</string>
     <string name="action_create">Anlegen</string>
     <string name="action_save">Speichern</string>
+    <string name="action_close">Schließen</string>
+
+    <!-- What's new (pro Release aktualisieren!) -->
+    <string name="whatsnew_title">Neu in Version %s</string>
+    <string name="whatsnew_body">• Warnung und Sperre, wenn der Speicherplatz nicht reicht\n• Hinweis bei entzogener Dateizugriffs-Berechtigung\n• Dieser „Was ist neu"-Dialog 😉\n\nAlle Details im Changelog auf GitHub.</string>
 
     <!-- Setup screen -->
     <string name="setup_title">Einrichtung</string>

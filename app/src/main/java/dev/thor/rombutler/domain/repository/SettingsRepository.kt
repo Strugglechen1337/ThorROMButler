@@ -36,6 +36,12 @@ interface SettingsRepository {
     /** Persists the trash-instead-of-delete behavior for archives. */
     suspend fun setTrashInsteadOfDelete(enabled: Boolean)
 
+    /** Version code whose what's-new dialog was already shown (0 = never). */
+    suspend fun lastSeenVersionCode(): Int
+
+    /** Marks the what's-new dialog of [versionCode] as shown. */
+    suspend fun setLastSeenVersionCode(versionCode: Int)
+
     /**
      * Overrides the target folder name for one system; `null` or blank
      * restores the ES-DE default.

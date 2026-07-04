@@ -10,6 +10,7 @@ import dev.thor.rombutler.data.update.GitHubUpdateChecker
 import dev.thor.rombutler.data.update.UpdateAvailability
 import dev.thor.rombutler.domain.repository.SettingsRepository
 import dev.thor.rombutler.ui.navigation.Routes
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
@@ -26,7 +27,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor(
     @param:ApplicationContext private val context: Context,
-    settingsRepository: SettingsRepository,
+    private val settingsRepository: SettingsRepository,
     private val updateChecker: GitHubUpdateChecker,
     private val updateAvailability: UpdateAvailability,
 ) : ViewModel() {
@@ -46,7 +47,36 @@ class MainViewModel @Inject constructor(
             initialValue = null,
         )
 
+    /** Version name to show a one-time what's-new dialog for, or null. */
+    val whatsNewVersion = MutableStateFlow<String?>(null)
+
+    /** Saves that the dialog was seen; called on dismiss. */
+    fun dismissWhatsNew() {
+        whatsNewVersion.value = null
+        viewModelScope.launch {
+            settingsRepository.setLastSeenVersionCode(currentVersionCode())
+        }
+    }
+
+    private fun currentVersionCode(): Int = runCatching {
+        context.packageManager.getPackageInfo(context.packageName, 0)
+            .longVersionCode.toInt()
+    }.getOrDefault(0)
+
     init {
+        // One-time what's-new dialog after an update (not on fresh installs)
+        viewModelScope.launch {
+            val seen = settingsRepository.lastSeenVersionCode()
+            val current = currentVersionCode()
+            if (seen == 0) {
+                settingsRepository.setLastSeenVersionCode(current)
+            } else if (current > seen) {
+                whatsNewVersion.value = runCatching {
+                    context.packageManager.getPackageInfo(context.packageName, 0).versionName
+                }.getOrNull()
+            }
+        }
+
         // Opt-in automatic update check (default OFF, see settings). Errors
         // are swallowed on purpose: a failed background check must never
         // bother the user.

@@ -111,3 +111,4 @@ app/src/main/java/dev/thor/rombutler/
   ui/                        #   theme/  navigation/  setup/  scan/  review/  log/
                              #   components/ (gemeinsame Composables)
 ```
+- Bei jedem Release: whatsnew_body in values/ und values-de/ mit den Highlights der neuen Version aktualisieren (einmaliger Was-ist-neu-Dialog nach Update).

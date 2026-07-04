@@ -35,6 +35,31 @@ class MainActivity : ComponentActivity() {
                         startDestination = destination,
                     )
                 }
+
+                // One-time what's-new dialog after an update
+                val whatsNew by viewModel.whatsNewVersion.collectAsStateWithLifecycle()
+                whatsNew?.let { version ->
+                    androidx.compose.material3.AlertDialog(
+                        onDismissRequest = viewModel::dismissWhatsNew,
+                        title = {
+                            androidx.compose.material3.Text(
+                                text = getString(R.string.whatsnew_title, version),
+                            )
+                        },
+                        text = {
+                            androidx.compose.material3.Text(
+                                text = getString(R.string.whatsnew_body),
+                            )
+                        },
+                        confirmButton = {
+                            androidx.compose.material3.TextButton(
+                                onClick = viewModel::dismissWhatsNew,
+                            ) {
+                                androidx.compose.material3.Text(getString(R.string.action_close))
+                            }
+                        },
+                    )
+                }
             }
         }
     }

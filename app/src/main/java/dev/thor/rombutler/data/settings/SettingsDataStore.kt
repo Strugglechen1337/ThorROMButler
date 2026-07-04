@@ -4,10 +4,12 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import dev.thor.rombutler.domain.model.AppSettings
 import dev.thor.rombutler.domain.repository.SettingsRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -29,6 +31,7 @@ class SettingsDataStore @Inject constructor(
         val FOLDER_OVERRIDES = stringPreferencesKey("folder_overrides") // JSON object
         val EXTRA_SOURCES = stringPreferencesKey("extra_source_paths") // JSON array
         val TRASH_MODE = booleanPreferencesKey("trash_instead_of_delete")
+        val LAST_SEEN_VERSION = intPreferencesKey("last_seen_version_code")
     }
 
     override val settings: Flow<AppSettings> = dataStore.data.map { prefs ->
@@ -82,6 +85,13 @@ class SettingsDataStore @Inject constructor(
 
     override suspend fun setTrashInsteadOfDelete(enabled: Boolean) {
         dataStore.edit { it[Keys.TRASH_MODE] = enabled }
+    }
+
+    override suspend fun lastSeenVersionCode(): Int =
+        dataStore.data.map { it[Keys.LAST_SEEN_VERSION] ?: 0 }.first()
+
+    override suspend fun setLastSeenVersionCode(versionCode: Int) {
+        dataStore.edit { it[Keys.LAST_SEEN_VERSION] = versionCode }
     }
 
     override suspend fun setFolderOverride(systemId: String, folder: String?) {
