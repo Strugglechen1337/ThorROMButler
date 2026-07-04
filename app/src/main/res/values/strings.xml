@@ -16,7 +16,7 @@
 
     <!-- What's new (update every release!) -->
     <string name="whatsnew_title">New in version %s</string>
-    <string name="whatsnew_body">• Much faster analysis of large 7z archives\n• A broken archive no longer stalls the scan (90-second timeout, 2 analyses in parallel)\n\nFull details in the changelog on GitHub.</string>
+    <string name="whatsnew_body">• New Quick Settings tile: toggle LAN receive straight from the notification shade — the tile shows the upload URL while active\n\nFull details in the changelog on GitHub.</string>
 
     <!-- Setup screen -->
     <string name="setup_title">Setup</string>
@@ -173,7 +173,7 @@
     <!-- LAN receive mode -->
     <string name="settings_theme">Color theme</string>
     <string name="receive_title">LAN receive</string>
-    <string name="receive_hint">Send ROMs straight from your PC: start receiving, open the shown address in a browser on the PC and drop files in. They land in the download folder.</string>
+    <string name="receive_hint">Send ROMs straight from your PC: start receiving, open the shown address in a browser on the PC and drop files in. They land in the download folder. Tip: there is also a Quick Settings tile for this.</string>
     <string name="receive_running_hint">Open in a browser on your PC (same Wi-Fi):</string>
     <string name="receive_start">Start receiving</string>
     <string name="receive_stop">Stop receiving</string>

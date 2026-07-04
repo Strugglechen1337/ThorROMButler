@@ -55,6 +55,19 @@
             android:exported="false"
             android:foregroundServiceType="dataSync" />
 
+        <!-- Quick Settings tile: toggle LAN receive from the notification
+             shade; exported + permission are required for SystemUI binding -->
+        <service
+            android:name=".receive.ReceiveTileService"
+            android:exported="true"
+            android:icon="@drawable/ic_notification_bolt"
+            android:label="@string/receive_title"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
+
         <!-- On-demand WorkManager init (Configuration.Provider in the App
              class provides the HiltWorkerFactory) -->
         <provider

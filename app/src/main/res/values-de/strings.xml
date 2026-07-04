@@ -15,7 +15,7 @@
 
     <!-- What's new (pro Release aktualisieren!) -->
     <string name="whatsnew_title">Neu in Version %s</string>
-    <string name="whatsnew_body">• Deutlich schnellere Analyse großer 7z-Archive\n• Ein defektes Archiv blockiert den Scan nicht mehr (90-s-Zeitlimit, 2 Analysen parallel)\n\nAlle Details im Changelog auf GitHub.</string>
+    <string name="whatsnew_body">• Neue Schnelleinstellungs-Kachel: LAN-Empfang direkt aus der Statusleiste starten/stoppen — aktiv zeigt die Kachel die Upload-Adresse\n\nAlle Details im Changelog auf GitHub.</string>
 
     <!-- Setup screen -->
     <string name="setup_title">Einrichtung</string>
@@ -172,7 +172,7 @@
     <!-- LAN receive mode -->
     <string name="settings_theme">Farbwelt</string>
     <string name="receive_title">LAN-Empfang</string>
-    <string name="receive_hint">ROMs direkt vom PC schicken: Empfang starten, die angezeigte Adresse am PC im Browser öffnen und Dateien hineinziehen. Sie landen im Download-Ordner.</string>
+    <string name="receive_hint">ROMs direkt vom PC schicken: Empfang starten, die angezeigte Adresse am PC im Browser öffnen und Dateien hineinziehen. Sie landen im Download-Ordner. Tipp: Dafür gibt es auch eine Schnelleinstellungs-Kachel.</string>
     <string name="receive_running_hint">Am PC im Browser öffnen (gleiches WLAN):</string>
     <string name="receive_start">Empfang starten</string>
     <string name="receive_stop">Empfang beenden</string>

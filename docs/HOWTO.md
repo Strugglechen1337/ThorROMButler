@@ -37,8 +37,11 @@ Einstellungen ergänzen.
 
 **Am bequemsten: LAN-Empfang.** In den Einstellungen „Empfang starten",
 die angezeigte Adresse am PC im Browser öffnen (gleiches WLAN) und die
-Dateien einfach auf die Seite ziehen — ganz ohne Kabel. Alternativ kannst
-du Dateien aus anderen Apps per „Teilen → Thor ROM Butler" schicken.
+Dateien einfach auf die Seite ziehen — ganz ohne Kabel. Noch schneller:
+Der LAN-Empfang lässt sich als Schnelleinstellungs-Kachel in die
+Statusleiste legen (Statusleiste ausklappen → Stift → „LAN-Empfang"
+hinzufügen). Alternativ kannst du Dateien aus anderen Apps per
+„Teilen → Thor ROM Butler" schicken.
 
 ### Schritt 3: Scannen
 
@@ -131,8 +134,10 @@ settings.
 
 **Most convenient: LAN receive.** Tap "Start receiving" in Settings, open
 the shown address in a browser on your PC (same Wi-Fi) and simply drop the
-files onto the page — no cable at all. Alternatively, send files from other
-apps via "Share → Thor ROM Butler".
+files onto the page — no cable at all. Even quicker: LAN receive is
+available as a Quick Settings tile (expand the notification shade → pencil
+icon → add "LAN receive"). Alternatively, send files from other apps via
+"Share → Thor ROM Butler".
 
 ### Step 3: Scan
 

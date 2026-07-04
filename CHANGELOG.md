@@ -2,6 +2,15 @@
 
 All notable user-facing changes are documented here.
 
+## 1.1.0
+
+- Added a Quick Settings tile for the LAN receive mode: toggle receiving
+  from the notification shade without opening the app; when active, the
+  tile shows the upload URL.
+- Dependency maintenance (XZ 1.12) and faster builds via Gradle
+  configuration cache.
+- New social preview image for the GitHub repo.
+
 ## 1.0.1
 
 - Much faster analysis of solid 7z archives: header prefixes are now read

@@ -27,7 +27,7 @@ nanohttpd = "2.3.1"
 
 # Archives
 commonsCompress = "1.28.0"
-xz = "1.10"
+xz = "1.12"
 junrar = "7.6.0"
 
 # Testing

@@ -57,6 +57,7 @@ läuft aber auf jedem Android-Smartphone ab Android 13.
   gegen No-Intro/Redump-DAT-Dateien verifizieren
 - 📡 **LAN-Empfang**: ROMs kabellos vom PC-Browser direkt aufs Gerät
   (Einstellungen → „Empfang starten", Adresse am PC öffnen, Dateien reinziehen)
+  — auch als Schnelleinstellungs-Kachel in der Statusleiste
 - 🔄 **Update-Check & In-App-Download** direkt aus den Einstellungen
 - 📜 **Aktions-Log mit Rückgängig**: jede Bewegung wird protokolliert und
   lässt sich direkt aus dem Log zurücknehmen
@@ -191,6 +192,7 @@ newer.
   against No-Intro/Redump DAT files
 - 📡 **LAN receive**: send ROMs wirelessly from your PC browser straight to
   the device (Settings → "Start receiving", open the address, drop files)
+  — also available as a Quick Settings tile in the notification shade
 - 🔄 **Update check & in-app download** directly from Settings
 - 📜 **Action log with undo**: every move is recorded and can be reverted
   right from the log
