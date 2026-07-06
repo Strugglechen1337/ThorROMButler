@@ -142,6 +142,16 @@ Thor ROM Butler verwaltet nur Dateien, die sich bereits auf deinem Gerät befind
 Die App enthält keine ROMs und stellt keine Download-Funktionen bereit. Bitte
 verwende nur Sicherungskopien von Spielen, die du besitzt.
 
+### Transparenz: KI-Einsatz
+
+Diese App entsteht in enger Zusammenarbeit mit einem KI-Assistenten (Claude):
+Architektur, Code und Tests werden gemeinsam entwickelt, jede Version wird vor
+dem Release auf echter Hardware getestet. Der gesamte Quellcode ist offen —
+Code-Review, Bug-Reports und Feedback sind ausdrücklich willkommen.
+Hinweis: Aufgrund ihrer KI-Richtlinie nimmt IzzyOnDroid die App nicht auf;
+Installation und automatische Updates laufen stattdessen bequem über
+[Obtainium](https://github.com/ImranR98/Obtainium) oder den In-App-Update-Check.
+
 ### Optional unterstützen
 
 Thor ROM Butler bleibt kostenlos. Wenn dir die App hilft und du freiwillig Danke
@@ -275,6 +285,16 @@ The debug APK is generated at `app/build/outputs/apk/debug/`.
 Thor ROM Butler only manages files that are already present on your device. The
 app does not include ROMs and does not provide any download functionality. Please
 use only backup copies of games you own.
+
+### Transparency: AI Involvement
+
+This app is built in close collaboration with an AI assistant (Claude):
+architecture, code and tests are developed together, and every version is
+tested on real hardware before release. The entire source code is open —
+code review, bug reports and feedback are very welcome.
+Note: due to their AI policy, IzzyOnDroid does not list this app; use
+[Obtainium](https://github.com/ImranR98/Obtainium) or the built-in update
+check for easy installation and automatic updates instead.
 
 ### Optional Support
 
