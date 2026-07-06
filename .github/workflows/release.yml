@@ -39,14 +39,25 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v4
 
-      # Skip the whole signed build gracefully while the signing secrets
-      # are not configured yet (manual releases are used instead).
-      - name: Check signing secrets
-        id: signing
-        run: echo "available=${{ secrets.SIGNING_KEYSTORE_BASE64 != '' }}" >> "$GITHUB_OUTPUT"
+      - name: Validate signing secrets
+        run: |
+          missing=0
+          for name in SIGNING_KEYSTORE_BASE64 SIGNING_STORE_PASSWORD SIGNING_KEY_ALIAS SIGNING_KEY_PASSWORD; do
+            if [ -z "${!name}" ]; then
+              echo "::error::$name is not configured."
+              missing=1
+            fi
+          done
+          if [ "$missing" -ne 0 ]; then
+            exit 1
+          fi
+        env:
+          SIGNING_KEYSTORE_BASE64: ${{ secrets.SIGNING_KEYSTORE_BASE64 }}
+          SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
+          SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
+          SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
 
       - name: Decode keystore
-        if: steps.signing.outputs.available == 'true'
         run: |
           mkdir -p signing
           echo "$SIGNING_KEYSTORE_BASE64" | base64 -d > signing/thor-release.jks
@@ -57,7 +68,6 @@ jobs:
         run: ./gradlew testDebugUnitTest
 
       - name: Build signed release APK
-        if: steps.signing.outputs.available == 'true'
         run: ./gradlew assembleRelease
         env:
           SIGNING_STORE_FILE: thor-release.jks
@@ -66,15 +76,31 @@ jobs:
           SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
 
       - name: Rename APK
-        if: steps.signing.outputs.available == 'true'
         run: |
           cp app/build/outputs/apk/release/app-release.apk \
-             ThorRomButler-${{ env.RELEASE_TAG }}.apk
+             ThorROMButler-${{ env.RELEASE_TAG }}.apk
+
+      - name: Prepare release notes
+        run: |
+          notes_path="docs/release-notes/${RELEASE_TAG}.md"
+          if [ -f "$notes_path" ]; then
+            cp "$notes_path" release-notes.md
+          elif gh release view "$RELEASE_TAG" --json body --jq .body > release-notes.md; then
+            if [ ! -s release-notes.md ]; then
+              echo "::error::Existing release has empty notes."
+              exit 1
+            fi
+          else
+            echo "::error::Missing $notes_path. Release notes must be bilingual (DE/EN)."
+            exit 1
+          fi
+        env:
+          GH_TOKEN: ${{ github.token }}
 
       - name: Create GitHub release
-        if: steps.signing.outputs.available == 'true'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.RELEASE_TAG }}
-          files: ThorRomButler-${{ env.RELEASE_TAG }}.apk
-          generate_release_notes: true
+          body_path: release-notes.md
+          files: ThorROMButler-${{ env.RELEASE_TAG }}.apk
+          overwrite_files: true
