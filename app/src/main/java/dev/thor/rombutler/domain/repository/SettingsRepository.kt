@@ -56,4 +56,7 @@ interface SettingsRepository {
 
     /** Persists a validated custom system pack; `null` removes all custom systems. */
     suspend fun setCustomSystemPack(json: String?)
+
+    /** Replaces all user-configurable settings in one atomic DataStore transaction. */
+    suspend fun replaceSettings(settings: AppSettings)
 }

@@ -37,11 +37,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import dev.thor.rombutler.R
+import dev.thor.rombutler.domain.detection.SystemPackCodec
 import dev.thor.rombutler.domain.detection.SystemRegistryState
 import dev.thor.rombutler.domain.model.Confidence
 import dev.thor.rombutler.domain.model.SystemDefinition
@@ -50,16 +52,18 @@ import dev.thor.rombutler.domain.model.SystemDefinition
 @Composable
 internal fun SystemPackManagerDialog(
     state: SystemRegistryState,
+    importPreview: SystemPackImportPreview?,
     onSave: (originalId: String?, definition: SystemDefinition) -> Unit,
     onDelete: (systemId: String) -> Unit,
-    onImport: () -> Unit,
+    onRequestImport: () -> Unit,
+    onConfirmImport: () -> Unit,
+    onCancelImport: () -> Unit,
     onExport: () -> Unit,
     onDismiss: () -> Unit,
 ) {
     var editing by remember { mutableStateOf<SystemDefinition?>(null) }
     var adding by remember { mutableStateOf(false) }
     var deleting by remember { mutableStateOf<SystemDefinition?>(null) }
-    var confirmImport by remember { mutableStateOf(false) }
 
     if (adding || editing != null) {
         SystemEditorDialog(
@@ -99,21 +103,76 @@ internal fun SystemPackManagerDialog(
         )
     }
 
-    if (confirmImport) {
+    if (importPreview != null) {
         AlertDialog(
-            onDismissRequest = { confirmImport = false },
-            title = { Text(stringResource(R.string.settings_system_import_title)) },
-            text = { Text(stringResource(R.string.settings_system_import_body)) },
+            onDismissRequest = onCancelImport,
+            title = { Text(stringResource(R.string.settings_system_import_preview_title)) },
+            text = {
+                Column(
+                    modifier = Modifier.testTag(SystemPackTestTags.IMPORT_PREVIEW),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    Text(
+                        text = importPreview.pack.displayName,
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurface,
+                    )
+                    Text(
+                        text = pluralStringResource(
+                            R.plurals.settings_system_import_system_count,
+                            importPreview.pack.systems.size,
+                            importPreview.pack.systems.size,
+                        ),
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                    Text(
+                        text = stringResource(
+                            if (state.customSystems.isEmpty()) {
+                                R.string.settings_system_import_add_body
+                            } else {
+                                R.string.settings_system_import_body
+                            },
+                        ),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    if (importPreview.conflicts.isEmpty()) {
+                        Text(
+                            text = stringResource(R.string.settings_system_import_no_conflicts),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.secondary,
+                        )
+                    } else {
+                        WarningText(
+                            pluralStringResource(
+                                R.plurals.settings_system_packs_conflicts,
+                                importPreview.conflicts.size,
+                                importPreview.conflicts.size,
+                            ),
+                            horizontalPadding = 0.dp,
+                        )
+                        for (conflict in importPreview.conflicts.take(MAX_VISIBLE_CONFLICTS)) {
+                            Text(
+                                text = stringResource(
+                                    R.string.settings_system_packs_conflict_item,
+                                    conflict.extension,
+                                    conflict.systemNames.joinToString(),
+                                ),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.error,
+                            )
+                        }
+                    }
+                }
+            },
             confirmButton = {
                 Button(
-                    onClick = {
-                        onImport()
-                        confirmImport = false
-                    },
+                    onClick = onConfirmImport,
+                    modifier = Modifier.testTag(SystemPackTestTags.CONFIRM_IMPORT),
                 ) { Text(stringResource(R.string.settings_system_packs_import)) }
             },
             dismissButton = {
-                TextButton(onClick = { confirmImport = false }) {
+                TextButton(onClick = onCancelImport) {
                     Text(stringResource(R.string.action_cancel))
                 }
             },
@@ -237,7 +296,9 @@ internal fun SystemPackManagerDialog(
                     Button(
                         onClick = { adding = true },
                         enabled = state.customSystems.size < MAX_CUSTOM_SYSTEMS,
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag(SystemPackTestTags.ADD_SYSTEM),
                     ) {
                         Icon(Icons.Filled.Add, contentDescription = null)
                         Spacer(Modifier.width(8.dp))
@@ -245,11 +306,10 @@ internal fun SystemPackManagerDialog(
                     }
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         OutlinedButton(
-                            onClick = {
-                                if (state.customSystems.isEmpty()) onImport()
-                                else confirmImport = true
-                            },
-                            modifier = Modifier.weight(1f),
+                            onClick = onRequestImport,
+                            modifier = Modifier
+                                .weight(1f)
+                                .testTag(SystemPackTestTags.REQUEST_IMPORT),
                         ) { Text(stringResource(R.string.settings_system_packs_import)) }
                         OutlinedButton(
                             onClick = onExport,
@@ -273,9 +333,9 @@ internal fun SystemPackManagerDialog(
 }
 
 @Composable
-private fun WarningText(text: String) {
+private fun WarningText(text: String, horizontalPadding: androidx.compose.ui.unit.Dp = 20.dp) {
     Row(
-        modifier = Modifier.padding(horizontal = 20.dp),
+        modifier = Modifier.padding(horizontal = horizontalPadding),
         verticalAlignment = Alignment.Top,
     ) {
         Icon(
@@ -289,6 +349,7 @@ private fun WarningText(text: String) {
             text = text,
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.error,
+            modifier = Modifier.weight(1f),
         )
     }
 }
@@ -324,21 +385,21 @@ private fun SystemEditorDialog(
     }
     val otherSystems = allSystems.filterNot { it.id == initial?.id }
     val otherCustomSystems = customSystems.filterNot { it.id == initial?.id }
-    val nameValid = displayName.trim().let {
-        it.isNotEmpty() && it.length <= 80 && it.none(Char::isISOControl)
-    }
-    val idValid = SYSTEM_ID.matches(normalizedId) && otherSystems.none { it.id == normalizedId }
-    val folderValid = SYSTEM_FOLDER.matches(normalizedFolder) && otherSystems.none {
+    val nameValid = SystemPackCodec.isValidDisplayName(displayName.trim())
+    val idValid = SystemPackCodec.isValidSystemId(normalizedId) &&
+        otherSystems.none { it.id == normalizedId }
+    val folderValid = SystemPackCodec.isValidFolder(normalizedFolder) && otherSystems.none {
         it.esdeFolder.equals(normalizedFolder, ignoreCase = true)
     }
-    val extensionsValid = extensions.all(EXTENSION::matches) && extensions.none { extension ->
-        val confidence = extensionMap.getValue(extension)
-        otherCustomSystems.any { other ->
-            other.extensions[extension]?.let { otherConfidence ->
-                confidence == Confidence.CERTAIN || otherConfidence == Confidence.CERTAIN
-            } == true
+    val extensionsValid = extensions.all(SystemPackCodec::isValidExtension) &&
+        extensions.none { extension ->
+            val confidence = extensionMap.getValue(extension)
+            otherCustomSystems.any { other ->
+                other.extensions[extension]?.let { otherConfidence ->
+                    confidence == Confidence.CERTAIN || otherConfidence == Confidence.CERTAIN
+                } == true
+            }
         }
-    }
     val formValid = nameValid && idValid && folderValid && extensionsValid
 
     AlertDialog(
@@ -365,7 +426,9 @@ private fun SystemEditorDialog(
                     label = { Text(stringResource(R.string.settings_system_name)) },
                     isError = displayName.isNotEmpty() && !nameValid,
                     singleLine = true,
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag(SystemPackTestTags.NAME_FIELD),
                 )
                 OutlinedTextField(
                     value = id,
@@ -375,7 +438,9 @@ private fun SystemEditorDialog(
                     isError = id.isNotEmpty() && !idValid,
                     enabled = initial == null,
                     singleLine = true,
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag(SystemPackTestTags.ID_FIELD),
                 )
                 OutlinedTextField(
                     value = folder,
@@ -383,7 +448,9 @@ private fun SystemEditorDialog(
                     label = { Text(stringResource(R.string.settings_system_folder)) },
                     isError = folder.isNotEmpty() && !folderValid,
                     singleLine = true,
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag(SystemPackTestTags.FOLDER_FIELD),
                 )
                 OutlinedTextField(
                     value = extensionsText,
@@ -393,7 +460,9 @@ private fun SystemEditorDialog(
                         Text(stringResource(R.string.settings_system_extensions_hint))
                     },
                     isError = extensionsText.isNotEmpty() && !extensionsValid,
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag(SystemPackTestTags.EXTENSIONS_FIELD),
                 )
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
@@ -432,6 +501,7 @@ private fun SystemEditorDialog(
                     )
                 },
                 enabled = formValid,
+                modifier = Modifier.testTag(SystemPackTestTags.SAVE_SYSTEM),
             ) { Text(stringResource(R.string.action_save)) }
         },
         dismissButton = {
@@ -442,6 +512,15 @@ private fun SystemEditorDialog(
 
 private const val MAX_VISIBLE_CONFLICTS = 6
 private const val MAX_CUSTOM_SYSTEMS = 128
-private val SYSTEM_ID = Regex("[a-z0-9][a-z0-9_-]{0,31}")
-private val SYSTEM_FOLDER = Regex("[A-Za-z0-9][A-Za-z0-9 ._+()-]{0,63}")
-private val EXTENSION = Regex("[a-z0-9][a-z0-9+_-]{0,15}")
+
+internal object SystemPackTestTags {
+    const val ADD_SYSTEM = "system_pack_add_system"
+    const val REQUEST_IMPORT = "system_pack_request_import"
+    const val IMPORT_PREVIEW = "system_pack_import_preview"
+    const val CONFIRM_IMPORT = "system_pack_confirm_import"
+    const val NAME_FIELD = "system_pack_name"
+    const val ID_FIELD = "system_pack_id"
+    const val FOLDER_FIELD = "system_pack_folder"
+    const val EXTENSIONS_FIELD = "system_pack_extensions"
+    const val SAVE_SYSTEM = "system_pack_save"
+}

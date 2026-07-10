@@ -29,3 +29,6 @@ jobs:
 
       - name: Build debug APK
         run: ./gradlew assembleDebug
+
+      - name: Compile Android UI tests
+        run: ./gradlew assembleDebugAndroidTest

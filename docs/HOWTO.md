@@ -92,8 +92,11 @@ anders überlegst.
   Dort kannst du Definitionen anlegen, bearbeiten und als
   `ThorRomButler-system-pack.json` im Download-Ordner exportieren. Zum Import
   legst du eine solche Datei in den Download-Ordner; der Import ersetzt nur
-  deine bisherigen eigenen Systeme. Konflikte werden gewarnt und bleiben bei
-  der automatischen Zuordnung unbekannt.
+  deine bisherigen eigenen Systeme. Vor der Bestätigung siehst du Pack-Inhalt
+  und Konflikte; Mehrdeutigkeiten bleiben bei der automatischen Zuordnung
+  unbekannt.
+- **Einstellungen sichern**: Der JSON-Import wird erst vollständig geprüft und
+  danach gemeinsam übernommen. Eine fehlerhafte Sicherung ändert nichts.
 - **Gamepad**: D-Pad/Stick navigiert, A bestätigt, B geht zurück —
   Touch funktioniert parallel weiter.
 - **Dump-Verifizierung**: Ordner mit No-Intro/Redump-`.dat`-Dateien in den
@@ -194,8 +197,11 @@ your mind.
 - **More systems**: Settings → "System packs & custom systems". Create or edit
   definitions there and export them as `ThorRomButler-system-pack.json` in the
   download folder. To import, place that file in the download folder; importing
-  replaces only your previous custom systems. Conflicts are shown and remain
-  unknown to automatic assignment.
+  replaces only your previous custom systems. Before confirmation, a preview
+  shows the pack contents and conflicts; ambiguities remain unknown to
+  automatic assignment.
+- **Settings backup**: the JSON import is validated completely and then applied
+  as one update. An invalid backup changes nothing.
 - **Gamepad**: D-pad/stick navigates, A confirms, B goes back — touch
   keeps working alongside.
 - **Dump verification**: pick a folder with No-Intro/Redump `.dat` files in

@@ -29,7 +29,7 @@ object SystemPackCodec {
         }
         val packId = root.optString("packId").trim()
         val displayName = root.optString("displayName").trim()
-        if (!PACK_ID.matches(packId) || !validDisplayName(displayName)) {
+        if (!isValidPackId(packId) || !isValidDisplayName(displayName)) {
             return failure(SystemPackError.INVALID_FIELD, "packId/displayName")
         }
         val array = root.optJSONArray("systems")
@@ -110,7 +110,7 @@ object SystemPackCodec {
         val id = item.optString("id").trim()
         val displayName = item.optString("displayName").trim()
         val folder = item.optString("folder").trim()
-        if (!SYSTEM_ID.matches(id) || !validDisplayName(displayName) || !FOLDER.matches(folder)) {
+        if (!isValidSystemId(id) || !isValidDisplayName(displayName) || !isValidFolder(folder)) {
             return SystemDecode.Failure(
                 failure(SystemPackError.INVALID_FIELD, "systems[$index]"),
             )
@@ -122,7 +122,7 @@ object SystemPackCodec {
             )
         val extensions = linkedMapOf<String, Confidence>()
         for (extension in extensionObject.keys()) {
-            if (!EXTENSION.matches(extension)) {
+            if (!isValidExtension(extension)) {
                 return SystemDecode.Failure(
                     failure(SystemPackError.INVALID_FIELD, "$id.$extension"),
                 )
@@ -158,7 +158,15 @@ object SystemPackCodec {
         )
     }
 
-    private fun validDisplayName(value: String): Boolean =
+    fun isValidPackId(value: String): Boolean = PACK_ID.matches(value)
+
+    fun isValidSystemId(value: String): Boolean = SYSTEM_ID.matches(value)
+
+    fun isValidFolder(value: String): Boolean = FOLDER.matches(value)
+
+    fun isValidExtension(value: String): Boolean = EXTENSION.matches(value)
+
+    fun isValidDisplayName(value: String): Boolean =
         value.isNotEmpty() && value.length <= MAX_DISPLAY_NAME && value.none(Char::isISOControl)
 
     private fun failure(error: SystemPackError, detail: String? = null) =

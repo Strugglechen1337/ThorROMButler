@@ -53,6 +53,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.thor.rombutler.R
+import dev.thor.rombutler.domain.detection.SystemPackCodec
 import dev.thor.rombutler.domain.model.SystemPackError
 import dev.thor.rombutler.ui.components.FolderPickerDialog
 
@@ -72,6 +73,7 @@ fun SettingsScreen(
     val receiveState by viewModel.receiveState.collectAsStateWithLifecycle()
     val registryState by viewModel.registryState.collectAsStateWithLifecycle()
     val systemPackResult by viewModel.systemPackResult.collectAsStateWithLifecycle()
+    val systemPackImportPreview by viewModel.systemPackImportPreview.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val resources = LocalResources.current
 
@@ -794,11 +796,17 @@ fun SettingsScreen(
     if (showSystemPacks) {
         SystemPackManagerDialog(
             state = registryState,
+            importPreview = systemPackImportPreview,
             onSave = viewModel::saveCustomSystem,
             onDelete = viewModel::deleteCustomSystem,
-            onImport = viewModel::importSystemPack,
+            onRequestImport = viewModel::previewSystemPackImport,
+            onConfirmImport = viewModel::confirmSystemPackImport,
+            onCancelImport = viewModel::cancelSystemPackImport,
             onExport = viewModel::exportSystemPack,
-            onDismiss = { showSystemPacks = false },
+            onDismiss = {
+                viewModel.cancelSystemPackImport()
+                showSystemPacks = false
+            },
         )
     }
     if (showDownloadPicker) {
@@ -893,6 +901,8 @@ private fun FolderOverridesDialog(
         var value by remember(system.id) {
             mutableStateOf(overrides[system.id] ?: system.esdeFolder)
         }
+        val trimmed = value.trim()
+        val valid = trimmed.isEmpty() || SystemPackCodec.isValidFolder(trimmed)
         androidx.compose.material3.AlertDialog(
             onDismissRequest = { editing = null },
             title = { Text(system.displayName) },
@@ -903,15 +913,28 @@ private fun FolderOverridesDialog(
                     singleLine = true,
                     label = { Text(stringResource(R.string.settings_folder_override_label)) },
                     supportingText = {
-                        Text(stringResource(R.string.settings_folder_override_default, system.esdeFolder))
+                        Text(
+                            if (valid) {
+                                stringResource(
+                                    R.string.settings_folder_override_default,
+                                    system.esdeFolder,
+                                )
+                            } else {
+                                stringResource(R.string.settings_system_pack_error_field)
+                            },
+                        )
                     },
+                    isError = !valid,
                 )
             },
             confirmButton = {
                 androidx.compose.material3.Button(onClick = {
-                    onSave(system.id, value.takeIf { it.isNotBlank() && it != system.esdeFolder })
+                    onSave(
+                        system.id,
+                        trimmed.takeIf { it.isNotBlank() && it != system.esdeFolder },
+                    )
                     editing = null
-                }) { Text(stringResource(R.string.action_save)) }
+                }, enabled = valid) { Text(stringResource(R.string.action_save)) }
             },
             dismissButton = {
                 androidx.compose.material3.TextButton(onClick = {

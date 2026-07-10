@@ -184,8 +184,14 @@
     <string name="settings_system_game_subfolder">Separate subfolder per game</string>
     <string name="settings_system_delete_title">Remove custom system?</string>
     <string name="settings_system_delete_body">The system definition is removed. ROM files already sorted remain unchanged.</string>
-    <string name="settings_system_import_title">Replace system pack?</string>
     <string name="settings_system_import_body">Importing replaces all currently installed custom systems. Built-in systems and ROM files remain unchanged.</string>
+    <string name="settings_system_import_preview_title">Import system pack?</string>
+    <plurals name="settings_system_import_system_count">
+        <item quantity="one">1 system in this pack</item>
+        <item quantity="other">%d systems in this pack</item>
+    </plurals>
+    <string name="settings_system_import_add_body">The validated pack will be installed. Built-in systems and ROM files remain unchanged.</string>
+    <string name="settings_system_import_no_conflicts">No ambiguous extensions found.</string>
     <string name="settings_system_pack_saved">Custom systems saved.</string>
     <string name="settings_system_pack_deleted">Custom system removed.</string>
     <string name="settings_system_pack_imported">System pack imported.</string>

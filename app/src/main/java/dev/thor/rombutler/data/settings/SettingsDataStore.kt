@@ -6,6 +6,7 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
+import dev.thor.rombutler.domain.detection.SystemPackCodec
 import dev.thor.rombutler.domain.model.AppSettings
 import dev.thor.rombutler.domain.repository.SettingsRepository
 import kotlinx.coroutines.flow.Flow
@@ -114,7 +115,13 @@ class SettingsDataStore @Inject constructor(
         dataStore.edit { prefs ->
             val current = prefs[Keys.FOLDER_OVERRIDES].parseOverrides().toMutableMap()
             val trimmed = folder?.trim()?.trim('/')
-            if (trimmed.isNullOrEmpty()) current.remove(systemId) else current[systemId] = trimmed
+            if (trimmed.isNullOrEmpty()) {
+                current.remove(systemId)
+            } else {
+                require(SystemPackCodec.isValidSystemId(systemId)) { "Invalid system id" }
+                require(SystemPackCodec.isValidFolder(trimmed)) { "Invalid target folder" }
+                current[systemId] = trimmed
+            }
             prefs[Keys.FOLDER_OVERRIDES] = org.json.JSONObject(current as Map<*, *>).toString()
         }
     }
@@ -129,7 +136,31 @@ class SettingsDataStore @Inject constructor(
         }
     }
 
+    override suspend fun replaceSettings(settings: AppSettings) {
+        dataStore.edit { prefs ->
+            prefs.setOrRemove(Keys.ROM_BASE_PATH, settings.romBasePath)
+            prefs.setOrRemove(Keys.DOWNLOAD_PATH, settings.downloadPath)
+            prefs[Keys.DELETE_ARCHIVES] = settings.deleteArchivesAfterExtract
+            prefs[Keys.AUTO_UPDATE_CHECK] = settings.autoUpdateCheck
+            prefs[Keys.WATCHER_ENABLED] = settings.watcherEnabled
+            prefs[Keys.EXTRA_SOURCES] = org.json.JSONArray(settings.additionalSourcePaths).toString()
+            prefs[Keys.TRASH_MODE] = settings.trashInsteadOfDelete
+            prefs[Keys.FOLDER_OVERRIDES] =
+                org.json.JSONObject(settings.folderOverrides as Map<*, *>).toString()
+            prefs.setOrRemove(Keys.DAT_FOLDER, settings.datFolderPath)
+            prefs[Keys.THEME_ID] = settings.themeId
+            prefs.setOrRemove(Keys.CUSTOM_SYSTEM_PACK, settings.customSystemPackJson)
+        }
+    }
+
     private companion object {
+        fun androidx.datastore.preferences.core.MutablePreferences.setOrRemove(
+            key: Preferences.Key<String>,
+            value: String?,
+        ) {
+            if (value.isNullOrBlank()) remove(key) else this[key] = value
+        }
+
         fun String?.parseStringList(): List<String> {
             if (this.isNullOrBlank()) return emptyList()
             return runCatching {
@@ -144,7 +175,12 @@ class SettingsDataStore @Inject constructor(
                 val obj = org.json.JSONObject(this)
                 buildMap {
                     for (key in obj.keys()) {
-                        put(key, obj.getString(key))
+                        val folder = obj.getString(key)
+                        if (SystemPackCodec.isValidSystemId(key) &&
+                            SystemPackCodec.isValidFolder(folder)
+                        ) {
+                            put(key, folder)
+                        }
                     }
                 }
             }.getOrDefault(emptyMap())

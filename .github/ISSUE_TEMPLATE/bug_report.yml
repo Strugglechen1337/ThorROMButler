@@ -1,72 +1,74 @@
-name: Bug report
-description: Report a problem with scanning, detection, extraction, updates, or UI.
-title: "[Bug]: "
+name: Fehler melden / Bug report
+description: Melde ein Problem mit Scan, Erkennung, Einsortieren, Updates oder UI. / Report an app problem.
+title: "[Fehler / Bug]: "
 labels: ["bug"]
 body:
   - type: markdown
     attributes:
       value: |
+        Danke, dass du Thor ROM Butler verbesserst. Bitte keine ROMs oder urheberrechtlich geschützten Dateien anhängen.
+
         Thanks for helping improve Thor ROM Butler. Please do not attach ROMs or copyrighted files.
   - type: input
     id: app-version
     attributes:
-      label: App version
+      label: App-Version / App version
       placeholder: "0.4.0"
     validations:
       required: true
   - type: input
     id: device
     attributes:
-      label: Device and Android version
+      label: Gerät und Android-Version / Device and Android version
       placeholder: "AYN Thor, Android 13"
     validations:
       required: true
   - type: dropdown
     id: area
     attributes:
-      label: Area
+      label: Bereich / Area
       options:
-        - Scan
-        - Detection
-        - Review / assignment
-        - Extraction / moving
-        - Update check
-        - Settings
-        - Other
+        - Scan / Scan
+        - Erkennung / Detection
+        - Zuordnung / Review
+        - Einsortieren / Sorting
+        - Update-Prüfung / Update check
+        - Einstellungen / Settings
+        - Sonstiges / Other
     validations:
       required: true
   - type: input
     id: archive
     attributes:
-      label: Archive type and size
+      label: Archivtyp und Größe / Archive type and size
       placeholder: "7z, 3.2 GB, LZMA2 if known"
   - type: textarea
     id: steps
     attributes:
-      label: Steps to reproduce
-      placeholder: "1. Put archive in Downloads\n2. Scan\n3. Tap Sort in ROMs"
+      label: Schritte zum Nachstellen / Steps to reproduce
+      placeholder: "1. Archiv in Downloads ablegen / Put archive in Downloads\n2. Scan starten / Start scan\n3. Einsortieren antippen / Tap Sort"
     validations:
       required: true
   - type: textarea
     id: expected
     attributes:
-      label: Expected behavior
+      label: Erwartetes Verhalten / Expected behavior
     validations:
       required: true
   - type: textarea
     id: actual
     attributes:
-      label: Actual behavior
+      label: Tatsächliches Verhalten / Actual behavior
     validations:
       required: true
   - type: textarea
     id: log
     attributes:
-      label: Log output
-      description: Use the Log screen's share button when possible.
+      label: Log-Ausgabe / Log output
+      description: Möglichst über die Teilen-Schaltfläche im Log exportieren. / Prefer the Log screen's share button.
       render: text
   - type: textarea
     id: screenshots
     attributes:
       label: Screenshots
-      description: Optional. Blur file names if needed.
+      description: Optional. Dateinamen bei Bedarf unkenntlich machen. / Blur file names if needed.

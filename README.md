@@ -36,7 +36,8 @@ läuft aber auf jedem Android-Smartphone ab Android 13.
   (*sicher* / *wahrscheinlich* / *unbekannt*)
 - 🧩 **System-Packs & eigene Systeme**: zusätzliche Systeme lokal in den
   Einstellungen anlegen oder als geprüftes JSON-Pack importieren/exportieren.
-  Konflikte bleiben unklar und werden niemals automatisch zugeordnet.
+  Vor dem Import zeigt eine Vorschau Inhalt und Konflikte; Mehrdeutigkeiten
+  werden niemals automatisch zugeordnet.
 - 🛡️ **Keine Automatik bei Unklarheit**: Nur eindeutig erkannte ROMs bekommen
   einen Zielordner-Vorschlag. Du entscheidest immer selbst - einzeln oder mit
   "Alle übernehmen".
@@ -193,8 +194,8 @@ newer.
   magic bytes, including ISO, RVZ, and CHD headers, with honest confidence levels
   (*certain* / *probable* / *unknown*)
 - 🧩 **System packs & custom systems**: add systems locally in Settings or
-  import/export them as a validated JSON pack. Conflicts stay ambiguous and
-  are never assigned automatically.
+  import/export them as a validated JSON pack. A preview shows contents and
+  conflicts before installation; ambiguities are never assigned automatically.
 - 🛡️ **No automation when unclear**: only clearly identified ROMs receive a
   suggested target folder. You always decide what gets applied, one item at a
   time or in bulk.

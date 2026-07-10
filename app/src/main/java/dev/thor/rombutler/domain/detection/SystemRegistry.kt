@@ -502,7 +502,7 @@ class SystemRegistry private constructor(
             is SystemPackDecodeResult.Success -> {
                 _state.value = _state.value.copy(
                     customPack = decoded.pack,
-                    conflicts = findCustomConflicts(decoded.pack.systems),
+                    conflicts = conflictsForCustomSystems(decoded.pack.systems),
                     customPackError = null,
                 )
             }
@@ -544,7 +544,10 @@ class SystemRegistry private constructor(
 
     fun byId(id: String): SystemDefinition? = systems.find { it.id == id }
 
-    private fun findCustomConflicts(customSystems: List<SystemDefinition>): List<SystemExtensionConflict> {
+    /** Predicts warnings for a validated pack without activating it. */
+    fun conflictsForCustomSystems(
+        customSystems: List<SystemDefinition>,
+    ): List<SystemExtensionConflict> {
         val customIds = customSystems.mapTo(hashSetOf()) { it.id }
         return (builtInSystems + customSystems)
             .flatMap { system -> system.extensions.keys.map { it to system } }

@@ -183,6 +183,23 @@ class SystemPackCodecTest {
     }
 
     @Test
+    fun `conflict preview does not activate the candidate system`() {
+        val registry = SystemRegistry()
+        val candidate = SystemDefinition(
+            id = "previewonly",
+            displayName = "Preview Only",
+            esdeFolder = "previewonly",
+            extensions = mapOf("gba" to Confidence.CERTAIN),
+        )
+
+        val conflicts = registry.conflictsForCustomSystems(listOf(candidate))
+
+        assertThat(conflicts.map { it.extension }).containsExactly("gba")
+        assertThat(registry.byId("previewonly")).isNull()
+        assertThat(registry.state.value.customSystems).isEmpty()
+    }
+
+    @Test
     fun `registry activates a pack from persisted settings`() {
         val pack = SystemPack(
             schemaVersion = 1,
@@ -236,6 +253,7 @@ class SystemPackCodecTest {
         override suspend fun setLastSeenVersionCode(versionCode: Int) = unused()
         override suspend fun setFolderOverride(systemId: String, folder: String?) = unused()
         override suspend fun setCustomSystemPack(json: String?) = unused()
+        override suspend fun replaceSettings(settings: AppSettings) = unused()
 
         private fun unused(): Nothing = error("Not used by this test")
     }

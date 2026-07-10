@@ -1,28 +1,28 @@
-name: Feature request
-description: Suggest an improvement or new supported system.
-title: "[Feature]: "
+name: Funktionswunsch / Feature request
+description: Schlage eine Verbesserung oder ein neues System vor. / Suggest an improvement or system.
+title: "[Wunsch / Feature]: "
 labels: ["enhancement"]
 body:
   - type: textarea
     id: problem
     attributes:
-      label: Problem or workflow
-      placeholder: "What are you trying to do?"
+      label: Problem oder Ablauf / Problem or workflow
+      placeholder: "Was möchtest du erreichen? / What are you trying to do?"
     validations:
       required: true
   - type: textarea
     id: solution
     attributes:
-      label: Suggested solution
-      placeholder: "What should Thor ROM Butler do?"
+      label: Lösungsvorschlag / Suggested solution
+      placeholder: "Was soll Thor ROM Butler tun? / What should Thor ROM Butler do?"
     validations:
       required: true
   - type: textarea
     id: alternatives
     attributes:
-      label: Alternatives considered
+      label: Erwogene Alternativen / Alternatives considered
   - type: textarea
     id: context
     attributes:
-      label: Additional context
-      description: Device, emulator frontend, file types, screenshots, etc.
+      label: Zusätzlicher Kontext / Additional context
+      description: Gerät, Emulator-Frontend, Dateitypen, Screenshots usw. / Device, frontend, file types, screenshots, etc.
