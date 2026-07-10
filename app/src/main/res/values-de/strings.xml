@@ -16,7 +16,7 @@
 
     <!-- What's new (pro Release aktualisieren!) -->
     <string name="whatsnew_title">Neu in Version %s</string>
-    <string name="whatsnew_body">• Sicheres Ersetzen: Vorhandene ROMs bleiben bis zur erfolgreichen Prüfung geschützt\n• Quellarchive bleiben standardmäßig erhalten; Rückgängig unterstützt den Papierkorb\n• LAN-Empfang mit einmaliger Sitzungsadresse und automatischem 30-Minuten-Stopp\n\nAlle Details im Changelog auf GitHub.</string>
+    <string name="whatsnew_body">• Eigene Systeme anlegen oder als geprüftes JSON-System-Pack importieren\n• Importvorschau zeigt Inhalt und Konflikte vor der Installation\n• Einstellungs-Backups werden vollständig geprüft und atomar übernommen\n\nAlle Details im Changelog auf GitHub.</string>
 
     <!-- Setup screen -->
     <string name="setup_title">Einrichtung</string>
