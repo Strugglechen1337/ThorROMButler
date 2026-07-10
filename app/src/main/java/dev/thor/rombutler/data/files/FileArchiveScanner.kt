@@ -36,6 +36,7 @@ class FileArchiveScanner @Inject constructor(
         val results = mutableListOf<RomArchive>()
         for (root in roots) {
             purgeOldTrash(root)
+            purgeInterruptedImports(root)
             scanDirectory(root, depth = 0, results = results)
         }
         results.sortedByDescending { it.lastModifiedMillis }
@@ -47,6 +48,19 @@ class FileArchiveScanner @Inject constructor(
         File(root, TRASH_DIR_NAME).listFiles()
             ?.filter { it.lastModified() < cutoff }
             ?.forEach { it.deleteRecursively() }
+    }
+
+    /** Removes abandoned incoming partial files after a process interruption. */
+    private fun purgeInterruptedImports(root: File) {
+        val cutoff = System.currentTimeMillis() - PARTIAL_RETENTION_MILLIS
+        root.listFiles()
+            ?.filter {
+                it.isFile &&
+                    it.name.startsWith(".thor-") &&
+                    it.name.endsWith(".partial") &&
+                    it.lastModified() < cutoff
+            }
+            ?.forEach { it.delete() }
     }
 
     private fun scanDirectory(dir: File, depth: Int, results: MutableList<RomArchive>) {
@@ -79,6 +93,7 @@ class FileArchiveScanner @Inject constructor(
 
         /** Recursion limit — download folders are usually flat. */
         private const val MAX_DEPTH = 3
+        private const val PARTIAL_RETENTION_MILLIS = 24L * 60 * 60 * 1000
 
         // Container signatures (magic bytes at offset 0)
         private val MAGIC_ZIP = byteArrayOf(0x50, 0x4B, 0x03, 0x04)

@@ -36,8 +36,9 @@ ungepackt, beides funktioniert. Weitere Quellordner kannst du in den
 Einstellungen ergänzen.
 
 **Am bequemsten: LAN-Empfang.** In den Einstellungen „Empfang starten",
-die angezeigte Adresse am PC im Browser öffnen (gleiches WLAN) und die
-Dateien einfach auf die Seite ziehen — ganz ohne Kabel. Noch schneller:
+die einmalige Sitzungsadresse am PC im Browser öffnen (gleiches WLAN) und die
+Dateien einfach auf die Seite ziehen — ganz ohne Kabel. Unvollständige Uploads
+bleiben unsichtbar; der Empfang endet automatisch nach 30 Minuten. Noch schneller:
 Der LAN-Empfang lässt sich als Schnelleinstellungs-Kachel in die
 Statusleiste legen (Statusleiste ausklappen → Stift → „LAN-Empfang"
 hinzufügen). Alternativ kannst du Dateien aus anderen Apps per
@@ -62,7 +63,9 @@ Jedes ROM bekommt eine Einschätzung:
 | ⚪ **Unbekannt** | Keine sichere Zuordnung möglich | System selbst wählen |
 
 Mit „Alle übernehmen" bestätigst du alle gelben Vorschläge auf einmal.
-Duplikate werden erkannt und übersprungen, außer du wählst „Ersetzen".
+Duplikate werden erkannt und übersprungen, außer du wählst „Ersetzen". Beim
+Ersetzen bleibt die vorhandene Datei gesichert, bis die neue vollständig
+geschrieben und geprüft wurde.
 
 <img src="screenshots/assign.png" alt="Zuordnung" width="600">
 
@@ -70,8 +73,8 @@ Duplikate werden erkannt und übersprungen, außer du wählst „Ersetzen".
 
 Ein Tipp auf **„n ROMs einsortieren"** — die App entpackt bzw. verschiebt
 alles in die richtigen Systemordner (mit Fortschrittsbalken, auch bei
-ausgeschaltetem Display). Vollständig verarbeitete Archive werden aus dem
-Download-Ordner entfernt (abschaltbar, optional in einen Papierkorb).
+ausgeschaltetem Display). Quellarchive bleiben standardmäßig im Download-Ordner;
+optional kannst du sie löschen oder für sieben Tage in den Papierkorb verschieben.
 
 Jede Aktion steht im **Log** — inklusive **Rückgängig**, falls du es dir
 anders überlegst.
@@ -133,8 +136,9 @@ RAR4) or loose, both work. Additional source folders can be added in the
 settings.
 
 **Most convenient: LAN receive.** Tap "Start receiving" in Settings, open
-the shown address in a browser on your PC (same Wi-Fi) and simply drop the
-files onto the page — no cable at all. Even quicker: LAN receive is
+the one-time session address in a browser on your PC (same Wi-Fi) and simply
+drop the files onto the page — no cable at all. Incomplete uploads stay hidden,
+and receiving stops automatically after 30 minutes. Even quicker: LAN receive is
 available as a Quick Settings tile (expand the notification shade → pencil
 icon → add "LAN receive"). Alternatively, send files from other apps via
 "Share → Thor ROM Butler".
@@ -157,16 +161,17 @@ Every ROM gets an honest confidence rating:
 | ⚪ **Unknown** | No reliable match | Pick the system yourself |
 
 "Accept all" confirms every yellow suggestion at once. Duplicates are
-detected and skipped unless you opt into replacing them.
+detected and skipped unless you opt into replacing them. During replacement,
+the existing file stays backed up until the new copy is complete and verified.
 
 <img src="screenshots/assign.png" alt="Review" width="600">
 
 ### Step 5: Sort
 
 Tap **"Sort in n ROMs"** — the app extracts/moves everything into the right
-system folders (with a progress bar, even with the screen off). Fully
-processed archives are removed from the download folder (optional, can also
-go to a trash folder instead).
+system folders (with a progress bar, even with the screen off). Source archives
+remain in the download folder by default; optionally, they can be deleted or
+kept in the trash for seven days.
 
 Every action is recorded in the **log** — including **undo** if you change
 your mind.

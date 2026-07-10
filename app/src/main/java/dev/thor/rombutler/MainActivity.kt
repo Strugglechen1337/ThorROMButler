@@ -1,5 +1,6 @@
 package dev.thor.rombutler
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -97,6 +98,10 @@ class MainActivity : ComponentActivity() {
      * B navigates back. Everything else (D-pad, stick as D-pad) already
      * drives Compose focus traversal natively.
      */
+    // ComponentActivity restricts this callback for library callers, but an
+    // Activity override is the only point where BUTTON_A can be remapped
+    // before Compose performs focus activation. This is exercised on hardware.
+    @SuppressLint("RestrictedApi")
     override fun dispatchKeyEvent(event: android.view.KeyEvent): Boolean {
         when (event.keyCode) {
             android.view.KeyEvent.KEYCODE_BUTTON_A ->

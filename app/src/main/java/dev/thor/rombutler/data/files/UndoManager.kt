@@ -34,8 +34,13 @@ class UndoManager @Inject constructor(
     }
 
     private fun undoExtraction(info: UndoInfo) {
-        val archive = info.sourceArchivePath?.let(::File)
-        if (archive == null || !archive.isFile) {
+        val originalArchive = info.sourceArchivePath?.let(::File)
+        val archive = originalArchive?.takeIf { it.isFile }
+            ?: originalArchive?.let { original ->
+                File(File(original.parentFile, ".thor_trash"), original.name)
+                    .takeIf { it.isFile }
+            }
+        if (archive == null) {
             throw IOException(
                 "Quellarchiv existiert nicht mehr – Rückgängig würde die einzige Kopie löschen",
             )

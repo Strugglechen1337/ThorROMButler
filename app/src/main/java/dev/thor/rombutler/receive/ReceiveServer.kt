@@ -1,51 +1,47 @@
 package dev.thor.rombutler.receive
 
+import dev.thor.rombutler.data.files.IncomingFile
 import fi.iki.elonen.NanoHTTPD
 import java.io.File
+import java.io.IOException
 
 /**
- * Tiny embedded HTTP server for the LAN receive mode: serves a minimal
- * upload page and stores uploaded files into the download folder, where
- * the normal scan flow picks them up.
- *
- * Security posture: LAN-only convenience feature, started explicitly by
- * the user and only while the foreground service runs. Filenames are
- * sanitized to their last path segment — no path traversal.
+ * Tiny embedded HTTP server for the LAN receive mode. A random per-session
+ * path is required for both the upload page and POST endpoint; received files
+ * become visible to the scanner only after their copy completed.
  */
 class ReceiveServer(
     port: Int,
     private val targetDir: File,
+    private val sessionToken: String,
     private val onFileReceived: (String) -> Unit,
 ) : NanoHTTPD(port) {
 
+    private val pagePath = "/$sessionToken/"
+    private val uploadPath = "/$sessionToken/upload"
+
     override fun serve(session: IHTTPSession): Response = when {
-        session.method == Method.POST && session.uri == "/upload" -> handleUpload(session)
-        else -> newFixedLengthResponse(Response.Status.OK, "text/html", UPLOAD_PAGE)
+        session.method == Method.POST && session.uri == uploadPath -> handleUpload(session)
+        session.method == Method.GET && session.uri == pagePath ->
+            newFixedLengthResponse(Response.Status.OK, "text/html", UPLOAD_PAGE)
+
+        else -> newFixedLengthResponse(Response.Status.NOT_FOUND, "text/plain", "Not found")
     }
 
     private fun handleUpload(session: IHTTPSession): Response {
         return try {
-            // NanoHTTPD writes multipart bodies to temp files
+            // NanoHTTPD finishes multipart reception into temp files first.
             val body = mutableMapOf<String, String>()
             session.parseBody(body)
 
             var saved = 0
             for ((param, tempPath) in body) {
                 val original = session.parameters[param]?.firstOrNull() ?: continue
-                val name = sanitizeFileName(original) ?: continue
-                var target = File(targetDir, name)
-                // Never overwrite: suffix (1), (2), ...
-                var counter = 1
-                while (target.exists()) {
-                    val stem = name.substringBeforeLast('.')
-                    val ext = name.substringAfterLast('.', "")
-                    target = File(
-                        targetDir,
-                        if (ext.isEmpty()) "$stem ($counter)" else "$stem ($counter).$ext",
-                    )
-                    counter++
-                }
-                File(tempPath).copyTo(target)
+                val name = IncomingFile.sanitizeName(original) ?: continue
+                val target = IncomingFile.uniqueTarget(targetDir, name) ?: continue
+                val tempFile = File(tempPath)
+                ensureFreeSpace(tempFile.length())
+                tempFile.inputStream().use { input -> IncomingFile.copyAtomically(input, target) }
                 onFileReceived(target.name)
                 saved++
             }
@@ -54,19 +50,21 @@ class ReceiveServer(
             newFixedLengthResponse(
                 Response.Status.INTERNAL_ERROR,
                 "text/plain",
-                "Fehler: ${e.message}",
+                "Upload failed: ${e.message}",
             )
         }
     }
 
-    companion object {
-        const val DEFAULT_PORT = 8737 // T=8, H=7, O=3... close enough to THOR
-
-        /** Last path segment only; rejects empty/hidden results. */
-        fun sanitizeFileName(raw: String): String? {
-            val name = raw.replace('\\', '/').substringAfterLast('/').trim()
-            return name.takeIf { it.isNotEmpty() && !it.startsWith(".") }
+    private fun ensureFreeSpace(incomingBytes: Long) {
+        val usable = targetDir.usableSpace
+        if (usable in 1 until incomingBytes + SPACE_MARGIN_BYTES) {
+            throw IOException("Not enough free space")
         }
+    }
+
+    companion object {
+        const val DEFAULT_PORT = 8737
+        private const val SPACE_MARGIN_BYTES = 64L * 1024 * 1024
 
         // language=HTML
         private val UPLOAD_PAGE = """
@@ -91,11 +89,10 @@ class ReceiveServer(
                 for(const f of files){
                   const fd=new FormData();fd.append('file',f,f.name);
                   log.textContent='Sende / sending: '+f.name+' …';
-                  const r=await fetch('/upload',{method:'POST',body:fd});
-                  log.textContent=(r.ok?'&#10003; ':'&#9888; ')+f.name;
-                  log.innerHTML=(r.ok?'&#10003; ':'&#9888; ')+f.name;
+                  const r=await fetch('upload',{method:'POST',body:fd});
+                  log.textContent=(r.ok?'✓ ':'⚠ ')+f.name;
                 }
-                log.innerHTML+='<br>Fertig / done.';
+                log.textContent+=' · Fertig / done.';
               }
               drop.addEventListener('dragover',e=>{e.preventDefault();drop.classList.add('hover')});
               drop.addEventListener('dragleave',()=>drop.classList.remove('hover'));

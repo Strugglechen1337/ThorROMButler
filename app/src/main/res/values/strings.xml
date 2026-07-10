@@ -173,8 +173,8 @@
     <!-- LAN receive mode -->
     <string name="settings_theme">Color theme</string>
     <string name="receive_title">LAN receive</string>
-    <string name="receive_hint">Send ROMs straight from your PC: start receiving, open the shown address in a browser on the PC and drop files in. They land in the download folder. Tip: there is also a Quick Settings tile for this.</string>
-    <string name="receive_running_hint">Open in a browser on your PC (same Wi-Fi):</string>
+    <string name="receive_hint">Send ROMs straight from your PC: start receiving, open the protected session address in a browser, and drop files. Receiving stops automatically after 30 minutes. Tip: there is also a Quick Settings tile for this.</string>
+    <string name="receive_running_hint">Open this one-time address on your PC (same Wi-Fi, valid for 30 minutes):</string>
     <string name="receive_start">Start receiving</string>
     <string name="receive_stop">Stop receiving</string>
     <string name="receive_count">%d file(s) received</string>

@@ -6,8 +6,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import dev.thor.rombutler.data.files.IncomingFile
 import dev.thor.rombutler.data.update.GitHubUpdateChecker
 import dev.thor.rombutler.data.update.UpdateAvailability
+import dev.thor.rombutler.di.IoDispatcher
 import dev.thor.rombutler.domain.repository.SettingsRepository
 import dev.thor.rombutler.ui.navigation.Routes
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,6 +19,8 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.CoroutineDispatcher
+import java.io.File
 import javax.inject.Inject
 
 /**
@@ -30,6 +34,7 @@ class MainViewModel @Inject constructor(
     private val settingsRepository: SettingsRepository,
     private val updateChecker: GitHubUpdateChecker,
     private val updateAvailability: UpdateAvailability,
+    @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
     /** `null` while settings are still loading (splash keeps showing). */
@@ -68,16 +73,18 @@ class MainViewModel @Inject constructor(
      */
     fun handleSharedUris(uris: List<android.net.Uri>) {
         if (uris.isEmpty()) return
-        viewModelScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+        viewModelScope.launch(ioDispatcher) {
             val downloadPath = settingsRepository.settings.first().downloadPath ?: return@launch
+            val downloadDir = File(downloadPath).takeIf { it.isDirectory } ?: return@launch
             var copied = 0
             for (uri in uris) {
                 runCatching {
-                    val name = queryDisplayName(uri) ?: uri.lastPathSegment ?: "geteilt.bin"
-                    val target = java.io.File(downloadPath, name)
+                    val rawName = queryDisplayName(uri) ?: uri.lastPathSegment ?: "shared.bin"
+                    val name = IncomingFile.sanitizeName(rawName) ?: return@runCatching
+                    val target = IncomingFile.resolveTarget(downloadDir, name) ?: return@runCatching
                     if (target.exists()) return@runCatching // never overwrite silently
                     context.contentResolver.openInputStream(uri)?.use { input ->
-                        target.outputStream().use { output -> input.copyTo(output) }
+                        IncomingFile.copyAtomically(input, target)
                         copied++
                     }
                 }

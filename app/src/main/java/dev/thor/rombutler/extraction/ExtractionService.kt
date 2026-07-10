@@ -79,6 +79,12 @@ class ExtractionService : Service() {
         super.onDestroy()
     }
 
+    /** Android 15+ calls this when the shared data-sync quota is exhausted. */
+    override fun onTimeout(startId: Int, fgsType: Int) {
+        manager.cancel()
+        stopSelf()
+    }
+
     private fun buildNotification(progress: ExtractionProgress?): Notification {
         val cancelIntent = PendingIntent.getService(
             this,

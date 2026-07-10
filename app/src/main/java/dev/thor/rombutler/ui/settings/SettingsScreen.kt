@@ -44,6 +44,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -67,6 +68,7 @@ fun SettingsScreen(
     val libraryState by viewModel.libraryState.collectAsStateWithLifecycle()
     val receiveState by viewModel.receiveState.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    val resources = LocalResources.current
 
     var showDownloadPicker by remember { mutableStateOf(false) }
     var showRomBasePicker by remember { mutableStateOf(false) }
@@ -291,7 +293,7 @@ fun SettingsScreen(
                             viewModel.exportSettings { ok ->
                                 android.widget.Toast.makeText(
                                     context,
-                                    context.getString(
+                                    resources.getString(
                                         if (ok) R.string.settings_backup_done else R.string.settings_backup_failed,
                                     ),
                                     android.widget.Toast.LENGTH_SHORT,
@@ -306,7 +308,7 @@ fun SettingsScreen(
                             viewModel.importSettings { ok ->
                                 android.widget.Toast.makeText(
                                     context,
-                                    context.getString(
+                                    resources.getString(
                                         if (ok) R.string.settings_backup_done else R.string.settings_backup_failed,
                                     ),
                                     android.widget.Toast.LENGTH_SHORT,
@@ -372,7 +374,7 @@ fun SettingsScreen(
                                 viewModel.startReceive {
                                     android.widget.Toast.makeText(
                                         context,
-                                        context.getString(R.string.receive_failed),
+                                        resources.getString(R.string.receive_failed),
                                         android.widget.Toast.LENGTH_LONG,
                                     ).show()
                                 }
@@ -514,7 +516,7 @@ fun SettingsScreen(
                                 viewModel.exportLibrary(report) { ok ->
                                     android.widget.Toast.makeText(
                                         context,
-                                        context.getString(
+                                        resources.getString(
                                             if (ok) R.string.settings_backup_done else R.string.settings_backup_failed,
                                         ),
                                         android.widget.Toast.LENGTH_SHORT,

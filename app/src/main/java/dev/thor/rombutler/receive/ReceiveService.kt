@@ -79,6 +79,12 @@ class ReceiveService : Service() {
         super.onDestroy()
     }
 
+    /** Android 15+ calls this when the shared data-sync quota is exhausted. */
+    override fun onTimeout(startId: Int, fgsType: Int) {
+        manager.stop()
+        stopSelf()
+    }
+
     private fun buildNotification(url: String, received: Int): Notification {
         val stopIntent = PendingIntent.getService(
             this,

@@ -2,6 +2,32 @@
 
 All notable user-facing changes are documented here.
 
+## Unveröffentlicht / Unreleased
+
+### Deutsch
+
+- Sicheres Ersetzen: Neue ROM-Dateien werden zunächst vollständig in eine
+  versteckte Teildatei geschrieben und geprüft. Vorhandene Dateien bleiben bis
+  zum erfolgreichen Abschluss gesichert und werden bei Fehlern wiederhergestellt.
+- Quellarchive bleiben bei neuen Installationen standardmäßig erhalten.
+  „Rückgängig“ erkennt Archive nun auch im siebentägigen Papierkorb.
+- LAN-Empfang mit zufälliger Sitzungsadresse, atomarer Dateiübernahme,
+  Speicherplatzprüfung und automatischem Ende nach 30 Minuten.
+- Geteilte Dateien werden mit bereinigten Dateinamen und atomar übernommen.
+- Android Lint ist fehlerfrei und läuft jetzt verpflichtend in der CI.
+
+### English
+
+- Safe replacement: new ROM files are fully written to a hidden partial file
+  and verified first. Existing targets stay backed up until commit and are
+  restored after failures.
+- Source archives are kept by default on new installations. Undo now also
+  recognizes archives in the seven-day trash folder.
+- LAN receive now uses a random session address, atomic file commits, free-space
+  checks, and an automatic 30-minute timeout.
+- Shared files are imported atomically with sanitized file names.
+- Android Lint is error-free and now runs as a required CI check.
+
 ## 1.1.0
 
 - Added a Quick Settings tile for the LAN receive mode: toggle receiving

@@ -67,6 +67,9 @@ jobs:
       - name: Run unit tests
         run: ./gradlew testDebugUnitTest
 
+      - name: Run Android lint
+        run: ./gradlew lintDebug
+
       - name: Build signed release APK
         run: ./gradlew assembleRelease
         env:

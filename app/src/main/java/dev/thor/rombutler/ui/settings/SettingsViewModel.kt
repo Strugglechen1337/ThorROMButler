@@ -176,7 +176,7 @@ class SettingsViewModel @Inject constructor(
                     }
                 }
                 settingsRepository.setDeleteArchivesAfterExtract(
-                    json.optBoolean("deleteArchivesAfterExtract", true),
+                    json.optBoolean("deleteArchivesAfterExtract", false),
                 )
                 settingsRepository.setTrashInsteadOfDelete(
                     json.optBoolean("trashInsteadOfDelete", false),

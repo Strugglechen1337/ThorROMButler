@@ -38,6 +38,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -59,6 +60,7 @@ fun LogScreen(
 ) {
     val entries by viewModel.entries.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    val resources = LocalResources.current
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -79,13 +81,13 @@ fun LogScreen(
                             onClick = {
                                 val sendIntent = Intent(Intent.ACTION_SEND).apply {
                                     type = "text/plain"
-                                    putExtra(Intent.EXTRA_SUBJECT, context.getString(R.string.log_share_subject))
+                                    putExtra(Intent.EXTRA_SUBJECT, resources.getString(R.string.log_share_subject))
                                     putExtra(Intent.EXTRA_TEXT, entries.toShareText())
                                 }
                                 context.startActivity(
                                     Intent.createChooser(
                                         sendIntent,
-                                        context.getString(R.string.log_share),
+                                        resources.getString(R.string.log_share),
                                     ),
                                 )
                             },

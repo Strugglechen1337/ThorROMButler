@@ -42,9 +42,11 @@ läuft aber auf jedem Android-Smartphone ab Android 13.
   und ignoriert
 - 🚚 **Einsortieren**: entpackt ROMs mit Fortschrittsbalken, Abbrechen-Option
   und CRC-Prüfung in den richtigen Systemordner - als Foreground-Service, der
-  auch ausgeschaltete Displays übersteht. Duplikate werden erkannt (Ersetzen
-  nur auf Wunsch), Speicherplatz wird vorab geprüft, vollständig verarbeitete
-  Archive werden optional gelöscht.
+  auch ausgeschaltete Displays übersteht. Neue und ersetzte Dateien werden
+  transaktional geschrieben: vorhandene ROMs bleiben bis zur erfolgreichen
+  Prüfung gesichert. Speicherplatz wird vorab geprüft; Quellarchive bleiben
+  standardmäßig erhalten und können optional gelöscht oder nach
+  `.thor_trash` verschoben werden.
 - 🕹️ **Arcade-Sets bleiben gepackt**: MAME-/Neo-Geo-ZIPs werden als Ganzes
   nach `roms/arcade` bzw. `roms/neogeo` verschoben
 - 🗂️ **ES-DE-Ordnerkonvention**: `roms/nes`, `roms/psx`, `roms/dreamcast/<Spiel>/`, ...
@@ -56,8 +58,10 @@ läuft aber auf jedem Android-Smartphone ab Android 13.
 - 🏅 **DAT-Verifizierung** (optional): einsortierte ROMs per Prüfsumme
   gegen No-Intro/Redump-DAT-Dateien verifizieren
 - 📡 **LAN-Empfang**: ROMs kabellos vom PC-Browser direkt aufs Gerät
-  (Einstellungen → „Empfang starten", Adresse am PC öffnen, Dateien reinziehen)
-  — auch als Schnelleinstellungs-Kachel in der Statusleiste
+  (Einstellungen → „Empfang starten", einmalige Sitzungsadresse am PC öffnen,
+  Dateien reinziehen). Uploads werden erst nach vollständigem Schreiben
+  sichtbar; die Sitzung endet automatisch nach 30 Minuten. Auch als
+  Schnelleinstellungs-Kachel in der Statusleiste verfügbar.
 - 🔄 **Update-Check & In-App-Download** direkt aus den Einstellungen
 - 📜 **Aktions-Log mit Rückgängig**: jede Bewegung wird protokolliert und
   lässt sich direkt aus dem Log zurücknehmen
@@ -109,10 +113,11 @@ Das ist eine bewusste Entscheidung: ROM-Archive sind oft mehrere Gigabyte groß,
 und die Analyse ohne Entpacken braucht schnellen wahlfreien Zugriff auf die
 Archivdateien - das Storage Access Framework ist dafür zu langsam.
 
-Internet nutzt die App ausschließlich für den **Update-Check** gegen die
-GitHub-Releases-API: manuell in den Einstellungen, optional (standardmäßig
-**aus**) auch automatisch beim App-Start. Es werden keinerlei Nutzungsdaten
-gesendet.
+Die Netzwerkberechtigung dient dem **Update-Check** gegen die
+GitHub-Releases-API und dem ausdrücklich gestarteten **LAN-Empfang** im lokalen
+Netz. Der Update-Check erfolgt manuell oder optional (standardmäßig **aus**)
+beim App-Start. Der LAN-Server ist nur während einer 30-minütigen Sitzung unter
+einer zufälligen Adresse erreichbar. Es werden keinerlei Nutzungsdaten gesendet.
 
 ### Installation
 
@@ -187,9 +192,10 @@ newer.
   `.bin`+`.cue` and `.m3u` files are treated as one unit, while BIOS files are
   detected and ignored
 - 🚚 **Sorting**: extracts ROMs into the correct system folder with progress,
-  cancellation, and CRC checks. Work runs as a foreground service, duplicate
-  files are detected, storage space is checked beforehand, and fully processed
-  archives can optionally be deleted.
+  cancellation, and CRC checks. New and replaced files are written as a
+  transaction: existing ROMs stay backed up until verification succeeds.
+  Storage space is checked beforehand; source archives are kept by default
+  and can optionally be deleted or moved to `.thor_trash`.
 - 🕹️ **Arcade sets stay packed**: MAME and Neo Geo ZIPs are moved as complete
   sets to `roms/arcade` or `roms/neogeo`
 - 🗂️ **ES-DE folder convention**: `roms/nes`, `roms/psx`, `roms/dreamcast/<game>/`, ...
@@ -201,8 +207,10 @@ newer.
 - 🏅 **DAT verification** (optional): verify sorted ROMs by checksum
   against No-Intro/Redump DAT files
 - 📡 **LAN receive**: send ROMs wirelessly from your PC browser straight to
-  the device (Settings → "Start receiving", open the address, drop files)
-  — also available as a Quick Settings tile in the notification shade
+  the device (Settings → "Start receiving", open the one-time session address,
+  drop files). Uploads appear only after the copy completes, and the session
+  stops automatically after 30 minutes. Also available as a Quick Settings
+  tile in the notification shade.
 - 🔄 **Update check & in-app download** directly from Settings
 - 📜 **Action log with undo**: every move is recorded and can be reverted
   right from the log
@@ -254,9 +262,11 @@ deliberate choice: ROM archives are often several gigabytes in size, and
 analyzing them without extraction needs fast random access to archive files.
 The Storage Access Framework is too slow for this workflow.
 
-Internet access is used only for the **update check** against the GitHub
-Releases API: manually from Settings and, optionally (**off** by default),
-automatically on app start. The app does not send analytics or user data.
+Network access is used for the **update check** against the GitHub Releases API
+and for the explicitly started **LAN receiver** on the local network. Update
+checks are manual or optionally automatic (**off** by default). The LAN server
+is reachable only during a 30-minute session at a random address. The app does
+not send analytics or user data.
 
 ### Installation
 

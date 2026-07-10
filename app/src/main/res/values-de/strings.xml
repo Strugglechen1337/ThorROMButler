@@ -172,8 +172,8 @@
     <!-- LAN receive mode -->
     <string name="settings_theme">Farbwelt</string>
     <string name="receive_title">LAN-Empfang</string>
-    <string name="receive_hint">ROMs direkt vom PC schicken: Empfang starten, die angezeigte Adresse am PC im Browser öffnen und Dateien hineinziehen. Sie landen im Download-Ordner. Tipp: Dafür gibt es auch eine Schnelleinstellungs-Kachel.</string>
-    <string name="receive_running_hint">Am PC im Browser öffnen (gleiches WLAN):</string>
+    <string name="receive_hint">ROMs direkt vom PC schicken: Empfang starten, die geschützte Sitzungsadresse am PC im Browser öffnen und Dateien hineinziehen. Der Empfang endet automatisch nach 30 Minuten. Tipp: Dafür gibt es auch eine Schnelleinstellungs-Kachel.</string>
+    <string name="receive_running_hint">Einmalige Adresse am PC öffnen (gleiches WLAN, 30 Minuten gültig):</string>
     <string name="receive_start">Empfang starten</string>
     <string name="receive_stop">Empfang beenden</string>
     <string name="receive_count">%d Datei(en) empfangen</string>

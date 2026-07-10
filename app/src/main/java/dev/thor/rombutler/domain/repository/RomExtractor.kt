@@ -14,8 +14,8 @@ interface RomExtractor {
      * written by this call are removed again — no half-extracted groups.
      *
      * @param replaceExisting when false, an existing target file fails the
-     *   whole group. When true, existing files are deleted first (the user
-     *   explicitly chose to replace them in the review UI).
+     *   whole group. When true, existing files are backed up until the new
+     *   group has been written and verified successfully.
      * @param expectedBytes decompressed size of the group; when > 0 the
      *   free space on the target volume is checked BEFORE extracting.
      * @param onBytesWritten delta of bytes written (drives the progress bar).

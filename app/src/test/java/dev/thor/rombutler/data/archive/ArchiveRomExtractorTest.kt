@@ -97,6 +97,90 @@ class ArchiveRomExtractorTest {
     }
 
     @Test
+    fun `failed replacement preserves the existing target`() = runTest {
+        val zipFile = tempFolder.newFile("broken-replacement.zip")
+        writeZip(zipFile, mapOf("game.bin" to byteArrayOf(9, 9, 9)))
+        val targetDir = tempFolder.newFolder("replacement", "psx")
+        val existing = File(targetDir, "game.bin").apply { writeBytes(byteArrayOf(1, 2, 3, 4)) }
+
+        val result = buildExtractor(StandardTestDispatcher(testScheduler)).extractGroup(
+            archivePath = zipFile.absolutePath,
+            archiveType = ArchiveType.ZIP,
+            entryPaths = listOf("game.bin", "missing.cue"),
+            targetDir = targetDir.absolutePath,
+            replaceExisting = true,
+        )
+
+        assertThat(result.isFailure).isTrue()
+        assertThat(existing.readBytes()).isEqualTo(byteArrayOf(1, 2, 3, 4))
+        assertThat(targetDir.listFiles().orEmpty().map { it.name })
+            .containsExactly("game.bin")
+    }
+
+    @Test
+    fun `successful replacement swaps the target after verification`() = runTest {
+        val zipFile = tempFolder.newFile("replacement.zip")
+        writeZip(zipFile, mapOf("game.gba" to byteArrayOf(7, 8, 9)))
+        val targetDir = tempFolder.newFolder("replacement-success", "gba")
+        val existing = File(targetDir, "game.gba").apply { writeBytes(byteArrayOf(1)) }
+
+        val result = buildExtractor(StandardTestDispatcher(testScheduler)).extractGroup(
+            archivePath = zipFile.absolutePath,
+            archiveType = ArchiveType.ZIP,
+            entryPaths = listOf("game.gba"),
+            targetDir = targetDir.absolutePath,
+            replaceExisting = true,
+        )
+
+        assertThat(result.isSuccess).isTrue()
+        assertThat(existing.readBytes()).isEqualTo(byteArrayOf(7, 8, 9))
+        assertThat(targetDir.listFiles().orEmpty().map { it.name })
+            .containsExactly("game.gba")
+    }
+
+    @Test
+    fun `duplicate flattened names fail without overwriting each other`() = runTest {
+        val zipFile = tempFolder.newFile("duplicate-names.zip")
+        writeZip(
+            zipFile,
+            mapOf(
+                "disc-one/game.bin" to byteArrayOf(1),
+                "disc-two/game.bin" to byteArrayOf(2),
+            ),
+        )
+        val targetDir = tempFolder.newFolder("duplicate-target", "psx")
+
+        val result = buildExtractor(StandardTestDispatcher(testScheduler)).extractGroup(
+            archivePath = zipFile.absolutePath,
+            archiveType = ArchiveType.ZIP,
+            entryPaths = listOf("disc-one/game.bin", "disc-two/game.bin"),
+            targetDir = targetDir.absolutePath,
+        )
+
+        assertThat(result.isFailure).isTrue()
+        assertThat(targetDir.listFiles().orEmpty()).isEmpty()
+    }
+
+    @Test
+    fun `next transaction restores a backup left by process death`() = runTest {
+        val zipFile = tempFolder.newFile("recovery.zip")
+        writeZip(zipFile, mapOf("new.gba" to byteArrayOf(5)))
+        val targetDir = tempFolder.newFolder("recovery-target", "gba")
+        File(targetDir, ".old.gba.thor-backup").writeBytes(byteArrayOf(1, 2))
+
+        val result = buildExtractor(StandardTestDispatcher(testScheduler)).extractGroup(
+            archivePath = zipFile.absolutePath,
+            archiveType = ArchiveType.ZIP,
+            entryPaths = listOf("new.gba"),
+            targetDir = targetDir.absolutePath,
+        )
+
+        assertThat(result.isSuccess).isTrue()
+        assertThat(File(targetDir, "old.gba").readBytes()).isEqualTo(byteArrayOf(1, 2))
+        assertThat(File(targetDir, ".old.gba.thor-backup").exists()).isFalse()
+    }
+
+    @Test
     fun `extracts from a real 7z archive`() = runTest {
         val sevenZipFile = tempFolder.newFile("game.7z")
         org.apache.commons.compress.archivers.sevenz.SevenZOutputFile(sevenZipFile).use { out ->

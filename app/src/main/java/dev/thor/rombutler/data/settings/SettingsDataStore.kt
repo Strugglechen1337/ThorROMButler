@@ -40,7 +40,7 @@ class SettingsDataStore @Inject constructor(
         AppSettings(
             romBasePath = prefs[Keys.ROM_BASE_PATH],
             downloadPath = prefs[Keys.DOWNLOAD_PATH],
-            deleteArchivesAfterExtract = prefs[Keys.DELETE_ARCHIVES] ?: true,
+            deleteArchivesAfterExtract = prefs[Keys.DELETE_ARCHIVES] ?: false,
             autoUpdateCheck = prefs[Keys.AUTO_UPDATE_CHECK] ?: false,
             watcherEnabled = prefs[Keys.WATCHER_ENABLED] ?: false,
             folderOverrides = prefs[Keys.FOLDER_OVERRIDES].parseOverrides(),
