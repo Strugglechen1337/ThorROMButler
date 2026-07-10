@@ -53,4 +53,7 @@ interface SettingsRepository {
      * restores the ES-DE default.
      */
     suspend fun setFolderOverride(systemId: String, folder: String?)
+
+    /** Persists a validated custom system pack; `null` removes all custom systems. */
+    suspend fun setCustomSystemPack(json: String?)
 }

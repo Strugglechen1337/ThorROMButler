@@ -10,6 +10,7 @@ import dev.thor.rombutler.data.files.IncomingFile
 import dev.thor.rombutler.data.update.GitHubUpdateChecker
 import dev.thor.rombutler.data.update.UpdateAvailability
 import dev.thor.rombutler.di.IoDispatcher
+import dev.thor.rombutler.domain.detection.SystemRegistry
 import dev.thor.rombutler.domain.repository.SettingsRepository
 import dev.thor.rombutler.ui.navigation.Routes
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -34,12 +35,15 @@ class MainViewModel @Inject constructor(
     private val settingsRepository: SettingsRepository,
     private val updateChecker: GitHubUpdateChecker,
     private val updateAvailability: UpdateAvailability,
+    private val systemRegistry: SystemRegistry,
     @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
     /** `null` while settings are still loading (splash keeps showing). */
     val startDestination: StateFlow<String?> = settingsRepository.settings
         .map { settings ->
+            // Activate persisted custom systems before the first scan screen is shown.
+            systemRegistry.applyCustomPackJson(settings.customSystemPackJson)
             if (settings.isSetupComplete && Environment.isExternalStorageManager()) {
                 Routes.SCAN
             } else {

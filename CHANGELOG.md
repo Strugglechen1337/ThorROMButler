@@ -2,6 +2,30 @@
 
 All notable user-facing changes are documented here.
 
+## Unveröffentlicht / Unreleased
+
+### Deutsch
+
+- Versionierte System-Packs: Die eingebauten Systemdefinitionen liegen jetzt
+  als geprüftes JSON-Schema v1 mit sicherem Code-Fallback vor.
+- Eigene Systeme können in den Einstellungen angelegt, bearbeitet und entfernt
+  sowie über `ThorRomButler-system-pack.json` importiert/exportiert werden.
+- Pack-Größe, Felder, IDs, Zielordner, Endungen und Magic-Regeln werden vor der
+  Aktivierung geprüft. Eingebaute Systeme können nicht überschrieben werden.
+- Konfligierende Endungen werden sichtbar gewarnt und bleiben für die
+  automatische Erkennung `UNKNOWN`.
+
+### English
+
+- Versioned system packs: built-in system definitions now use a validated JSON
+  schema v1 with a safe code fallback.
+- Custom systems can be created, edited, and removed in Settings, then imported
+  or exported through `ThorRomButler-system-pack.json`.
+- Pack size, fields, IDs, target folders, extensions, and magic rules are
+  validated before activation. Built-in systems cannot be overwritten.
+- Conflicting extensions are shown as warnings and remain `UNKNOWN` for
+  automatic detection.
+
 ## 1.1.1
 
 ### Deutsch

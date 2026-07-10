@@ -109,10 +109,11 @@ sealed interface MagicRule {
 }
 
 /**
- * One emulated system in the registry. Adding support for a new system means
- * adding exactly one new [SystemDefinition] — nothing else.
+ * One emulated system loaded from the bundled or user-provided registry pack.
+ * Adding a built-in system means adding one validated JSON definition; users
+ * can add extension-based definitions without an app update.
  *
- * @property id stable identifier, equals the ES-DE folder name.
+ * @property id stable identifier used by settings and logs.
  * @property displayName name shown in the UI.
  * @property esdeFolder subfolder below the ROM base folder (ES-DE convention).
  * @property extensions ROM file extensions (lowercase, no dot) mapped to the

@@ -34,6 +34,7 @@ class SettingsDataStore @Inject constructor(
         val LAST_SEEN_VERSION = intPreferencesKey("last_seen_version_code")
         val DAT_FOLDER = stringPreferencesKey("dat_folder_path")
         val THEME_ID = stringPreferencesKey("theme_id")
+        val CUSTOM_SYSTEM_PACK = stringPreferencesKey("custom_system_pack_json")
     }
 
     override val settings: Flow<AppSettings> = dataStore.data.map { prefs ->
@@ -48,6 +49,7 @@ class SettingsDataStore @Inject constructor(
             trashInsteadOfDelete = prefs[Keys.TRASH_MODE] ?: false,
             datFolderPath = prefs[Keys.DAT_FOLDER],
             themeId = prefs[Keys.THEME_ID] ?: "thor",
+            customSystemPackJson = prefs[Keys.CUSTOM_SYSTEM_PACK],
         )
     }
 
@@ -114,6 +116,16 @@ class SettingsDataStore @Inject constructor(
             val trimmed = folder?.trim()?.trim('/')
             if (trimmed.isNullOrEmpty()) current.remove(systemId) else current[systemId] = trimmed
             prefs[Keys.FOLDER_OVERRIDES] = org.json.JSONObject(current as Map<*, *>).toString()
+        }
+    }
+
+    override suspend fun setCustomSystemPack(json: String?) {
+        dataStore.edit { prefs ->
+            if (json.isNullOrBlank()) {
+                prefs.remove(Keys.CUSTOM_SYSTEM_PACK)
+            } else {
+                prefs[Keys.CUSTOM_SYSTEM_PACK] = json
+            }
         }
     }
 

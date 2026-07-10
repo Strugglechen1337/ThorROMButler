@@ -88,6 +88,12 @@ anders überlegst.
 - **Arcade/MAME-Sets** bleiben gepackt und werden als Ganzes verschoben.
 - **Eigene Ordnernamen** (z. B. `ps1` statt `psx`): Einstellungen →
   „Systemordner anpassen".
+- **Weitere Systeme**: Einstellungen → „System-Packs & eigene Systeme".
+  Dort kannst du Definitionen anlegen, bearbeiten und als
+  `ThorRomButler-system-pack.json` im Download-Ordner exportieren. Zum Import
+  legst du eine solche Datei in den Download-Ordner; der Import ersetzt nur
+  deine bisherigen eigenen Systeme. Konflikte werden gewarnt und bleiben bei
+  der automatischen Zuordnung unbekannt.
 - **Gamepad**: D-Pad/Stick navigiert, A bestätigt, B geht zurück —
   Touch funktioniert parallel weiter.
 - **Dump-Verifizierung**: Ordner mit No-Intro/Redump-`.dat`-Dateien in den
@@ -185,6 +191,11 @@ your mind.
 - **Arcade/MAME sets** stay zipped and are moved as a whole.
 - **Custom folder names** (e.g. `ps1` instead of `psx`): Settings →
   "Customize system folders".
+- **More systems**: Settings → "System packs & custom systems". Create or edit
+  definitions there and export them as `ThorRomButler-system-pack.json` in the
+  download folder. To import, place that file in the download folder; importing
+  replaces only your previous custom systems. Conflicts are shown and remain
+  unknown to automatic assignment.
 - **Gamepad**: D-pad/stick navigates, A confirms, B goes back — touch
   keeps working alongside.
 - **Dump verification**: pick a folder with No-Intro/Redump `.dat` files in

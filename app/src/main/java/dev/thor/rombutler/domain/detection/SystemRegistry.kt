@@ -6,25 +6,28 @@ import dev.thor.rombutler.domain.model.Confidence.PROBABLE
 import dev.thor.rombutler.domain.model.Confidence.UNKNOWN
 import dev.thor.rombutler.domain.model.MagicRule
 import dev.thor.rombutler.domain.model.SystemDefinition
+import dev.thor.rombutler.domain.model.SystemExtensionConflict
+import dev.thor.rombutler.domain.model.SystemPack
+import dev.thor.rombutler.domain.model.SystemPackDecodeResult
+import dev.thor.rombutler.domain.model.SystemPackError
+import dev.thor.rombutler.domain.repository.SettingsRepository
+import dev.thor.rombutler.di.IoDispatcher
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
 
-/**
- * The single source of truth for all supported systems (v0.1: 16 systems).
- *
- * Folder names follow the ES-DE convention (`roms/nes`, `roms/psx`, ...).
- * Extending the app with a new system means appending ONE entry here —
- * detection, review UI and move logic pick it up automatically.
- *
- * Confidence policy per extension:
- * - CERTAIN: the extension exists only for this system (`.gba`, `.nsp`, ...)
- * - PROBABLE: strong convention, but not guaranteed (`.cue` -> PS1)
- * - UNKNOWN: listed for grouping only, no assignment (`.bin` alone)
- * Extensions claimed by SEVERAL systems (`.iso`, `.rvz`, `.chd`) are resolved
- * via magic bytes; without a match the result stays UNKNOWN.
- */
-@Singleton
-class SystemRegistry @Inject constructor() {
+/** Last-known-good definitions used only if the bundled JSON cannot be read. */
+internal object LegacySystemDefinitions {
 
     val systems: List<SystemDefinition> = listOf(
 
@@ -362,54 +365,229 @@ class SystemRegistry @Inject constructor() {
         ),
     )
 
-    /** All ROM extensions any system claims (lowercase, no dot). */
-    val allRomExtensions: Set<String> by lazy {
-        systems.flatMap { it.extensions.keys }.toSet()
+}
+
+/** Immutable view consumed by detection and the settings UI. */
+data class SystemRegistryState(
+    val builtInSystems: List<SystemDefinition>,
+    val customPack: SystemPack? = null,
+    val conflicts: List<SystemExtensionConflict> = emptyList(),
+    val customPackError: SystemPackDecodeResult.Failure? = null,
+    val builtInFallbackUsed: Boolean = false,
+) {
+    val customSystems: List<SystemDefinition> = customPack?.systems.orEmpty()
+    val systems: List<SystemDefinition> = builtInSystems + customSystems
+}
+
+/**
+ * Single source of truth backed by a versioned bundled JSON pack plus an
+ * optional user pack persisted in DataStore. Invalid user data never replaces
+ * the built-ins; shared extensions become explicit warnings and stay ambiguous.
+ */
+@Singleton
+class SystemRegistry private constructor(
+    private val builtInSystems: List<SystemDefinition>,
+    builtInFallbackUsed: Boolean,
+    settingsRepository: SettingsRepository?,
+    ioDispatcher: CoroutineDispatcher,
+) {
+    @Inject
+    constructor(
+        settingsRepository: SettingsRepository,
+        @IoDispatcher ioDispatcher: CoroutineDispatcher,
+    ) : this(
+        load = loadBundledSystems(),
+        settingsRepository = settingsRepository,
+        ioDispatcher = ioDispatcher,
+    )
+
+    private constructor(
+        load: BuiltInLoad,
+        settingsRepository: SettingsRepository?,
+        ioDispatcher: CoroutineDispatcher,
+    ) : this(
+        builtInSystems = load.systems,
+        builtInFallbackUsed = load.fallbackUsed,
+        settingsRepository = settingsRepository,
+        ioDispatcher = ioDispatcher,
+    )
+
+    /** JVM-friendly constructor; production uses the injected JSON-backed one. */
+    constructor() : this(
+        builtInSystems = LegacySystemDefinitions.systems,
+        builtInFallbackUsed = true,
+        settingsRepository = null,
+        ioDispatcher = Dispatchers.Unconfined,
+    )
+
+    private val _state = MutableStateFlow(
+        SystemRegistryState(
+            builtInSystems = builtInSystems,
+            builtInFallbackUsed = builtInFallbackUsed,
+        ),
+    )
+    val state: StateFlow<SystemRegistryState> = _state.asStateFlow()
+
+    private val aliases = mapOf(
+        "supernintendo" to "snes", "famicom" to "nes",
+        "gameboy" to "gb", "gameboycolor" to "gbc", "gameboyadvance" to "gba",
+        "nintendo64" to "n64", "nintendods" to "nds", "ds" to "nds",
+        "3ds" to "n3ds", "nintendo3ds" to "n3ds",
+        "ps1" to "psx", "psone" to "psx", "playstation" to "psx",
+        "playstation1" to "psx", "playstation2" to "ps2",
+        "gamecube" to "gc", "ngc" to "gc", "dc" to "dreamcast",
+        "nsw" to "switch", "nintendoswitch" to "switch",
+        "commodore64" to "c64", "commodoreamiga" to "amiga",
+        "genesis" to "megadrive", "md" to "megadrive", "segamegadrive" to "megadrive",
+        "sms" to "mastersystem", "segamastersystem" to "mastersystem",
+        "gg" to "gamegear", "segagamegear" to "gamegear",
+        "segasaturn" to "saturn", "32x" to "sega32x",
+        "2600" to "atari2600", "7800" to "atari7800", "lynx" to "atarilynx",
+        "turbografx" to "pcengine", "turbografx16" to "pcengine",
+        "tg16" to "pcengine", "pce" to "pcengine", "ws" to "wonderswan",
+        "wsc" to "wonderswancolor", "mame" to "arcade",
+    )
+
+    init {
+        if (settingsRepository != null) {
+            CoroutineScope(SupervisorJob() + ioDispatcher).launch {
+                settingsRepository.settings
+                    .map { it.customSystemPackJson }
+                    .distinctUntilChanged()
+                    .collect(::applyCustomPackJson)
+            }
+        }
     }
 
-    /**
-     * Folder-name aliases -> system id, for the folder-hint heuristic
-     * (an ambiguous file inside an "SNES/" folder is probably SNES).
-     * Keys are normalized: lowercase, no spaces/dashes/underscores.
-     */
-    private val folderAliases: Map<String, String> = buildMap {
-        // Every system folder + id is an alias for itself
-        for (system in systems) {
-            put(system.esdeFolder.lowercase(), system.id)
-            put(system.id.lowercase(), system.id)
+    val systems: List<SystemDefinition>
+        get() = _state.value.systems
+
+    val allRomExtensions: Set<String>
+        get() = systems.flatMapTo(linkedSetOf()) { it.extensions.keys }
+
+    /** Validates against schema rules and immutable built-in ids/folders. */
+    fun validateCustomPack(json: String): SystemPackDecodeResult {
+        val decoded = SystemPackCodec.decode(json)
+        if (decoded !is SystemPackDecodeResult.Success) return decoded
+        if (decoded.pack.packId == BUILTIN_PACK_ID) {
+            return SystemPackDecodeResult.Failure(SystemPackError.RESERVED_PACK_ID, BUILTIN_PACK_ID)
         }
-        // Common colloquial folder names
-        put("supernintendo", "snes"); put("famicom", "nes")
-        put("gameboy", "gb"); put("gameboycolor", "gbc"); put("gameboyadvance", "gba")
-        put("nintendo64", "n64"); put("nintendods", "nds"); put("ds", "nds")
-        put("3ds", "n3ds"); put("nintendo3ds", "n3ds")
-        put("ps1", "psx"); put("psone", "psx"); put("playstation", "psx")
-        put("playstation1", "psx"); put("playstation2", "ps2")
-        put("gamecube", "gc"); put("ngc", "gc")
-        put("dc", "dreamcast"); put("nsw", "switch"); put("nintendoswitch", "switch")
-        put("commodore64", "c64"); put("commodoreamiga", "amiga")
-        put("genesis", "megadrive"); put("md", "megadrive"); put("segamegadrive", "megadrive")
-        put("sms", "mastersystem"); put("segamastersystem", "mastersystem")
-        put("gg", "gamegear"); put("segagamegear", "gamegear")
-        put("segasaturn", "saturn"); put("32x", "sega32x")
-        put("2600", "atari2600"); put("7800", "atari7800"); put("lynx", "atarilynx")
-        put("turbografx", "pcengine"); put("turbografx16", "pcengine")
-        put("tg16", "pcengine"); put("pce", "pcengine")
-        put("ws", "wonderswan"); put("wsc", "wonderswancolor")
-        put("mame", "arcade")
+        decoded.pack.systems.firstOrNull { candidate ->
+            builtInSystems.any { it.id == candidate.id }
+        }?.let {
+            return SystemPackDecodeResult.Failure(SystemPackError.BUILTIN_ID_COLLISION, it.id)
+        }
+        decoded.pack.systems.firstOrNull { candidate ->
+            builtInSystems.any { it.esdeFolder.equals(candidate.esdeFolder, ignoreCase = true) }
+        }?.let {
+            return SystemPackDecodeResult.Failure(
+                SystemPackError.BUILTIN_FOLDER_COLLISION,
+                it.esdeFolder,
+            )
+        }
+        return decoded
     }
+
+    /** Applies a persisted pack immediately; malformed data falls back safely. */
+    fun applyCustomPackJson(json: String?) {
+        if (json.isNullOrBlank()) {
+            _state.value = _state.value.copy(
+                customPack = null,
+                conflicts = emptyList(),
+                customPackError = null,
+            )
+            return
+        }
+        when (val decoded = validateCustomPack(json)) {
+            is SystemPackDecodeResult.Success -> {
+                _state.value = _state.value.copy(
+                    customPack = decoded.pack,
+                    conflicts = findCustomConflicts(decoded.pack.systems),
+                    customPackError = null,
+                )
+            }
+
+            is SystemPackDecodeResult.Failure -> {
+                _state.value = _state.value.copy(
+                    customPack = null,
+                    conflicts = emptyList(),
+                    customPackError = decoded,
+                )
+            }
+        }
+    }
+
+    fun encodeCustomPack(
+        systems: List<SystemDefinition>,
+        packId: String = DEFAULT_CUSTOM_PACK_ID,
+        displayName: String = DEFAULT_CUSTOM_PACK_NAME,
+    ): String = SystemPackCodec.encode(
+        SystemPack(
+            schemaVersion = SystemPackCodec.SCHEMA_VERSION,
+            packId = packId,
+            displayName = displayName,
+            systems = systems,
+        ),
+    )
 
     /** System hinted at by a folder name, or `null`. */
     fun systemForFolderName(folderName: String): SystemDefinition? {
-        val normalized = folderName.lowercase()
-            .replace(" ", "").replace("-", "").replace("_", "")
-        return folderAliases[normalized]?.let(::byId)
+        val normalized = normalizeAlias(folderName)
+        val dynamic = systems.firstOrNull {
+            normalizeAlias(it.id) == normalized || normalizeAlias(it.esdeFolder) == normalized
+        }
+        return dynamic ?: aliases[normalized]?.let(::byId)
     }
 
-    /** Systems that claim [extension] (lowercase, no dot). */
     fun systemsForExtension(extension: String): List<SystemDefinition> =
-        systems.filter { extension in it.extensions }
+        systems.filter { extension.lowercase() in it.extensions }
 
-    /** Lookup by stable id (= ES-DE folder name). */
     fun byId(id: String): SystemDefinition? = systems.find { it.id == id }
+
+    private fun findCustomConflicts(customSystems: List<SystemDefinition>): List<SystemExtensionConflict> {
+        val customIds = customSystems.mapTo(hashSetOf()) { it.id }
+        return (builtInSystems + customSystems)
+            .flatMap { system -> system.extensions.keys.map { it to system } }
+            .groupBy({ it.first }, { it.second })
+            .filterValues { claimants ->
+                claimants.size > 1 && claimants.any { it.id in customIds }
+            }
+            .map { (extension, claimants) ->
+                SystemExtensionConflict(extension, claimants.map { it.displayName }.sorted())
+            }
+            .sortedBy { it.extension }
+    }
+
+    private fun normalizeAlias(value: String): String = value.lowercase()
+        .replace(" ", "").replace("-", "").replace("_", "")
+
+    companion object {
+        const val DEFAULT_CUSTOM_PACK_ID = "user.custom"
+        const val DEFAULT_CUSTOM_PACK_NAME = "My custom systems"
+        private const val BUILTIN_PACK_ID = "thor.builtin"
+        private const val BUILTIN_RESOURCE = "system-packs/builtin-v1.json"
+
+        private fun loadBundledSystems(): BuiltInLoad {
+            val json = SystemRegistry::class.java.classLoader
+                ?.getResourceAsStream(BUILTIN_RESOURCE)
+                ?.bufferedReader()
+                ?.use { it.readText() }
+                ?: return BuiltInLoad(LegacySystemDefinitions.systems, fallbackUsed = true)
+            return when (val decoded = SystemPackCodec.decode(json)) {
+                is SystemPackDecodeResult.Success -> BuiltInLoad(
+                    decoded.pack.systems,
+                    fallbackUsed = false,
+                )
+                is SystemPackDecodeResult.Failure -> BuiltInLoad(
+                    LegacySystemDefinitions.systems,
+                    fallbackUsed = true,
+                )
+            }
+        }
+
+        private data class BuiltInLoad(
+            val systems: List<SystemDefinition>,
+            val fallbackUsed: Boolean,
+        )
+    }
 }

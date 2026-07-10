@@ -34,6 +34,9 @@ läuft aber auf jedem Android-Smartphone ab Android 13.
 - 🧠 **Detection Engine**: bestimmt das Zielsystem über Dateiendungen und Magic
   Bytes (inkl. ISO-, RVZ- und CHD-Header) - mit ehrlichen Confidence-Leveln
   (*sicher* / *wahrscheinlich* / *unbekannt*)
+- 🧩 **System-Packs & eigene Systeme**: zusätzliche Systeme lokal in den
+  Einstellungen anlegen oder als geprüftes JSON-Pack importieren/exportieren.
+  Konflikte bleiben unklar und werden niemals automatisch zugeordnet.
 - 🛡️ **Keine Automatik bei Unklarheit**: Nur eindeutig erkannte ROMs bekommen
   einen Zielordner-Vorschlag. Du entscheidest immer selbst - einzeln oder mit
   "Alle übernehmen".
@@ -78,6 +81,10 @@ Wii · Wii U · Dreamcast · Switch · Amiga · C64 · Mega Drive · Master Syst
 Game Gear · Saturn · Sega 32X · Atari 2600 · Atari 7800 · Atari Lynx ·
 PC Engine / TurboGrafx-16 · Neo Geo Pocket (Color) · WonderSwan (Color) ·
 Arcade (MAME) · Neo Geo
+
+Weitere Systeme lassen sich lokal als eigenes System-Pack ergänzen. Das
+[Schema v1](docs/system-pack-schema-v1.md) ist dokumentiert; es gibt keine
+automatischen oder ungeprüften Pack-Downloads.
 
 ### Unterstützte Archive
 
@@ -185,6 +192,9 @@ newer.
 - 🧠 **Detection engine**: identifies the target system from file extensions and
   magic bytes, including ISO, RVZ, and CHD headers, with honest confidence levels
   (*certain* / *probable* / *unknown*)
+- 🧩 **System packs & custom systems**: add systems locally in Settings or
+  import/export them as a validated JSON pack. Conflicts stay ambiguous and
+  are never assigned automatically.
 - 🛡️ **No automation when unclear**: only clearly identified ROMs receive a
   suggested target folder. You always decide what gets applied, one item at a
   time or in bulk.
@@ -227,6 +237,10 @@ Wii · Wii U · Dreamcast · Switch · Amiga · C64 · Mega Drive · Master Syst
 Game Gear · Saturn · Sega 32X · Atari 2600 · Atari 7800 · Atari Lynx ·
 PC Engine / TurboGrafx-16 · Neo Geo Pocket (Color) · WonderSwan (Color) ·
 Arcade (MAME) · Neo Geo
+
+More systems can be added locally through a custom system pack. The
+[v1 schema](docs/system-pack-schema-v1.md#english) is documented; packs are
+never downloaded or activated automatically.
 
 ### Supported Archives
 

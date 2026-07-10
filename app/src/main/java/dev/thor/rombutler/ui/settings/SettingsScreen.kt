@@ -18,6 +18,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.filled.Extension
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.SystemUpdate
@@ -36,6 +37,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -51,6 +53,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.thor.rombutler.R
+import dev.thor.rombutler.domain.model.SystemPackError
 import dev.thor.rombutler.ui.components.FolderPickerDialog
 
 /**
@@ -67,6 +70,8 @@ fun SettingsScreen(
     val updateState by viewModel.updateState.collectAsStateWithLifecycle()
     val libraryState by viewModel.libraryState.collectAsStateWithLifecycle()
     val receiveState by viewModel.receiveState.collectAsStateWithLifecycle()
+    val registryState by viewModel.registryState.collectAsStateWithLifecycle()
+    val systemPackResult by viewModel.systemPackResult.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val resources = LocalResources.current
 
@@ -75,6 +80,17 @@ fun SettingsScreen(
     var showFolderOverrides by remember { mutableStateOf(false) }
     var showSourcePicker by remember { mutableStateOf(false) }
     var showDatPicker by remember { mutableStateOf(false) }
+    var showSystemPacks by remember { mutableStateOf(false) }
+
+    LaunchedEffect(systemPackResult) {
+        val result = systemPackResult ?: return@LaunchedEffect
+        android.widget.Toast.makeText(
+            context,
+            resources.systemPackActionMessage(result),
+            android.widget.Toast.LENGTH_LONG,
+        ).show()
+        viewModel.consumeSystemPackResult()
+    }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -534,6 +550,70 @@ fun SettingsScreen(
                 }
             }
 
+            // Validated local extensions to the built-in system registry
+            SettingsCard {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        imageVector = Icons.Filled.Extension,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(24.dp),
+                    )
+                    Spacer(Modifier.width(12.dp))
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = stringResource(R.string.settings_system_packs_title),
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onSurface,
+                        )
+                        Text(
+                            text = if (registryState.customSystems.isEmpty()) {
+                                stringResource(R.string.settings_system_packs_none)
+                            } else {
+                                resources.getQuantityString(
+                                    R.plurals.settings_system_packs_count,
+                                    registryState.customSystems.size,
+                                    registryState.customSystems.size,
+                                )
+                            },
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                }
+                Spacer(Modifier.size(8.dp))
+                Text(
+                    text = stringResource(R.string.settings_system_packs_hint),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                if (registryState.customPackError != null) {
+                    Spacer(Modifier.size(8.dp))
+                    Text(
+                        text = stringResource(R.string.settings_system_pack_invalid_saved),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.error,
+                    )
+                }
+                if (registryState.conflicts.isNotEmpty()) {
+                    Spacer(Modifier.size(8.dp))
+                    Text(
+                        text = resources.getQuantityString(
+                            R.plurals.settings_system_packs_conflicts,
+                            registryState.conflicts.size,
+                            registryState.conflicts.size,
+                        ),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.error,
+                    )
+                }
+                Spacer(Modifier.size(10.dp))
+                OutlinedButton(
+                    onClick = { showSystemPacks = true },
+                    modifier = Modifier.fillMaxWidth(),
+                ) { Text(stringResource(R.string.settings_system_packs_manage)) }
+            }
+
             // System folder overrides (non-ES-DE frontends) + battery hint
             SettingsCard {
                 Row(
@@ -705,10 +785,20 @@ fun SettingsScreen(
     }
     if (showFolderOverrides) {
         FolderOverridesDialog(
-            systems = viewModel.registry.systems,
+            systems = registryState.systems,
             overrides = settings.folderOverrides,
             onSave = viewModel::setFolderOverride,
             onDismiss = { showFolderOverrides = false },
+        )
+    }
+    if (showSystemPacks) {
+        SystemPackManagerDialog(
+            state = registryState,
+            onSave = viewModel::saveCustomSystem,
+            onDelete = viewModel::deleteCustomSystem,
+            onImport = viewModel::importSystemPack,
+            onExport = viewModel::exportSystemPack,
+            onDismiss = { showSystemPacks = false },
         )
     }
     if (showDownloadPicker) {
@@ -732,6 +822,55 @@ fun SettingsScreen(
             },
             onDismiss = { showRomBasePicker = false },
         )
+    }
+}
+
+private fun android.content.res.Resources.systemPackActionMessage(
+    result: SystemPackActionResult,
+): String = when (result) {
+    is SystemPackActionResult.Success -> getString(
+        when (result.action) {
+            SystemPackAction.SAVED -> R.string.settings_system_pack_saved
+            SystemPackAction.DELETED -> R.string.settings_system_pack_deleted
+            SystemPackAction.IMPORTED -> R.string.settings_system_pack_imported
+            SystemPackAction.EXPORTED -> R.string.settings_system_pack_exported
+        },
+    )
+
+    is SystemPackActionResult.Failed -> getString(
+        when (result.error) {
+            SystemPackActionError.NO_DOWNLOAD_FOLDER -> R.string.settings_system_pack_no_download
+            SystemPackActionError.FILE_NOT_FOUND -> R.string.settings_system_pack_file_missing
+            SystemPackActionError.NO_CUSTOM_SYSTEMS -> R.string.settings_system_pack_no_systems
+            SystemPackActionError.IO_ERROR -> R.string.settings_system_pack_io_error
+        },
+    )
+
+    is SystemPackActionResult.Invalid -> {
+        val base = getString(
+            when (result.failure.error) {
+                SystemPackError.MALFORMED_JSON -> R.string.settings_system_pack_error_malformed
+                SystemPackError.PACK_TOO_LARGE -> R.string.settings_system_pack_error_large
+                SystemPackError.UNSUPPORTED_VERSION -> R.string.settings_system_pack_error_version
+                SystemPackError.INVALID_FIELD -> R.string.settings_system_pack_error_field
+                SystemPackError.EMPTY_PACK -> R.string.settings_system_pack_error_empty
+                SystemPackError.TOO_MANY_SYSTEMS -> R.string.settings_system_pack_error_many
+                SystemPackError.DUPLICATE_ID -> R.string.settings_system_pack_error_duplicate_id
+                SystemPackError.DUPLICATE_FOLDER -> R.string.settings_system_pack_error_duplicate_folder
+                SystemPackError.CERTAIN_EXTENSION_CONFLICT -> {
+                    R.string.settings_system_pack_error_certain_conflict
+                }
+                SystemPackError.UNKNOWN_MAGIC_RULE -> R.string.settings_system_pack_error_magic
+                SystemPackError.BUILTIN_ID_COLLISION -> R.string.settings_system_pack_error_builtin_id
+                SystemPackError.BUILTIN_FOLDER_COLLISION -> {
+                    R.string.settings_system_pack_error_builtin_folder
+                }
+                SystemPackError.RESERVED_PACK_ID -> R.string.settings_system_pack_error_reserved
+            },
+        )
+        result.failure.detail?.takeIf { it.isNotBlank() }
+            ?.let { getString(R.string.settings_system_pack_error_detail, base, it) }
+            ?: base
     }
 }
 

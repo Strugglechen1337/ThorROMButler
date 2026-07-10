@@ -37,6 +37,8 @@ data class AppSettings(
     val datFolderPath: String? = null,
     /** Color theme id: "thor" (default), "odin", "crt". */
     val themeId: String = "thor",
+    /** Validated schema-v1 JSON containing optional user-defined systems. */
+    val customSystemPackJson: String? = null,
 ) {
     /** Setup is complete once both folders are configured. */
     val isSetupComplete: Boolean

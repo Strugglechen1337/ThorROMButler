@@ -1,0 +1,243 @@
+{
+  "schemaVersion": 1,
+  "packId": "thor.builtin",
+  "displayName": "Thor ROM Butler Built-ins",
+  "systems": [
+    {
+      "id": "nes",
+      "displayName": "Nintendo Entertainment System",
+      "folder": "nes",
+      "extensions": { "nes": "CERTAIN", "fds": "CERTAIN" },
+      "magicRuleIds": ["nes-ines"]
+    },
+    {
+      "id": "snes",
+      "displayName": "Super Nintendo",
+      "folder": "snes",
+      "extensions": { "sfc": "CERTAIN", "smc": "CERTAIN" }
+    },
+    {
+      "id": "gb",
+      "displayName": "Game Boy",
+      "folder": "gb",
+      "extensions": { "gb": "CERTAIN" }
+    },
+    {
+      "id": "gbc",
+      "displayName": "Game Boy Color",
+      "folder": "gbc",
+      "extensions": { "gbc": "CERTAIN" }
+    },
+    {
+      "id": "gba",
+      "displayName": "Game Boy Advance",
+      "folder": "gba",
+      "extensions": { "gba": "CERTAIN" }
+    },
+    {
+      "id": "n64",
+      "displayName": "Nintendo 64",
+      "folder": "n64",
+      "extensions": { "n64": "CERTAIN", "z64": "CERTAIN", "v64": "CERTAIN" },
+      "magicRuleIds": ["n64-native"]
+    },
+    {
+      "id": "nds",
+      "displayName": "Nintendo DS",
+      "folder": "nds",
+      "extensions": { "nds": "CERTAIN" }
+    },
+    {
+      "id": "n3ds",
+      "displayName": "Nintendo 3DS",
+      "folder": "n3ds",
+      "extensions": {
+        "3ds": "CERTAIN",
+        "cia": "CERTAIN",
+        "cci": "CERTAIN",
+        "cxi": "CERTAIN",
+        "3dsx": "CERTAIN"
+      }
+    },
+    {
+      "id": "psx",
+      "displayName": "PlayStation 1",
+      "folder": "psx",
+      "extensions": {
+        "cue": "PROBABLE",
+        "m3u": "PROBABLE",
+        "bin": "UNKNOWN",
+        "chd": "UNKNOWN"
+      },
+      "magicRuleIds": ["chd-cd"]
+    },
+    {
+      "id": "ps2",
+      "displayName": "PlayStation 2",
+      "folder": "ps2",
+      "extensions": { "iso": "UNKNOWN", "chd": "UNKNOWN" },
+      "magicRuleIds": ["chd-dvd", "playstation-iso"]
+    },
+    {
+      "id": "psp",
+      "displayName": "PlayStation Portable",
+      "folder": "psp",
+      "extensions": { "cso": "CERTAIN", "iso": "UNKNOWN", "pbp": "PROBABLE" },
+      "magicRuleIds": ["psp-iso"]
+    },
+    {
+      "id": "gc",
+      "displayName": "GameCube",
+      "folder": "gc",
+      "extensions": { "gcm": "CERTAIN", "iso": "UNKNOWN", "rvz": "UNKNOWN" },
+      "magicRuleIds": ["gamecube-disc", "gamecube-rvz"]
+    },
+    {
+      "id": "wii",
+      "displayName": "Wii",
+      "folder": "wii",
+      "extensions": { "wbfs": "CERTAIN", "iso": "UNKNOWN", "rvz": "UNKNOWN" },
+      "magicRuleIds": ["wii-disc", "wii-rvz"]
+    },
+    {
+      "id": "wiiu",
+      "displayName": "Wii U",
+      "folder": "wiiu",
+      "extensions": { "wud": "CERTAIN", "wux": "CERTAIN", "wua": "CERTAIN" }
+    },
+    {
+      "id": "dreamcast",
+      "displayName": "Dreamcast",
+      "folder": "dreamcast",
+      "extensions": {
+        "cdi": "CERTAIN",
+        "gdi": "CERTAIN",
+        "chd": "UNKNOWN",
+        "bin": "UNKNOWN"
+      },
+      "magicRuleIds": ["dreamcast-disc"],
+      "gameSubfolder": true
+    },
+    {
+      "id": "switch",
+      "displayName": "Nintendo Switch",
+      "folder": "switch",
+      "extensions": { "nsp": "CERTAIN", "xci": "CERTAIN" }
+    },
+    {
+      "id": "amiga",
+      "displayName": "Commodore Amiga",
+      "folder": "amiga",
+      "extensions": { "adf": "CERTAIN", "ipf": "CERTAIN", "hdf": "CERTAIN" }
+    },
+    {
+      "id": "c64",
+      "displayName": "Commodore 64",
+      "folder": "c64",
+      "extensions": {
+        "d64": "CERTAIN",
+        "t64": "CERTAIN",
+        "crt": "CERTAIN",
+        "prg": "PROBABLE",
+        "tap": "PROBABLE"
+      }
+    },
+    {
+      "id": "megadrive",
+      "displayName": "Sega Mega Drive",
+      "folder": "megadrive",
+      "extensions": {
+        "md": "CERTAIN",
+        "gen": "CERTAIN",
+        "smd": "CERTAIN",
+        "bin": "UNKNOWN"
+      },
+      "magicRuleIds": ["megadrive", "genesis"]
+    },
+    {
+      "id": "mastersystem",
+      "displayName": "Sega Master System",
+      "folder": "mastersystem",
+      "extensions": { "sms": "CERTAIN" }
+    },
+    {
+      "id": "gamegear",
+      "displayName": "Sega Game Gear",
+      "folder": "gamegear",
+      "extensions": { "gg": "CERTAIN" }
+    },
+    {
+      "id": "saturn",
+      "displayName": "Sega Saturn",
+      "folder": "saturn",
+      "extensions": { "bin": "UNKNOWN", "iso": "UNKNOWN", "chd": "UNKNOWN" },
+      "magicRuleIds": ["saturn-disc"]
+    },
+    {
+      "id": "atari2600",
+      "displayName": "Atari 2600",
+      "folder": "atari2600",
+      "extensions": { "a26": "CERTAIN" }
+    },
+    {
+      "id": "atari7800",
+      "displayName": "Atari 7800",
+      "folder": "atari7800",
+      "extensions": { "a78": "CERTAIN" }
+    },
+    {
+      "id": "atarilynx",
+      "displayName": "Atari Lynx",
+      "folder": "atarilynx",
+      "extensions": { "lnx": "CERTAIN" }
+    },
+    {
+      "id": "pcengine",
+      "displayName": "PC Engine / TurboGrafx-16",
+      "folder": "pcengine",
+      "extensions": { "pce": "CERTAIN" }
+    },
+    {
+      "id": "sega32x",
+      "displayName": "Sega 32X",
+      "folder": "sega32x",
+      "extensions": { "32x": "CERTAIN" }
+    },
+    {
+      "id": "ngp",
+      "displayName": "Neo Geo Pocket",
+      "folder": "ngp",
+      "extensions": { "ngp": "CERTAIN" }
+    },
+    {
+      "id": "ngpc",
+      "displayName": "Neo Geo Pocket Color",
+      "folder": "ngpc",
+      "extensions": { "ngc": "CERTAIN" }
+    },
+    {
+      "id": "wonderswan",
+      "displayName": "WonderSwan",
+      "folder": "wonderswan",
+      "extensions": { "ws": "CERTAIN" }
+    },
+    {
+      "id": "wonderswancolor",
+      "displayName": "WonderSwan Color",
+      "folder": "wonderswancolor",
+      "extensions": { "wsc": "CERTAIN" }
+    },
+    {
+      "id": "arcade",
+      "displayName": "Arcade (MAME)",
+      "folder": "arcade",
+      "extensions": {}
+    },
+    {
+      "id": "neogeo",
+      "displayName": "Neo Geo",
+      "folder": "neogeo",
+      "extensions": {}
+    }
+  ]
+}
