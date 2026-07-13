@@ -1,7 +1,10 @@
 package dev.thor.rombutler.ui.settings
 
+import android.Manifest
 import android.content.Intent
 import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -55,6 +58,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.thor.rombutler.R
 import dev.thor.rombutler.domain.detection.SystemPackCodec
 import dev.thor.rombutler.domain.model.SystemPackError
+import dev.thor.rombutler.receive.LocalNetworkPermission
 import dev.thor.rombutler.ui.components.FolderPickerDialog
 
 /**
@@ -76,6 +80,30 @@ fun SettingsScreen(
     val systemPackImportPreview by viewModel.systemPackImportPreview.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val resources = LocalResources.current
+
+    fun startReceive() {
+        viewModel.startReceive {
+            android.widget.Toast.makeText(
+                context,
+                resources.getString(R.string.receive_failed),
+                android.widget.Toast.LENGTH_LONG,
+            ).show()
+        }
+    }
+
+    val localNetworkPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission(),
+    ) { granted ->
+        if (granted) {
+            startReceive()
+        } else {
+            android.widget.Toast.makeText(
+                context,
+                resources.getString(R.string.receive_permission_denied),
+                android.widget.Toast.LENGTH_LONG,
+            ).show()
+        }
+    }
 
     var showDownloadPicker by remember { mutableStateOf(false) }
     var showRomBasePicker by remember { mutableStateOf(false) }
@@ -389,12 +417,12 @@ fun SettingsScreen(
                         Spacer(Modifier.size(10.dp))
                         OutlinedButton(
                             onClick = {
-                                viewModel.startReceive {
-                                    android.widget.Toast.makeText(
-                                        context,
-                                        resources.getString(R.string.receive_failed),
-                                        android.widget.Toast.LENGTH_LONG,
-                                    ).show()
+                                if (LocalNetworkPermission.isGranted(context)) {
+                                    startReceive()
+                                } else {
+                                    localNetworkPermissionLauncher.launch(
+                                        Manifest.permission.ACCESS_LOCAL_NETWORK,
+                                    )
                                 }
                             },
                             modifier = Modifier.fillMaxWidth(),

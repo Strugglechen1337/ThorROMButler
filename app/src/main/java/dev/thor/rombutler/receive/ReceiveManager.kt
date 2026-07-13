@@ -51,6 +51,7 @@ class ReceiveManager @Inject constructor(
     /** Starts the server. @return false when no WLAN IP / no download folder. */
     suspend fun start(): Boolean {
         if (_state.value is ReceiveState.Running) return true
+        if (!LocalNetworkPermission.isGranted(context)) return false
         val downloadPath = settingsRepository.settings.first().downloadPath ?: return false
         val ip = localIpv4() ?: return false
         val sessionToken = newSessionToken()

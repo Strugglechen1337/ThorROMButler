@@ -2,6 +2,28 @@
 
 All notable user-facing changes are documented here.
 
+## 1.2.1
+
+### Deutsch
+
+- LAN-Empfang unter Android 17 repariert: Die dort erforderliche
+  `ACCESS_LOCAL_NETWORK`-Laufzeitberechtigung wird erst angefragt, wenn der
+  Nutzer den Empfang ausdrücklich startet.
+- Der Berechtigungsfluss funktioniert sowohl in den Einstellungen als auch
+  über die Schnelleinstellungs-Kachel. Ohne Freigabe wird kein LAN-Server
+  gestartet.
+- Ein automatischer Server-Test prüft geschützte Sitzungsadresse,
+  Multipart-Upload und die unveränderte Dateiübernahme.
+
+### English
+
+- Fixed LAN receive on Android 17: the required `ACCESS_LOCAL_NETWORK` runtime
+  permission is requested only when the user explicitly starts receiving.
+- Permission handling works from both Settings and the Quick Settings tile. No
+  LAN server is started without access.
+- An automated server test covers the protected session address, multipart
+  upload, and byte-identical file storage.
+
 ## 1.2.0
 
 ### Deutsch

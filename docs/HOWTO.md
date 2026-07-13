@@ -38,7 +38,9 @@ Einstellungen ergänzen.
 **Am bequemsten: LAN-Empfang.** In den Einstellungen „Empfang starten",
 die einmalige Sitzungsadresse am PC im Browser öffnen (gleiches WLAN) und die
 Dateien einfach auf die Seite ziehen — ganz ohne Kabel. Unvollständige Uploads
-bleiben unsichtbar; der Empfang endet automatisch nach 30 Minuten. Noch schneller:
+bleiben unsichtbar; der Empfang endet automatisch nach 30 Minuten. Unter
+Android 17 die einmalige Abfrage für den Zugriff auf das lokale Netzwerk
+erlauben; sie erscheint erst beim Start des LAN-Empfangs. Noch schneller:
 Der LAN-Empfang lässt sich als Schnelleinstellungs-Kachel in die
 Statusleiste legen (Statusleiste ausklappen → Stift → „LAN-Empfang"
 hinzufügen). Alternativ kannst du Dateien aus anderen Apps per
@@ -147,7 +149,9 @@ settings.
 **Most convenient: LAN receive.** Tap "Start receiving" in Settings, open
 the one-time session address in a browser on your PC (same Wi-Fi) and simply
 drop the files onto the page — no cable at all. Incomplete uploads stay hidden,
-and receiving stops automatically after 30 minutes. Even quicker: LAN receive is
+and receiving stops automatically after 30 minutes. On Android 17, allow the
+one-time local network access prompt; it is shown only when LAN receive is
+started. Even quicker: LAN receive is
 available as a Quick Settings tile (expand the notification shade → pencil
 icon → add "LAN receive"). Alternatively, send files from other apps via
 "Share → Thor ROM Butler".

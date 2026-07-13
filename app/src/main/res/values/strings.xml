@@ -17,7 +17,7 @@
 
     <!-- What's new (update every release!) -->
     <string name="whatsnew_title">New in version %s</string>
-    <string name="whatsnew_body">• Create custom systems or import them as a validated JSON system pack\n• Import preview shows contents and conflicts before installation\n• Settings backups are fully validated and applied atomically\n\nFull details in the changelog on GitHub.</string>
+    <string name="whatsnew_body">• Fixed LAN receive on Android 17\n• The new network permission is requested only when starting a LAN session\n• Starts from Settings and the Quick Settings tile are both covered\n\nFull details in the changelog on GitHub.</string>
 
     <!-- Setup screen -->
     <string name="setup_title">Setup</string>
@@ -233,12 +233,13 @@
     <!-- LAN receive mode -->
     <string name="settings_theme">Color theme</string>
     <string name="receive_title">LAN receive</string>
-    <string name="receive_hint">Send ROMs straight from your PC: start receiving, open the protected session address in a browser, and drop files. Receiving stops automatically after 30 minutes. Tip: there is also a Quick Settings tile for this.</string>
+    <string name="receive_hint">Send ROMs straight from your PC: start receiving, open the protected session address in a browser, and drop files. Android 17 asks once for local network access. Receiving stops automatically after 30 minutes. Tip: there is also a Quick Settings tile for this.</string>
     <string name="receive_running_hint">Open this one-time address on your PC (same Wi-Fi, valid for 30 minutes):</string>
     <string name="receive_start">Start receiving</string>
     <string name="receive_stop">Stop receiving</string>
     <string name="receive_count">%d file(s) received</string>
     <string name="receive_failed">Start failed – is the device on Wi-Fi and the download folder set?</string>
+    <string name="receive_permission_denied">Local network access is required only while LAN receive is active.</string>
     <string name="notification_channel_receive">LAN receive</string>
     <string name="notification_receive_title">Receive mode active</string>
     <string name="notification_receive_text_count">%1$s · %2$d received</string>

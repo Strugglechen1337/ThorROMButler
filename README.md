@@ -125,7 +125,10 @@ Die Netzwerkberechtigung dient dem **Update-Check** gegen die
 GitHub-Releases-API und dem ausdrücklich gestarteten **LAN-Empfang** im lokalen
 Netz. Der Update-Check erfolgt manuell oder optional (standardmäßig **aus**)
 beim App-Start. Der LAN-Server ist nur während einer 30-minütigen Sitzung unter
-einer zufälligen Adresse erreichbar. Es werden keinerlei Nutzungsdaten gesendet.
+einer zufälligen Adresse erreichbar. Ab Android 17 fragt die App beim Start
+einer solchen Sitzung nach Zugriff auf das lokale Netzwerk; für alle anderen
+Funktionen ist diese Freigabe nicht nötig. Es werden keinerlei Nutzungsdaten
+gesendet.
 
 ### Installation
 
@@ -280,8 +283,10 @@ The Storage Access Framework is too slow for this workflow.
 Network access is used for the **update check** against the GitHub Releases API
 and for the explicitly started **LAN receiver** on the local network. Update
 checks are manual or optionally automatic (**off** by default). The LAN server
-is reachable only during a 30-minute session at a random address. The app does
-not send analytics or user data.
+is reachable only during a 30-minute session at a random address. On Android 17
+and newer, the app requests local network access when such a session is started;
+the permission is not needed for other features. The app does not send analytics
+or user data.
 
 ### Installation
 

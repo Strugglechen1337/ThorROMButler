@@ -16,7 +16,7 @@
 
     <!-- What's new (pro Release aktualisieren!) -->
     <string name="whatsnew_title">Neu in Version %s</string>
-    <string name="whatsnew_body">• Eigene Systeme anlegen oder als geprüftes JSON-System-Pack importieren\n• Importvorschau zeigt Inhalt und Konflikte vor der Installation\n• Einstellungs-Backups werden vollständig geprüft und atomar übernommen\n\nAlle Details im Changelog auf GitHub.</string>
+    <string name="whatsnew_body">• LAN-Empfang unter Android 17 repariert\n• Die neue Netzwerkfreigabe wird nur beim Start einer LAN-Sitzung angefragt\n• Start über Einstellungen und Schnelleinstellungs-Kachel abgesichert\n\nAlle Details im Changelog auf GitHub.</string>
 
     <!-- Setup screen -->
     <string name="setup_title">Einrichtung</string>
@@ -232,12 +232,13 @@
     <!-- LAN receive mode -->
     <string name="settings_theme">Farbwelt</string>
     <string name="receive_title">LAN-Empfang</string>
-    <string name="receive_hint">ROMs direkt vom PC schicken: Empfang starten, die geschützte Sitzungsadresse am PC im Browser öffnen und Dateien hineinziehen. Der Empfang endet automatisch nach 30 Minuten. Tipp: Dafür gibt es auch eine Schnelleinstellungs-Kachel.</string>
+    <string name="receive_hint">ROMs direkt vom PC schicken: Empfang starten, die geschützte Sitzungsadresse am PC im Browser öffnen und Dateien hineinziehen. Android 17 fragt dafür einmal nach Zugriff auf das lokale Netzwerk. Der Empfang endet automatisch nach 30 Minuten. Tipp: Dafür gibt es auch eine Schnelleinstellungs-Kachel.</string>
     <string name="receive_running_hint">Einmalige Adresse am PC öffnen (gleiches WLAN, 30 Minuten gültig):</string>
     <string name="receive_start">Empfang starten</string>
     <string name="receive_stop">Empfang beenden</string>
     <string name="receive_count">%d Datei(en) empfangen</string>
     <string name="receive_failed">Start fehlgeschlagen – ist das Gerät im WLAN und der Download-Ordner gesetzt?</string>
+    <string name="receive_permission_denied">Der Zugriff auf das lokale Netzwerk wird nur während des LAN-Empfangs benötigt.</string>
     <string name="notification_channel_receive">LAN-Empfang</string>
     <string name="notification_receive_title">Empfangsmodus aktiv</string>
     <string name="notification_receive_text_count">%1$s · %2$d empfangen</string>

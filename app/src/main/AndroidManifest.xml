@@ -14,8 +14,12 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
-    <!-- Only used for the MANUAL update check against GitHub Releases -->
+    <!-- Used for the manual update check and the explicitly started LAN receiver. -->
     <uses-permission android:name="android.permission.INTERNET" />
+
+    <!-- Android 17+ blocks incoming LAN sockets unless the user grants this
+         runtime permission. It is requested only when LAN receive is started. -->
+    <uses-permission android:name="android.permission.ACCESS_LOCAL_NETWORK" />
 
     <application
         android:name=".ThorRomButlerApp"
@@ -44,6 +48,13 @@
                 <data android:mimeType="*/*" />
             </intent-filter>
         </activity>
+
+        <!-- Permission bridge for starting LAN receive from the Quick Settings tile. -->
+        <activity
+            android:name=".receive.ReceivePermissionActivity"
+            android:excludeFromRecents="true"
+            android:exported="false"
+            android:theme="@style/Theme.ThorRomButler" />
 
         <service
             android:name=".extraction.ExtractionService"
