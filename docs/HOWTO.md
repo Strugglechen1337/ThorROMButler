@@ -96,6 +96,9 @@ anders überlegst.
   Hintergrund und meldet neue Funde per Benachrichtigung.
 - **Arcade/MAME-Sets** bleiben nur als ZIP und bei ausdrücklicher Zuordnung zu
   Arcade oder Neo Geo gepackt. 7z-/RAR-Archive werden immer entpackt.
+- **GameCube-/Wii-CISO**: Die App liest die Disc-Kennung direkt aus dem
+  CISO-Container und erkennt das System auch innerhalb von ZIP, 7z oder RAR4.
+  Nur ungültige oder nicht eindeutige Dateien brauchen eine manuelle Auswahl.
 - **Eigene Ordnernamen** (z. B. `ps1` statt `psx`): Einstellungen →
   „Systemordner anpassen". Für Batocera/Knulli oder Onion OS (Miyoo) gibt
   es fertige **Frontend-Profile**, die alle Ordner in einem Schritt setzen.
@@ -227,6 +230,9 @@ your mind.
   and notifies you about new finds.
 - **Arcade/MAME sets** stay packed only as ZIPs explicitly assigned to Arcade
   or Neo Geo. 7z and RAR archives are always extracted.
+- **GameCube/Wii CISO**: the app reads the disc marker directly from the CISO
+  container and detects the system even inside ZIP, 7z, or RAR4. Only invalid
+  or ambiguous files need a manual choice.
 - **Custom folder names** (e.g. `ps1` instead of `psx`): Settings →
   "Customize system folders". For Batocera/Knulli or Onion OS (Miyoo)
   there are ready-made **frontend profiles** that set all folders in one step.

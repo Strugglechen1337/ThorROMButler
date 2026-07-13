@@ -181,6 +181,32 @@ class CommonsArchiveAnalyzerTest {
     }
 
     @Test
+    fun `detects gamecube ciso inside 7z without manual assignment`() = runTest {
+        val ciso = ByteArray(DetectionEngine.MAX_HEADER_BYTES).also { header ->
+            "CISO".toByteArray(Charsets.US_ASCII).copyInto(header)
+            header[6] = 0x20 // 2 MiB block size, little-endian
+            header[8] = 1
+            byteArrayOf(0xC2.toByte(), 0x33, 0x9F.toByte(), 0x3D)
+                .copyInto(header, 0x8000 + 0x1C)
+        }
+        val sevenZipFile = tempFolder.newFile("gamecube.7z")
+        org.apache.commons.compress.archivers.sevenz.SevenZOutputFile(sevenZipFile).use { out ->
+            val entry = out.createArchiveEntry(tempFolder.newFile("ciso-source"), "Wind Waker.ciso")
+            out.putArchiveEntry(entry)
+            out.write(ciso)
+            out.closeArchiveEntry()
+        }
+
+        val analysis = buildAnalyzer(StandardTestDispatcher(testScheduler)).analyze(
+            romArchive(sevenZipFile).copy(type = ArchiveType.SEVEN_ZIP),
+        )
+
+        val rom = (analysis as ArchiveAnalysis.Success).roms.single()
+        assertThat(rom.detection.system?.id).isEqualTo("gc")
+        assertThat(rom.detection.confidence).isEqualTo(Confidence.CERTAIN)
+    }
+
+    @Test
     fun `single pass resolves multiple ambiguous entries in one 7z`() = runTest {
         // Regression for the O(n^2) solid-7z prefix reads: two ambiguous
         // .iso entries must both be magic-resolved from ONE archive pass.

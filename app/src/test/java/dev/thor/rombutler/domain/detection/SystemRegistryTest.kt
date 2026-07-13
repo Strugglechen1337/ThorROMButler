@@ -57,9 +57,9 @@ class SystemRegistryTest {
 
     @Test
     fun `ambiguous extensions have at least one magic rule among claimants`() {
-        // .iso and .rvz must be resolvable; .chd and .bin are known-unsolvable
+        // .iso, .rvz and .ciso must be resolvable; .chd and .bin are known-unsolvable
         // and stay UNKNOWN by design.
-        val resolvable = listOf("iso", "rvz")
+        val resolvable = listOf("iso", "rvz", "ciso")
         for (extension in resolvable) {
             val claimants = registry.systemsForExtension(extension)
             assertThat(claimants.size).isAtLeast(2)

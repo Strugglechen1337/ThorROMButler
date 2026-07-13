@@ -99,6 +99,10 @@ Game Gear · Saturn · Sega 32X · Atari 2600 · Atari 7800 · Atari Lynx ·
 PC Engine / TurboGrafx-16 · Neo Geo Pocket (Color) · WonderSwan (Color) ·
 Arcade (MAME) · Neo Geo
 
+GameCube- und Wii-Abbilder im CISO-Format werden anhand des enthaltenen
+Disc-Headers unterschieden - auch wenn die CISO-Datei in ZIP, 7z oder RAR4
+verpackt ist. Bei einer ungültigen oder mehrdeutigen Datei fragt die App nach.
+
 Weitere Systeme lassen sich lokal als eigenes System-Pack ergänzen. Das
 [Schema v1](docs/system-pack-schema-v1.md) ist dokumentiert; es gibt keine
 automatischen oder ungeprüften Pack-Downloads.
@@ -271,6 +275,10 @@ Wii · Wii U · Dreamcast · Switch · Amiga · C64 · Mega Drive · Master Syst
 Game Gear · Saturn · Sega 32X · Atari 2600 · Atari 7800 · Atari Lynx ·
 PC Engine / TurboGrafx-16 · Neo Geo Pocket (Color) · WonderSwan (Color) ·
 Arcade (MAME) · Neo Geo
+
+GameCube and Wii images in CISO format are distinguished through their embedded
+disc header, including CISO files packed inside ZIP, 7z, or RAR4. Invalid or
+ambiguous files still require a manual choice.
 
 More systems can be added locally through a custom system pack. The
 [v1 schema](docs/system-pack-schema-v1.md#english) is documented; packs are

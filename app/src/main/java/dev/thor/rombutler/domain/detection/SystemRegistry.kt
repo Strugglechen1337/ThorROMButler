@@ -159,7 +159,12 @@ internal object LegacySystemDefinitions {
             id = "gc",
             displayName = "GameCube",
             esdeFolder = "gc",
-            extensions = mapOf("gcm" to CERTAIN, "iso" to UNKNOWN, "rvz" to UNKNOWN),
+            extensions = mapOf(
+                "gcm" to CERTAIN,
+                "iso" to UNKNOWN,
+                "rvz" to UNKNOWN,
+                "ciso" to UNKNOWN,
+            ),
             magicRules = listOf(
                 // GameCube disc magic C2 33 9F 3D at 0x1C
                 MagicRule.BytesAt(0x1C, byteArrayOf(0xC2.toByte(), 0x33, 0x9F.toByte(), 0x3D)),
@@ -169,6 +174,11 @@ internal object LegacySystemDefinitions {
                     rangeEnd = 0x200,
                     bytes = byteArrayOf(0xC2.toByte(), 0x33, 0x9F.toByte(), 0x3D),
                 ),
+                MagicRule.Predicate(
+                    name = "gamecube-ciso",
+                    confidence = CERTAIN,
+                    test = CisoHeader::isGameCube,
+                ),
             ),
         ),
 
@@ -176,7 +186,12 @@ internal object LegacySystemDefinitions {
             id = "wii",
             displayName = "Wii",
             esdeFolder = "wii",
-            extensions = mapOf("wbfs" to CERTAIN, "iso" to UNKNOWN, "rvz" to UNKNOWN),
+            extensions = mapOf(
+                "wbfs" to CERTAIN,
+                "iso" to UNKNOWN,
+                "rvz" to UNKNOWN,
+                "ciso" to UNKNOWN,
+            ),
             magicRules = listOf(
                 // Wii disc magic 5D 1C 9E A3 at 0x18
                 MagicRule.BytesAt(0x18, byteArrayOf(0x5D, 0x1C, 0x9E.toByte(), 0xA3.toByte())),
@@ -185,6 +200,11 @@ internal object LegacySystemDefinitions {
                     rangeStart = 0x40,
                     rangeEnd = 0x200,
                     bytes = byteArrayOf(0x5D, 0x1C, 0x9E.toByte(), 0xA3.toByte()),
+                ),
+                MagicRule.Predicate(
+                    name = "wii-ciso",
+                    confidence = CERTAIN,
+                    test = CisoHeader::isWii,
                 ),
             ),
         ),

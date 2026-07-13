@@ -198,6 +198,32 @@ class DetectionEngineTest {
     }
 
     @Test
+    fun `ciso with gamecube disc header is certain gc`() {
+        val result = engine.detect("Wind Waker.ciso", cisoHeader(gameCube = true))
+
+        assertThat(result.system?.id).isEqualTo("gc")
+        assertThat(result.confidence).isEqualTo(Confidence.CERTAIN)
+        assertThat(result.source).isEqualTo(MatchSource.MAGIC_BYTES)
+    }
+
+    @Test
+    fun `ciso with wii disc header is certain wii`() {
+        val result = engine.detect("Mario Galaxy.ciso", cisoHeader(gameCube = false))
+
+        assertThat(result.system?.id).isEqualTo("wii")
+        assertThat(result.confidence).isEqualTo(Confidence.CERTAIN)
+        assertThat(result.source).isEqualTo(MatchSource.MAGIC_BYTES)
+    }
+
+    @Test
+    fun `ciso without a valid disc header stays unknown`() {
+        val header = cisoHeader(gameCube = true).also { it[8] = 0 }
+
+        assertThat(engine.detect("Mystery.ciso", header).confidence)
+            .isEqualTo(Confidence.UNKNOWN)
+    }
+
+    @Test
     fun `new systems detect by unique extension`() {
         val cases = mapOf(
             "Turrican II.adf" to "amiga",
@@ -303,5 +329,17 @@ class DetectionEngineTest {
         assertThat(engine.isRomFileName("game.iso")).isTrue()
         assertThat(engine.isRomFileName("cover.jpg")).isFalse()
         assertThat(engine.isRomFileName("noextension")).isFalse()
+    }
+
+    private fun cisoHeader(gameCube: Boolean): ByteArray = ByteArray(0x9000).also { header ->
+        "CISO".toByteArray(Charsets.US_ASCII).copyInto(header)
+        header[6] = 0x20 // 2 MiB block size, little-endian
+        header[8] = 1 // logical block zero is stored
+        val magic = if (gameCube) {
+            byteArrayOf(0xC2.toByte(), 0x33, 0x9F.toByte(), 0x3D)
+        } else {
+            byteArrayOf(0x5D, 0x1C, 0x9E.toByte(), 0xA3.toByte())
+        }
+        magic.copyInto(header, 0x8000 + if (gameCube) 0x1C else 0x18)
     }
 }

@@ -44,6 +44,11 @@ object MagicRuleCatalog {
             rangeEnd = 0x200,
             bytes = byteArrayOf(0xC2.toByte(), 0x33, 0x9F.toByte(), 0x3D),
         ),
+        "gamecube-ciso" to MagicRule.Predicate(
+            name = "gamecube-ciso",
+            confidence = Confidence.CERTAIN,
+            test = CisoHeader::isGameCube,
+        ),
         "wii-disc" to MagicRule.BytesAt(
             offset = 0x18,
             bytes = byteArrayOf(0x5D, 0x1C, 0x9E.toByte(), 0xA3.toByte()),
@@ -52,6 +57,11 @@ object MagicRuleCatalog {
             rangeStart = 0x40,
             rangeEnd = 0x200,
             bytes = byteArrayOf(0x5D, 0x1C, 0x9E.toByte(), 0xA3.toByte()),
+        ),
+        "wii-ciso" to MagicRule.Predicate(
+            name = "wii-ciso",
+            confidence = Confidence.CERTAIN,
+            test = CisoHeader::isWii,
         ),
         "dreamcast-disc" to MagicRule.TextInRange(
             rangeStart = 0,

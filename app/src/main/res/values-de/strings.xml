@@ -16,7 +16,7 @@
 
     <!-- What's new (pro Release aktualisieren!) -->
     <string name="whatsnew_title">Neu in Version %s</string>
-    <string name="whatsnew_body">• Manuell zugeordnete 7z-/RAR-Archive werden wieder entpackt statt ungeöffnet verschoben\n• Unbekannte Archivinhalte bleiben nach der Systemwahl entpackbar\n• Nur ausdrücklich Arcade oder Neo Geo zugeordnete ZIP-Sets bleiben gepackt\n\nAlle Details im Changelog auf GitHub.</string>
+    <string name="whatsnew_body">• GameCube- und Wii-CISO-Dateien werden jetzt automatisch erkannt\n• Die CISO-Erkennung funktioniert auch innerhalb von ZIP-, 7z- und RAR4-Archiven\n• Mehrdeutige oder ungültige CISO-Dateien verlangen weiterhin deine Bestätigung\n\nAlle Details im Changelog auf GitHub.</string>
 
     <!-- Setup screen -->
     <string name="setup_title">Einrichtung</string>

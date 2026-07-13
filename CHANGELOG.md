@@ -2,6 +2,27 @@
 
 All notable user-facing changes are documented here.
 
+## 1.4.2
+
+### Deutsch
+
+- GameCube- und Wii-Abbilder im CISO-Format werden jetzt anhand ihres
+  Container- und Disc-Headers automatisch dem richtigen System zugeordnet.
+- Die Erkennung arbeitet direkt auf dem Dateianfang und funktioniert daher
+  auch für CISO-Dateien innerhalb von ZIP-, 7z- und RAR4-Archiven, ohne das
+  komplette Spiel vorab in den Arbeitsspeicher zu laden.
+- Fehlt eine gültige GameCube- oder Wii-Kennung, bleibt die Zuordnung wie
+  vorgesehen `UNKNOWN`; die App entscheidet in diesem Fall nicht eigenmächtig.
+
+### English
+
+- GameCube and Wii images in CISO format are now assigned automatically by
+  inspecting both the container and embedded disc headers.
+- Detection reads only the file prefix, so it also works for CISO files inside
+  ZIP, 7z, and RAR4 archives without loading the complete game into memory.
+- If no valid GameCube or Wii marker is present, assignment remains `UNKNOWN`;
+  the app still leaves the decision to the user.
+
 ## 1.4.1
 
 ### Deutsch

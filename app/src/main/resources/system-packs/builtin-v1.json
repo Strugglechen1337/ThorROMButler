@@ -89,15 +89,15 @@
       "id": "gc",
       "displayName": "GameCube",
       "folder": "gc",
-      "extensions": { "gcm": "CERTAIN", "iso": "UNKNOWN", "rvz": "UNKNOWN" },
-      "magicRuleIds": ["gamecube-disc", "gamecube-rvz"]
+      "extensions": { "gcm": "CERTAIN", "iso": "UNKNOWN", "rvz": "UNKNOWN", "ciso": "UNKNOWN" },
+      "magicRuleIds": ["gamecube-disc", "gamecube-rvz", "gamecube-ciso"]
     },
     {
       "id": "wii",
       "displayName": "Wii",
       "folder": "wii",
-      "extensions": { "wbfs": "CERTAIN", "iso": "UNKNOWN", "rvz": "UNKNOWN" },
-      "magicRuleIds": ["wii-disc", "wii-rvz"]
+      "extensions": { "wbfs": "CERTAIN", "iso": "UNKNOWN", "rvz": "UNKNOWN", "ciso": "UNKNOWN" },
+      "magicRuleIds": ["wii-disc", "wii-rvz", "wii-ciso"]
     },
     {
       "id": "wiiu",

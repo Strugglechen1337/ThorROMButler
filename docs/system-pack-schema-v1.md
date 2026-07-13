@@ -57,8 +57,9 @@ Pack mit `PROBABLE`, `UNKNOWN` oder einer bekannten `magicRuleId` kann die JSON-
 Datei extern bearbeitet und anschließend importiert werden.
 
 Bekannte Regel-IDs in Schema v1: `nes-ines`, `n64-native`, `chd-cd`, `chd-dvd`,
-`playstation-iso`, `psp-iso`, `gamecube-disc`, `gamecube-rvz`, `wii-disc`,
-`wii-rvz`, `dreamcast-disc`, `megadrive`, `genesis`, `saturn-disc`.
+`playstation-iso`, `psp-iso`, `gamecube-disc`, `gamecube-rvz`,
+`gamecube-ciso`, `wii-disc`, `wii-rvz`, `wii-ciso`, `dreamcast-disc`,
+`megadrive`, `genesis`, `saturn-disc`.
 
 ---
 
@@ -118,5 +119,6 @@ The in-app editor creates safe, extension-based definitions. To use
 and import it afterward.
 
 Known rule IDs in schema v1: `nes-ines`, `n64-native`, `chd-cd`, `chd-dvd`,
-`playstation-iso`, `psp-iso`, `gamecube-disc`, `gamecube-rvz`, `wii-disc`,
-`wii-rvz`, `dreamcast-disc`, `megadrive`, `genesis`, `saturn-disc`.
+`playstation-iso`, `psp-iso`, `gamecube-disc`, `gamecube-rvz`,
+`gamecube-ciso`, `wii-disc`, `wii-rvz`, `wii-ciso`, `dreamcast-disc`,
+`megadrive`, `genesis`, `saturn-disc`.
