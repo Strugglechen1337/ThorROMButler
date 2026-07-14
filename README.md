@@ -61,6 +61,10 @@ läuft aber auf jedem Android-Smartphone ab Android 13.
 - 🧹 **Bibliotheks-Prüfung**: Statistik pro System, Erkennung falsch
   einsortierter ROMs und Duplikat-Übersicht (Regionen/Revisionen). Optional
   findet ein speicherschonender SHA-256-Lauf bytegleiche Dateien.
+- 💾 **ROM-Sicherung mit Wiederherstellung**: das komplette ROM-Verzeichnis
+  als 1:1-Ordnerspiegel auf SD-Karte/USB sichern — inkrementell, Folgeläufe
+  kopieren nur Neues. Die Wiederherstellung ergänzt fehlende Dateien und
+  überschreibt nie etwas.
 - 🏅 **DAT-Verifizierung** (optional): einsortierte ROMs per Prüfsumme
   gegen No-Intro/Redump-DAT-Dateien verifizieren — auf Wunsch werden
   verifizierte ROMs auf ihren offiziellen DAT-Namen umbenannt
@@ -240,6 +244,9 @@ newer.
 - 🧹 **Library check**: per-system statistics, detection of misplaced
   ROMs and a duplicate overview (regions/revisions). An optional,
   memory-efficient SHA-256 pass finds byte-identical files.
+- 💾 **ROM library backup & restore**: mirror the complete ROM folder 1:1
+  to SD card/USB — incrementally, follow-up runs only copy what is new.
+  Restoring adds missing files back and never overwrites anything.
 - 🏅 **DAT verification** (optional): verify sorted ROMs by checksum
   against No-Intro/Redump DAT files — optionally, verified ROMs are
   renamed to their official DAT name

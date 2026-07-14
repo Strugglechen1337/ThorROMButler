@@ -100,6 +100,7 @@ class SettingsViewModel @Inject constructor(
     private val libraryRepository: LibraryRepository,
     private val reviewSession: ReviewSession,
     private val receiveManager: dev.thor.rombutler.receive.ReceiveManager,
+    private val backupManager: dev.thor.rombutler.backup.BackupManager,
     private val diagnosticReportBuilder: DiagnosticReportBuilder,
     val registry: SystemRegistry,
 ) : ViewModel() {
@@ -181,6 +182,47 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun stopReceive() = receiveManager.stop()
+
+    /** ROM library backup/restore (see [dev.thor.rombutler.backup.BackupManager]). */
+    val romBackupState = backupManager.state
+
+    private val _backupManifest =
+        MutableStateFlow<dev.thor.rombutler.data.backup.BackupManifest?>(null)
+    val backupManifest: StateFlow<dev.thor.rombutler.data.backup.BackupManifest?> =
+        _backupManifest.asStateFlow()
+
+    fun setBackupTargetPath(path: String) {
+        viewModelScope.launch {
+            settingsRepository.setBackupTargetPath(path)
+            refreshBackupManifest()
+        }
+    }
+
+    /** Reads the manifest of the configured backup target (IO, async). */
+    fun refreshBackupManifest() {
+        viewModelScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+            val target = settings.value.backupTargetPath
+            _backupManifest.value = target?.let(backupManager::manifestAt)
+        }
+    }
+
+    fun startRomBackup() = startBackupRun(dev.thor.rombutler.backup.BackupMode.BACKUP)
+
+    fun startRomRestore() = startBackupRun(dev.thor.rombutler.backup.BackupMode.RESTORE)
+
+    private fun startBackupRun(mode: dev.thor.rombutler.backup.BackupMode) {
+        val current = settings.value
+        val romBase = current.romBasePath ?: return
+        val target = current.backupTargetPath ?: return
+        backupManager.start(mode, romBase, target)
+    }
+
+    fun cancelRomBackup() = backupManager.cancel()
+
+    fun acknowledgeRomBackupFinished() {
+        backupManager.acknowledgeFinished()
+        refreshBackupManifest()
+    }
 
     fun setThemeId(themeId: String) {
         viewModelScope.launch { settingsRepository.setThemeId(themeId) }

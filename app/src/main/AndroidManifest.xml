@@ -66,6 +66,11 @@
             android:exported="false"
             android:foregroundServiceType="dataSync" />
 
+        <service
+            android:name=".backup.BackupService"
+            android:exported="false"
+            android:foregroundServiceType="dataSync" />
+
         <!-- Quick Settings tile: toggle LAN receive from the notification
              shade; exported + permission are required for SystemUI binding -->
         <service

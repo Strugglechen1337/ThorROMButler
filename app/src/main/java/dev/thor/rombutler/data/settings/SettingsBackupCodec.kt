@@ -26,6 +26,7 @@ object SettingsBackupCodec {
         )
         .put("writeM3uPlaylists", settings.writeM3uPlaylists)
         .put("renameToDatName", settings.renameToDatName)
+        .put("backupTargetPath", settings.backupTargetPath ?: JSONObject.NULL)
         .toString(2)
 
     /**
@@ -82,6 +83,7 @@ object SettingsBackupCodec {
                 current.writeM3uPlaylists,
             ),
             renameToDatName = root.booleanSetting("renameToDatName", current.renameToDatName),
+            backupTargetPath = root.pathSetting("backupTargetPath", current.backupTargetPath),
         )
     }
 

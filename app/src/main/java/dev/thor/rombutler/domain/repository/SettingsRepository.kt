@@ -63,6 +63,9 @@ interface SettingsRepository {
     /** Persists the opt-in DAT rename after successful verification. */
     suspend fun setRenameToDatName(enabled: Boolean)
 
+    /** Persists the ROM backup target folder (null/blank = unset). */
+    suspend fun setBackupTargetPath(path: String?)
+
     /** Persists a validated custom system pack; `null` removes all custom systems. */
     suspend fun setCustomSystemPack(json: String?)
 

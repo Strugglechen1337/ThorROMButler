@@ -49,6 +49,8 @@ data class AppSettings(
      * after a successful checksum verification (default OFF).
      */
     val renameToDatName: Boolean = false,
+    /** Target folder of the incremental ROM library backup (null = unset). */
+    val backupTargetPath: String? = null,
 ) {
     /** Setup is complete once both folders are configured. */
     val isSetupComplete: Boolean

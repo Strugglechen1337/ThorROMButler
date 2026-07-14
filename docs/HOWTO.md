@@ -119,6 +119,10 @@ anders überlegst.
   unbekannt.
 - **Einstellungen sichern**: Der JSON-Import wird erst vollständig geprüft und
   danach gemeinsam übernommen. Eine fehlerhafte Sicherung ändert nichts.
+- **ROM-Sicherung**: Einstellungen → „ROM-Sicherung" — Zielordner wählen
+  (z. B. SD-Karte oder USB) und „Jetzt sichern". Der Butler spiegelt das
+  komplette ROM-Verzeichnis 1:1; beim nächsten Lauf wird nur Neues kopiert.
+  „Wiederherstellen" holt fehlende Dateien zurück und überschreibt nie etwas.
 - **Exakte Duplikate**: Nach der normalen Bibliotheks-Prüfung kannst du optional
   einen SHA-256-Abgleich starten. Nur gleich große Kandidaten werden gelesen;
   gelöscht wird nichts. Pfade und Prüfsummen stehen im Sammlungsexport.
@@ -252,6 +256,10 @@ your mind.
   automatic assignment.
 - **Settings backup**: the JSON import is validated completely and then applied
   as one update. An invalid backup changes nothing.
+- **ROM library backup**: Settings → "ROM library backup" — choose a target
+  folder (e.g. SD card or USB) and tap "Back up now". The butler mirrors the
+  complete ROM folder 1:1; the next run only copies what is new. "Restore"
+  brings missing files back and never overwrites anything.
 - **Exact duplicates**: after the regular library check, optionally run a
   SHA-256 comparison. Only same-sized candidates are read and nothing is
   deleted. Paths and hashes are included in the collection export.

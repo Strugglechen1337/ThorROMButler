@@ -38,6 +38,7 @@ class SettingsDataStore @Inject constructor(
         val CUSTOM_SYSTEM_PACK = stringPreferencesKey("custom_system_pack_json")
         val WRITE_M3U = booleanPreferencesKey("write_m3u_playlists")
         val RENAME_TO_DAT = booleanPreferencesKey("rename_to_dat_name")
+        val BACKUP_TARGET = stringPreferencesKey("backup_target_path")
     }
 
     override val settings: Flow<AppSettings> = dataStore.data.map { prefs ->
@@ -55,6 +56,7 @@ class SettingsDataStore @Inject constructor(
             customSystemPackJson = prefs[Keys.CUSTOM_SYSTEM_PACK],
             writeM3uPlaylists = prefs[Keys.WRITE_M3U] ?: true,
             renameToDatName = prefs[Keys.RENAME_TO_DAT] ?: false,
+            backupTargetPath = prefs[Keys.BACKUP_TARGET],
         )
     }
 
@@ -152,6 +154,12 @@ class SettingsDataStore @Inject constructor(
         dataStore.edit { it[Keys.RENAME_TO_DAT] = enabled }
     }
 
+    override suspend fun setBackupTargetPath(path: String?) {
+        dataStore.edit { prefs ->
+            if (path.isNullOrBlank()) prefs.remove(Keys.BACKUP_TARGET) else prefs[Keys.BACKUP_TARGET] = path
+        }
+    }
+
     override suspend fun setCustomSystemPack(json: String?) {
         dataStore.edit { prefs ->
             if (json.isNullOrBlank()) {
@@ -178,6 +186,7 @@ class SettingsDataStore @Inject constructor(
             prefs.setOrRemove(Keys.CUSTOM_SYSTEM_PACK, settings.customSystemPackJson)
             prefs[Keys.WRITE_M3U] = settings.writeM3uPlaylists
             prefs[Keys.RENAME_TO_DAT] = settings.renameToDatName
+            prefs.setOrRemove(Keys.BACKUP_TARGET, settings.backupTargetPath)
         }
     }
 

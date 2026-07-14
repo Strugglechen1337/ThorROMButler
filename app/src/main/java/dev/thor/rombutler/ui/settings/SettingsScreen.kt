@@ -79,6 +79,8 @@ fun SettingsScreen(
     val libraryState by viewModel.libraryState.collectAsStateWithLifecycle()
     val exactDuplicateState by viewModel.exactDuplicateState.collectAsStateWithLifecycle()
     val receiveState by viewModel.receiveState.collectAsStateWithLifecycle()
+    val romBackupState by viewModel.romBackupState.collectAsStateWithLifecycle()
+    val backupManifest by viewModel.backupManifest.collectAsStateWithLifecycle()
     val registryState by viewModel.registryState.collectAsStateWithLifecycle()
     val systemPackResult by viewModel.systemPackResult.collectAsStateWithLifecycle()
     val systemPackImportPreview by viewModel.systemPackImportPreview.collectAsStateWithLifecycle()
@@ -118,6 +120,42 @@ fun SettingsScreen(
     var showRomBasePicker by remember { mutableStateOf(false) }
     var showFolderOverrides by remember { mutableStateOf(false) }
     var showFrontendProfiles by remember { mutableStateOf(false) }
+    var showBackupTargetPicker by remember { mutableStateOf(false) }
+    var showRestoreConfirm by remember { mutableStateOf(false) }
+
+    // Load the manifest info whenever the backup target changes
+    LaunchedEffect(settings.backupTargetPath) {
+        viewModel.refreshBackupManifest()
+    }
+
+    // One-shot toast when a backup/restore run finishes
+    LaunchedEffect(romBackupState) {
+        val finished = romBackupState as? dev.thor.rombutler.backup.BackupRunState.Finished
+            ?: return@LaunchedEffect
+        val summary = finished.summary
+        val message = when {
+            summary.errorMessage != null -> summary.errorMessage
+            else -> resources.getString(
+                if (summary.mode == dev.thor.rombutler.backup.BackupMode.BACKUP) {
+                    R.string.backup_result_backup
+                } else {
+                    R.string.backup_result_restore
+                },
+                summary.copied,
+                summary.skipped,
+            ) + (if (summary.failed > 0) {
+                resources.getString(R.string.backup_result_failed_suffix, summary.failed)
+            } else {
+                ""
+            }) + (if (summary.cancelled) {
+                " · " + resources.getString(R.string.backup_result_cancelled)
+            } else {
+                ""
+            })
+        }
+        android.widget.Toast.makeText(context, message, android.widget.Toast.LENGTH_LONG).show()
+        viewModel.acknowledgeRomBackupFinished()
+    }
     var showSourcePicker by remember { mutableStateOf(false) }
     var showDatPicker by remember { mutableStateOf(false) }
     var showSystemPacks by remember { mutableStateOf(false) }
@@ -720,6 +758,112 @@ fun SettingsScreen(
                 }
             }
 
+            // Incremental mirror backup of the whole ROM library
+            SettingsCard {
+                Text(
+                    text = stringResource(R.string.settings_rombackup_title),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+                Text(
+                    text = stringResource(R.string.settings_rombackup_hint),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Spacer(Modifier.size(10.dp))
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { showBackupTargetPicker = true },
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Folder,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(24.dp),
+                    )
+                    Spacer(Modifier.width(12.dp))
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = stringResource(R.string.settings_rombackup_choose_target),
+                            style = MaterialTheme.typography.titleSmall,
+                            color = MaterialTheme.colorScheme.onSurface,
+                        )
+                        Text(
+                            text = settings.backupTargetPath
+                                ?: stringResource(R.string.settings_folder_not_set),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.primary,
+                            maxLines = 1,
+                            overflow = TextOverflow.StartEllipsis,
+                        )
+                    }
+                }
+                Spacer(Modifier.size(8.dp))
+                val manifest = backupManifest
+                Text(
+                    text = if (manifest != null) {
+                        stringResource(
+                            R.string.settings_rombackup_last,
+                            java.text.DateFormat.getDateTimeInstance(
+                                java.text.DateFormat.MEDIUM,
+                                java.text.DateFormat.SHORT,
+                            ).format(java.util.Date(manifest.createdAtMillis)),
+                            manifest.fileCount,
+                            dev.thor.rombutler.ui.components.formatFileSize(manifest.totalBytes),
+                        )
+                    } else {
+                        stringResource(R.string.settings_rombackup_none)
+                    },
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Spacer(Modifier.size(10.dp))
+                when (val backup = romBackupState) {
+                    is dev.thor.rombutler.backup.BackupRunState.Running -> Column {
+                        androidx.compose.material3.LinearProgressIndicator(
+                            progress = { backup.progress.fraction },
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                        Spacer(Modifier.size(6.dp))
+                        Text(
+                            text = stringResource(
+                                R.string.backup_progress,
+                                backup.progress.copiedFiles,
+                                backup.progress.totalFiles,
+                                backup.progress.currentName,
+                            ),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                        Spacer(Modifier.size(8.dp))
+                        OutlinedButton(
+                            onClick = viewModel::cancelRomBackup,
+                            modifier = Modifier.fillMaxWidth(),
+                        ) { Text(stringResource(R.string.action_cancel)) }
+                    }
+
+                    else -> Column {
+                        val ready = !settings.romBasePath.isNullOrBlank() &&
+                            !settings.backupTargetPath.isNullOrBlank()
+                        Button(
+                            onClick = viewModel::startRomBackup,
+                            enabled = ready,
+                            modifier = Modifier.fillMaxWidth(),
+                        ) { Text(stringResource(R.string.settings_rombackup_run)) }
+                        Spacer(Modifier.size(6.dp))
+                        OutlinedButton(
+                            onClick = { showRestoreConfirm = true },
+                            enabled = ready,
+                            modifier = Modifier.fillMaxWidth(),
+                        ) { Text(stringResource(R.string.settings_rombackup_restore)) }
+                    }
+                }
+            }
+
             // Validated local extensions to the built-in system registry
             SettingsCard {
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -1018,6 +1162,35 @@ fun SettingsScreen(
                 showFrontendProfiles = false
             },
             onDismiss = { showFrontendProfiles = false },
+        )
+    }
+    if (showBackupTargetPicker) {
+        FolderPickerDialog(
+            title = stringResource(R.string.settings_rombackup_choose_target),
+            initialPath = settings.backupTargetPath,
+            onSelect = {
+                viewModel.setBackupTargetPath(it)
+                showBackupTargetPicker = false
+            },
+            onDismiss = { showBackupTargetPicker = false },
+        )
+    }
+    if (showRestoreConfirm) {
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { showRestoreConfirm = false },
+            title = { Text(stringResource(R.string.settings_rombackup_restore_title)) },
+            text = { Text(stringResource(R.string.settings_rombackup_restore_text)) },
+            confirmButton = {
+                Button(onClick = {
+                    showRestoreConfirm = false
+                    viewModel.startRomRestore()
+                }) { Text(stringResource(R.string.settings_rombackup_restore)) }
+            },
+            dismissButton = {
+                androidx.compose.material3.TextButton(onClick = { showRestoreConfirm = false }) {
+                    Text(stringResource(R.string.action_cancel))
+                }
+            },
         )
     }
     if (showSystemPacks) {

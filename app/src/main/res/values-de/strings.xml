@@ -16,7 +16,7 @@
 
     <!-- What's new (pro Release aktualisieren!) -->
     <string name="whatsnew_title">Neu in Version %s</string>
-    <string name="whatsnew_body">• GameCube- und Wii-CISO-Dateien werden jetzt automatisch erkannt\n• Die CISO-Erkennung funktioniert auch innerhalb von ZIP-, 7z- und RAR4-Archiven\n• Mehrdeutige oder ungültige CISO-Dateien verlangen weiterhin deine Bestätigung\n\nAlle Details im Changelog auf GitHub.</string>
+    <string name="whatsnew_body">• ROM-Sicherung: das komplette ROM-Verzeichnis auf SD/USB spiegeln — inkrementell, Folgeläufe kopieren nur Neues\n• Wiederherstellung inklusive: Fehlendes kommt zurück, Vorhandenes wird nie überschrieben\n• Läuft im Hintergrund mit Fortschritts-Benachrichtigung und Abbrechen\n\nAlle Details im Changelog auf GitHub.</string>
 
     <!-- Setup screen -->
     <string name="setup_title">Einrichtung</string>
@@ -155,6 +155,26 @@
     <string name="settings_frontend_default_folders">Nutzt die eingebauten Ordnernamen</string>
     <string name="settings_frontend_override_count">%d Ordner weichen von ES-DE ab</string>
     <string name="settings_frontend_apply">Profil anwenden</string>
+
+    <!-- ROM library backup & restore -->
+    <string name="settings_rombackup_title">ROM-Sicherung</string>
+    <string name="settings_rombackup_hint">Spiegelt das komplette ROM-Verzeichnis mit allen Systemen in einen Zielordner deiner Wahl (z. B. SD-Karte oder USB) — inkrementell, Folgeläufe kopieren nur Neues. Die Wiederherstellung ergänzt fehlende Dateien und überschreibt NIE etwas.</string>
+    <string name="settings_rombackup_choose_target">Sicherungsziel wählen</string>
+    <string name="settings_rombackup_last">Letzte Sicherung: %1$s · %2$d Dateien · %3$s</string>
+    <string name="settings_rombackup_none">Noch keine Sicherung am Ziel gefunden.</string>
+    <string name="settings_rombackup_run">Jetzt sichern</string>
+    <string name="settings_rombackup_restore">Wiederherstellen</string>
+    <string name="settings_rombackup_restore_title">Sicherung wiederherstellen?</string>
+    <string name="settings_rombackup_restore_text">Fehlende Dateien werden aus der Sicherung zurück in den ROM-Ordner kopiert. Dateien, die in deiner Bibliothek vorhanden sind, werden nie überschrieben.</string>
+    <string name="backup_progress">Datei %1$d von %2$d: %3$s</string>
+    <string name="backup_preparing">Vergleiche Bestände …</string>
+    <string name="backup_result_backup">Sicherung: %1$d kopiert · %2$d bereits vorhanden</string>
+    <string name="backup_result_restore">Wiederherstellung: %1$d kopiert · %2$d bereits vorhanden</string>
+    <string name="backup_result_failed_suffix"> · %d fehlgeschlagen</string>
+    <string name="backup_result_cancelled">abgebrochen – bereits Kopiertes bleibt erhalten</string>
+    <string name="notification_channel_backup">ROM-Sicherung</string>
+    <string name="notification_backup_title">Sichere ROMs …</string>
+    <string name="notification_restore_title">Stelle ROMs wieder her …</string>
     <string name="settings_sources_title">Weitere Quellordner</string>
     <string name="settings_sources_hint">Zusätzlich zum Download-Ordner durchsuchen (z. B. Telegram, USB-Import).</string>
     <string name="settings_sources_add">Quellordner hinzufügen</string>

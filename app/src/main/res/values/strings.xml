@@ -17,7 +17,7 @@
 
     <!-- What's new (update every release!) -->
     <string name="whatsnew_title">New in version %s</string>
-    <string name="whatsnew_body">• GameCube and Wii CISO files are now recognized automatically\n• CISO detection also works inside ZIP, 7z, and RAR4 archives\n• Ambiguous or invalid CISO files still require your confirmation\n\nFull details in the changelog on GitHub.</string>
+    <string name="whatsnew_body">• ROM library backup: mirror your complete ROM folder to SD/USB — incrementally, follow-up runs only copy what is new\n• Restore included: missing files come back, existing ones are never overwritten\n• Runs in the background with progress notification and cancel\n\nFull details in the changelog on GitHub.</string>
 
     <!-- Setup screen -->
     <string name="setup_title">Setup</string>
@@ -156,6 +156,26 @@
     <string name="settings_frontend_default_folders">Uses the built-in folder names</string>
     <string name="settings_frontend_override_count">%d folders differ from ES-DE</string>
     <string name="settings_frontend_apply">Apply profile</string>
+
+    <!-- ROM library backup & restore -->
+    <string name="settings_rombackup_title">ROM library backup</string>
+    <string name="settings_rombackup_hint">Mirrors the complete ROM folder with all systems into a target of your choice (e.g. SD card or USB) — incrementally, follow-up runs only copy what is new. Restoring adds missing files back and NEVER overwrites anything.</string>
+    <string name="settings_rombackup_choose_target">Choose backup target</string>
+    <string name="settings_rombackup_last">Last backup: %1$s · %2$d files · %3$s</string>
+    <string name="settings_rombackup_none">No backup found at the target yet.</string>
+    <string name="settings_rombackup_run">Back up now</string>
+    <string name="settings_rombackup_restore">Restore</string>
+    <string name="settings_rombackup_restore_title">Restore backup?</string>
+    <string name="settings_rombackup_restore_text">Missing files are copied from the backup back into the ROM folder. Files already in your library are never overwritten.</string>
+    <string name="backup_progress">File %1$d of %2$d: %3$s</string>
+    <string name="backup_preparing">Comparing files …</string>
+    <string name="backup_result_backup">Backup: %1$d copied · %2$d already present</string>
+    <string name="backup_result_restore">Restore: %1$d copied · %2$d already present</string>
+    <string name="backup_result_failed_suffix"> · %d failed</string>
+    <string name="backup_result_cancelled">cancelled – completed files are kept</string>
+    <string name="notification_channel_backup">ROM backup</string>
+    <string name="notification_backup_title">Backing up ROMs …</string>
+    <string name="notification_restore_title">Restoring ROMs …</string>
     <string name="settings_sources_title">Additional source folders</string>
     <string name="settings_sources_hint">Scanned in addition to the download folder (e.g. Telegram, USB import).</string>
     <string name="settings_sources_add">Add source folder</string>

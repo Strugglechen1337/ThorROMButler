@@ -2,6 +2,35 @@
 
 All notable user-facing changes are documented here.
 
+## 1.5.0
+
+### Deutsch
+
+- Neue ROM-Sicherung: Das komplette ROM-Verzeichnis mit allen Systemen wird
+  als 1:1-Ordnerspiegel in ein frei wählbares Ziel gesichert (SD-Karte, USB,
+  beliebiger Ordner). Folgeläufe sind inkrementell und kopieren nur Neues.
+- Wiederherstellung eingebaut: Fehlende Dateien werden aus der Sicherung
+  zurückkopiert — vorhandene Dateien in der Bibliothek werden dabei nie
+  überschrieben.
+- Läuft als Foreground-Service mit Fortschritts-Benachrichtigung und
+  Abbrechen; ein Abbruch behält bereits kopierte Dateien (nächster Lauf
+  setzt inkrementell fort). Speicherplatz wird vorab geprüft.
+- Ein Manifest an der Sicherung zeigt Datum, Dateizahl und Größe der
+  letzten Sicherung direkt in den Einstellungen.
+
+### English
+
+- New ROM library backup: the complete ROM folder with all systems is
+  mirrored 1:1 into a target of your choice (SD card, USB, any folder).
+  Follow-up runs are incremental and only copy what is new.
+- Restore built in: missing files are copied back from the backup — files
+  already in the library are never overwritten.
+- Runs as a foreground service with progress notification and cancel;
+  cancelling keeps completed files (the next run continues incrementally).
+  Free space is checked upfront.
+- A manifest at the backup shows date, file count, and size of the last
+  backup right in Settings.
+
 ## 1.4.2
 
 ### Deutsch
