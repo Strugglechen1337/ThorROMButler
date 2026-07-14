@@ -27,6 +27,7 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.SystemUpdate
 import androidx.compose.material.icons.filled.Tune
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -412,17 +413,11 @@ fun SettingsScreen(
 
             // Settings backup: export/import via JSON in the download folder
             SettingsCard {
-                Text(
-                    text = stringResource(R.string.settings_backup_title),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurface,
+                SectionHeader(
+                    title = stringResource(R.string.settings_backup_title),
+                    hint = stringResource(R.string.settings_backup_hint),
                 )
-                Text(
-                    text = stringResource(R.string.settings_backup_hint),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-                Spacer(Modifier.size(10.dp))
+                Spacer(Modifier.size(4.dp))
                 Row {
                     OutlinedButton(
                         onClick = {
@@ -492,19 +487,13 @@ fun SettingsScreen(
 
             // LAN receive mode
             SettingsCard {
-                Text(
-                    text = stringResource(R.string.receive_title),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurface,
+                SectionHeader(
+                    title = stringResource(R.string.receive_title),
+                    hint = stringResource(R.string.receive_hint),
                 )
                 when (val rs = receiveState) {
                     dev.thor.rombutler.receive.ReceiveState.Off -> {
-                        Text(
-                            text = stringResource(R.string.receive_hint),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                        Spacer(Modifier.size(10.dp))
+                        Spacer(Modifier.size(4.dp))
                         OutlinedButton(
                             onClick = {
                                 if (LocalNetworkPermission.isGranted(context)) {
@@ -760,17 +749,11 @@ fun SettingsScreen(
 
             // Incremental mirror backup of the whole ROM library
             SettingsCard {
-                Text(
-                    text = stringResource(R.string.settings_rombackup_title),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurface,
+                SectionHeader(
+                    title = stringResource(R.string.settings_rombackup_title),
+                    hint = stringResource(R.string.settings_rombackup_hint),
                 )
-                Text(
-                    text = stringResource(R.string.settings_rombackup_hint),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-                Spacer(Modifier.size(10.dp))
+                Spacer(Modifier.size(4.dp))
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -1007,24 +990,10 @@ fun SettingsScreen(
 
             // Explicitly shared, privacy-friendly support report.
             SettingsCard {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        imageVector = Icons.Filled.BugReport,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(24.dp),
-                    )
-                    Spacer(Modifier.width(12.dp))
-                    Text(
-                        text = stringResource(R.string.settings_diagnostics_title),
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.onSurface,
-                    )
-                }
-                Text(
-                    text = stringResource(R.string.settings_diagnostics_hint),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                SectionHeader(
+                    title = stringResource(R.string.settings_diagnostics_title),
+                    hint = stringResource(R.string.settings_diagnostics_hint),
+                    icon = Icons.Filled.BugReport,
                 )
                 if (viewModel.hasCrashReport) {
                     Text(
@@ -1492,6 +1461,60 @@ private fun SettingsCard(content: @Composable () -> Unit) {
         ),
     ) {
         Column(modifier = Modifier.padding(18.dp)) { content() }
+    }
+}
+
+/**
+ * Card header with an optional long explanation collapsed behind an
+ * info toggle — keeps the settings list scannable instead of a text
+ * wall, while every detail stays one tap away.
+ */
+@Composable
+private fun SectionHeader(
+    title: String,
+    hint: String? = null,
+    icon: ImageVector? = null,
+) {
+    var showHint by remember { mutableStateOf(false) }
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        if (icon != null) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(24.dp),
+            )
+            Spacer(Modifier.width(12.dp))
+        }
+        Text(
+            text = title,
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.weight(1f),
+        )
+        if (hint != null) {
+            IconButton(onClick = { showHint = !showHint }) {
+                Icon(
+                    imageVector = Icons.Outlined.Info,
+                    contentDescription = stringResource(R.string.settings_hint_toggle),
+                    tint = if (showHint) {
+                        MaterialTheme.colorScheme.primary
+                    } else {
+                        MaterialTheme.colorScheme.onSurfaceVariant
+                    },
+                )
+            }
+        }
+    }
+    if (hint != null) {
+        androidx.compose.animation.AnimatedVisibility(visible = showHint) {
+            Text(
+                text = hint,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(bottom = 6.dp),
+            )
+        }
     }
 }
 

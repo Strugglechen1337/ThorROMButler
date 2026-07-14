@@ -1,6 +1,7 @@
 package dev.thor.rombutler.ui.scan
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -51,8 +52,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
@@ -197,11 +200,41 @@ fun ScanScreen(
 
 @Composable
 private fun ScanningIndicator(modifier: Modifier = Modifier) {
+    // Hero moment: the butler's bolt pulses while the folder is scanned
+    val pulse = androidx.compose.animation.core.rememberInfiniteTransition(label = "scanPulse")
+    val scale by pulse.animateFloat(
+        initialValue = 0.88f,
+        targetValue = 1.12f,
+        animationSpec = androidx.compose.animation.core.infiniteRepeatable(
+            animation = androidx.compose.animation.core.tween(650),
+            repeatMode = androidx.compose.animation.core.RepeatMode.Reverse,
+        ),
+        label = "scanScale",
+    )
+    val glow by pulse.animateFloat(
+        initialValue = 0.35f,
+        targetValue = 1f,
+        animationSpec = androidx.compose.animation.core.infiniteRepeatable(
+            animation = androidx.compose.animation.core.tween(650),
+            repeatMode = androidx.compose.animation.core.RepeatMode.Reverse,
+        ),
+        label = "scanGlow",
+    )
     Column(
         modifier = modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
+        Text(
+            text = "⚡",
+            fontSize = 64.sp,
+            color = MaterialTheme.colorScheme.secondary.copy(alpha = glow),
+            modifier = Modifier.graphicsLayer {
+                scaleX = scale
+                scaleY = scale
+            },
+        )
+        Spacer(Modifier.size(20.dp))
         CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
         Spacer(Modifier.size(16.dp))
         Text(
@@ -256,23 +289,44 @@ private fun PermissionMissingState(modifier: Modifier = Modifier) {
 
 @Composable
 private fun EmptyState(modifier: Modifier = Modifier) {
+    // Gentle idle float so "all tidied up" feels alive, not dead
+    val idle = androidx.compose.animation.core.rememberInfiniteTransition(label = "emptyIdle")
+    val offsetY by idle.animateFloat(
+        initialValue = -6f,
+        targetValue = 6f,
+        animationSpec = androidx.compose.animation.core.infiniteRepeatable(
+            animation = androidx.compose.animation.core.tween(2200),
+            repeatMode = androidx.compose.animation.core.RepeatMode.Reverse,
+        ),
+        label = "emptyOffset",
+    )
     Column(
         modifier = modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Icon(
-            imageVector = Icons.Filled.FolderOff,
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.size(48.dp),
-        )
-        Spacer(Modifier.size(12.dp))
+        androidx.compose.material3.Surface(
+            shape = androidx.compose.foundation.shape.CircleShape,
+            color = MaterialTheme.colorScheme.surfaceContainerHigh,
+            modifier = Modifier
+                .size(112.dp)
+                .graphicsLayer { translationY = offsetY }
+                .neonGlow(elevation = 8.dp),
+        ) {
+            Column(
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Text(text = "⚡", fontSize = 52.sp, color = MaterialTheme.colorScheme.secondary)
+            }
+        }
+        Spacer(Modifier.size(20.dp))
         Text(
             text = stringResource(R.string.scan_empty_title),
-            style = MaterialTheme.typography.titleMedium,
+            style = MaterialTheme.typography.titleLarge,
             color = MaterialTheme.colorScheme.onBackground,
         )
+        Spacer(Modifier.size(6.dp))
         Text(
             text = stringResource(R.string.scan_empty_hint),
             style = MaterialTheme.typography.bodyMedium,

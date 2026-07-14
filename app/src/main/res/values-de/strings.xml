@@ -267,6 +267,7 @@
     <string name="settings_diagnostics_crash_included">Der letzte lokale Absturzbericht wird mit aufgenommen.</string>
     <string name="settings_diagnostics_share">Bericht erstellen und teilen</string>
     <string name="settings_diagnostics_failed">Der Diagnosebericht konnte nicht erstellt werden.</string>
+    <string name="settings_hint_toggle">Erklärung anzeigen</string>
     <string name="settings_version">Thor ROM Butler %s</string>
     <string name="settings_check_updates">Auf Updates prüfen</string>
     <string name="settings_up_to_date">Du hast die neueste Version.</string>
