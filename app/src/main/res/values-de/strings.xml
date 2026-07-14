@@ -16,7 +16,7 @@
 
     <!-- What's new (pro Release aktualisieren!) -->
     <string name="whatsnew_title">Neu in Version %s</string>
-    <string name="whatsnew_body">• ROM-Sicherung: das komplette ROM-Verzeichnis auf SD/USB spiegeln — inkrementell, Folgeläufe kopieren nur Neues\n• Wiederherstellung inklusive: Fehlendes kommt zurück, Vorhandenes wird nie überschrieben\n• Läuft im Hintergrund mit Fortschritts-Benachrichtigung und Abbrechen\n\nAlle Details im Changelog auf GitHub.</string>
+    <string name="whatsnew_body">• Frischer Look: neue Display-Schrift, weichere Formen, aufgeräumte Einstellungen (Erklärungen hinter ⓘ)\n• Federnde Animationen: Screen-Übergänge, Gamepad-Fokus und ein goldener Erfolgs-Moment nach dem Einsortieren\n• Neuer Scan- und Aufgeräumt-Zustand mit pulsierendem Blitz\n\nAlle Details im Changelog auf GitHub.</string>
 
     <!-- Setup screen -->
     <string name="setup_title">Einrichtung</string>

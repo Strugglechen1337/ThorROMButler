@@ -59,7 +59,7 @@ Die App durchsucht den Ordner und analysiert jeden Fund — bei Archiven
 **ohne sie zu entpacken**. Auf jeder Karte siehst du, welche ROMs erkannt
 wurden.
 
-<img src="screenshots/01-scan.png" alt="Scan" width="600">
+<img src="screenshots/v2-scan.png" alt="Scan" width="600">
 
 ### Schritt 4: Zuordnung prüfen
 
@@ -76,7 +76,7 @@ Duplikate werden erkannt und übersprungen, außer du wählst „Ersetzen". Beim
 Ersetzen bleibt die vorhandene Datei gesichert, bis die neue vollständig
 geschrieben und geprüft wurde.
 
-<img src="screenshots/02-assign.png" alt="Zuordnung" width="600">
+<img src="screenshots/v2-assign.png" alt="Zuordnung" width="600">
 
 ### Schritt 5: Einsortieren
 
@@ -140,7 +140,7 @@ anders überlegst.
 - **Updates**: Einstellungen → „Auf Updates prüfen", oder via
   [Obtainium](https://github.com/ImranR98/Obtainium).
 
-<img src="screenshots/04-settings.png" alt="Einstellungen" width="600">
+<img src="screenshots/v2-settings.png" alt="Einstellungen" width="600">
 
 ---
 
@@ -198,7 +198,7 @@ send files from other apps via
 The app scans the folder and analyzes every find — archives are inspected
 **without extracting them**. Each card shows which ROMs were detected.
 
-<img src="screenshots/01-scan.png" alt="Scan" width="600">
+<img src="screenshots/v2-scan.png" alt="Scan" width="600">
 
 ### Step 4: Review
 
@@ -214,7 +214,7 @@ Every ROM gets an honest confidence rating:
 detected and skipped unless you opt into replacing them. During replacement,
 the existing file stays backed up until the new copy is complete and verified.
 
-<img src="screenshots/02-assign.png" alt="Review" width="600">
+<img src="screenshots/v2-assign.png" alt="Review" width="600">
 
 ### Step 5: Sort
 
@@ -276,4 +276,4 @@ your mind.
 - **Updates**: Settings → "Check for updates", or via
   [Obtainium](https://github.com/ImranR98/Obtainium).
 
-<img src="screenshots/04-settings.png" alt="Settings" width="600">
+<img src="screenshots/v2-settings.png" alt="Settings" width="600">

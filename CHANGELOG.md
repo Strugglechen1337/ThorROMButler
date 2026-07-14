@@ -2,6 +2,33 @@
 
 All notable user-facing changes are documented here.
 
+## 1.6.0
+
+### Deutsch
+
+- Design-Release: neue Display-Schrift (Chakra Petch, SIL OFL) für alle
+  Überschriften, modernisierte Formen-Skala mit großzügigeren Eckenradien.
+- Einstellungen entrümpelt: lange Erklärtexte sind hinter ⓘ-Icons
+  einklappbar — jede Karte ist auf einen Blick erfassbar, alle Details
+  bleiben einen Tipp entfernt.
+- Federnde Animationen: Screen-Übergänge gleiten mit Spring-Physik, der
+  Gamepad-Fokus poppt sanft, und nach einem fehlerfreien Einsortieren
+  erscheint ein goldener Blitz-Moment („N ROMs einsortiert!").
+- Scan-Screen: pulsierender Blitz während des Scans und ein schwebendes
+  Blitz-Badge im „Alles aufgeräumt"-Zustand.
+
+### English
+
+- Design release: new display font (Chakra Petch, SIL OFL) for all
+  headlines, modernized shape scale with more generous corner radii.
+- Decluttered settings: long explanations collapse behind ⓘ icons —
+  every card is scannable at a glance, all details stay one tap away.
+- Springy animations: screen transitions glide with spring physics, the
+  gamepad focus pops gently, and a golden bolt moment ("N ROMs sorted
+  in!") celebrates a clean sorting run.
+- Scan screen: pulsing bolt while scanning and a floating bolt badge in
+  the all-tidied-up state.
+
 ## 1.5.0
 
 ### Deutsch

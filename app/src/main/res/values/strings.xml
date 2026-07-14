@@ -17,7 +17,7 @@
 
     <!-- What's new (update every release!) -->
     <string name="whatsnew_title">New in version %s</string>
-    <string name="whatsnew_body">• ROM library backup: mirror your complete ROM folder to SD/USB — incrementally, follow-up runs only copy what is new\n• Restore included: missing files come back, existing ones are never overwritten\n• Runs in the background with progress notification and cancel\n\nFull details in the changelog on GitHub.</string>
+    <string name="whatsnew_body">• Fresh look: new display font, softer shapes, decluttered settings (explanations behind ⓘ)\n• Springy animations: screen transitions, gamepad focus and a golden success moment after sorting\n• New scanning and all-tidied-up states with a pulsing bolt\n\nFull details in the changelog on GitHub.</string>
 
     <!-- Setup screen -->
     <string name="setup_title">Setup</string>
