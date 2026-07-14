@@ -232,6 +232,10 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch { settingsRepository.setDatFolderPath(path) }
     }
 
+    fun setBiosFolderPath(path: String?) {
+        viewModelScope.launch { settingsRepository.setBiosFolderPath(path) }
+    }
+
     fun setTrashInsteadOfDelete(enabled: Boolean) {
         viewModelScope.launch { settingsRepository.setTrashInsteadOfDelete(enabled) }
     }

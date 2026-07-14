@@ -191,6 +191,10 @@ fun ScanScreen(
                     applyingPatch = s.applyingPatch,
                     patchError = s.patchError,
                     onApplyPatch = viewModel::applyPatch,
+                    biosFiles = s.biosFiles,
+                    biosFolderSet = s.biosFolderSet,
+                    movingBios = s.movingBios,
+                    onMoveBios = viewModel::moveBiosFiles,
                     contentPadding = innerPadding,
                 )
             }
@@ -343,6 +347,10 @@ private fun ArchiveList(
     applyingPatch: String?,
     patchError: String?,
     onApplyPatch: (dev.thor.rombutler.data.patch.PatchPair) -> Unit,
+    biosFiles: List<String>,
+    biosFolderSet: Boolean,
+    movingBios: Boolean,
+    onMoveBios: () -> Unit,
     contentPadding: PaddingValues,
 ) {
     // Adaptive grid: two+ columns on wide/landscape screens (AYN Thor!)
@@ -380,6 +388,17 @@ private fun ArchiveList(
         if (looseRoms.isNotEmpty()) {
             item(key = "loose") {
                 LooseRomsCard(looseRoms, modifier = Modifier.animateItem())
+            }
+        }
+        if (biosFiles.isNotEmpty()) {
+            item(key = "bios") {
+                BiosCard(
+                    biosFiles = biosFiles,
+                    folderSet = biosFolderSet,
+                    moving = movingBios,
+                    onMove = onMoveBios,
+                    modifier = Modifier.animateItem(),
+                )
             }
         }
         items(items, key = { it.archive.path }) { item ->
@@ -460,6 +479,74 @@ private fun PatchesCard(
                     text = patchError,
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.error,
+                )
+            }
+        }
+    }
+}
+
+/** BIOS/firmware files: not ROMs, but the butler can shelve them too. */
+@Composable
+private fun BiosCard(
+    biosFiles: List<String>,
+    folderSet: Boolean,
+    moving: Boolean,
+    onMove: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .neonGlow(elevation = 5.dp)
+            .thorFocusable(MaterialTheme.shapes.medium),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+        ),
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(
+                text = stringResource(R.string.scan_bios_title, biosFiles.size),
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurface,
+            )
+            Spacer(Modifier.size(10.dp))
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                for (path in biosFiles.take(MAX_ROM_ROWS)) {
+                    Text(
+                        text = path.substringAfterLast('/'),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
+                val more = biosFiles.size - MAX_ROM_ROWS
+                if (more > 0) {
+                    Text(
+                        text = stringResource(R.string.analysis_more_roms, more),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
+            Spacer(Modifier.size(10.dp))
+            if (folderSet) {
+                Button(onClick = onMove, enabled = !moving) {
+                    if (moving) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(18.dp),
+                            strokeWidth = 2.dp,
+                            color = MaterialTheme.colorScheme.onPrimary,
+                        )
+                        Spacer(Modifier.size(8.dp))
+                    }
+                    Text(stringResource(R.string.scan_bios_move))
+                }
+            } else {
+                Text(
+                    text = stringResource(R.string.scan_bios_no_folder),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.secondary,
                 )
             }
         }

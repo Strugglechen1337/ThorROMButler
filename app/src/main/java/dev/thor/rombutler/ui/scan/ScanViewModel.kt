@@ -58,6 +58,12 @@ sealed interface ScanUiState {
         val applyingPatch: String? = null,
         /** User-facing message of the last failed patch attempt. */
         val patchError: String? = null,
+        /** Loose BIOS/firmware files found in the scan folders. */
+        val biosFiles: List<String> = emptyList(),
+        /** True when a BIOS target folder is configured in settings. */
+        val biosFolderSet: Boolean = false,
+        /** True while BIOS files are being moved. */
+        val movingBios: Boolean = false,
     ) : ScanUiState {
         /** All analyses finished? */
         val analysisComplete: Boolean get() = items.all { it.analysis != null }
@@ -82,6 +88,7 @@ class ScanViewModel @Inject constructor(
     private val archiveAnalyzer: ArchiveAnalyzer,
     private val looseRomRepository: LooseRomRepository,
     private val patchScanner: PatchScanner,
+    private val biosSorter: dev.thor.rombutler.data.files.BiosSorter,
     private val reviewSession: ReviewSession,
     updateAvailability: UpdateAvailability,
 ) : ViewModel() {
@@ -139,7 +146,10 @@ class ScanViewModel @Inject constructor(
             val archives = archiveRepository.scanForArchives()
             val looseRoms = looseRomRepository.scanAndDetect()
             val patches = patchScanner.findPairs()
-            if (archives.isEmpty() && looseRoms.isEmpty() && patches.isEmpty()) {
+            val biosScan = biosSorter.scan()
+            if (archives.isEmpty() && looseRoms.isEmpty() && patches.isEmpty() &&
+                biosScan.files.isEmpty()
+            ) {
                 _uiState.value = ScanUiState.Empty
                 return@launch
             }
@@ -147,6 +157,8 @@ class ScanViewModel @Inject constructor(
                 items = archives.map { ArchiveListItem(it) },
                 looseRoms = looseRoms,
                 patches = patches,
+                biosFiles = biosScan.files,
+                biosFolderSet = biosScan.folderSet,
             )
 
             // Two analyses in parallel: disk-bound, but one slow/broken
@@ -199,6 +211,21 @@ class ScanViewModel @Inject constructor(
                         )
                     }
                 }
+        }
+    }
+
+    /**
+     * Moves all found BIOS files into the configured BIOS folder and
+     * rescans; the log records one undoable entry for the whole run.
+     */
+    fun moveBiosFiles() {
+        val state = _uiState.value as? ScanUiState.Found ?: return
+        if (state.movingBios || state.biosFiles.isEmpty()) return
+        _uiState.value = state.copy(movingBios = true)
+
+        viewModelScope.launch {
+            runCatching { biosSorter.moveAll(state.biosFiles) }
+            rescan()
         }
     }
 

@@ -17,7 +17,7 @@
 
     <!-- What's new (update every release!) -->
     <string name="whatsnew_title">New in version %s</string>
-    <string name="whatsnew_body">• Fresh look: new display font, softer shapes, decluttered settings (explanations behind ⓘ)\n• Springy animations: screen transitions, gamepad focus and a golden success moment after sorting\n• New scanning and all-tidied-up states with a pulsing bolt\n\nFull details in the changelog on GitHub.</string>
+    <string name="whatsnew_body">• BIOS sorting: detected BIOS files get their own card and move to your BIOS folder with one tap (undoable)\n• New optional BIOS folder in Settings\n\nFull details in the changelog on GitHub.</string>
 
     <!-- Setup screen -->
     <string name="setup_title">Setup</string>
@@ -56,6 +56,13 @@
     <string name="scan_found_count">%d found</string>
     <string name="scan_loose_title">Loose ROM files (%d)</string>
     <string name="scan_rar5_unsupported">RAR5 is not supported – please download as ZIP or 7z.</string>
+
+    <!-- BIOS sorting -->
+    <string name="scan_bios_title">BIOS files (%d)</string>
+    <string name="scan_bios_move">Move to BIOS folder</string>
+    <string name="scan_bios_no_folder">Set a BIOS folder in Settings to sort these in.</string>
+    <string name="settings_bios_title">BIOS folder</string>
+    <string name="settings_bios_hint">Optional: BIOS/firmware files found during scans can be moved here with one tap (e.g. your emulator\'s system folder).</string>
 
     <!-- ROM patches (IPS/UPS/BPS) -->
     <string name="scan_patch_title">ROM patches (%d)</string>

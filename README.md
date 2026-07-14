@@ -43,7 +43,10 @@ läuft aber auf jedem Android-Smartphone ab Android 13.
   "Alle übernehmen".
 - 📦 **Archiv-Analyse ohne Entpacken**: Inhalte werden direkt im Archiv gelesen;
   `.bin`+`.cue` und `.m3u` werden als Einheit behandelt, BIOS-Dateien erkannt
-  und ignoriert
+  und aus der ROM-Liste herausgehalten
+- 🧰 **BIOS-Einsortierung**: erkannte BIOS-/Firmware-Dateien (scph*,
+  gba_bios, Kickstart, syscard, …) wandern mit einem Tipp in deinen
+  BIOS-Ordner — rückgängig machbar, nichts wird überschrieben
 - 🚚 **Einsortieren**: entpackt ROMs mit Fortschrittsbalken, Abbrechen-Option
   und CRC-Prüfung in den richtigen Systemordner - als Foreground-Service, der
   auch ausgeschaltete Displays übersteht. Neue und ersetzte Dateien werden
@@ -228,7 +231,10 @@ newer.
   time or in bulk.
 - 📦 **Archive analysis without extraction**: archive entries are read directly;
   `.bin`+`.cue` and `.m3u` files are treated as one unit, while BIOS files are
-  detected and ignored
+  detected and kept out of the ROM list
+- 🧰 **BIOS sorting**: detected BIOS/firmware files (scph*, gba_bios,
+  Kickstart, syscard, …) move to your BIOS folder with one tap —
+  undoable, nothing is overwritten
 - 🚚 **Sorting**: extracts ROMs into the correct system folder with progress,
   cancellation, and CRC checks. New and replaced files are written as a
   transaction: existing ROMs stay backed up until verification succeeds.

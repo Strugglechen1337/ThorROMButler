@@ -27,6 +27,7 @@ object SettingsBackupCodec {
         .put("writeM3uPlaylists", settings.writeM3uPlaylists)
         .put("renameToDatName", settings.renameToDatName)
         .put("backupTargetPath", settings.backupTargetPath ?: JSONObject.NULL)
+        .put("biosFolderPath", settings.biosFolderPath ?: JSONObject.NULL)
         .toString(2)
 
     /**
@@ -84,6 +85,7 @@ object SettingsBackupCodec {
             ),
             renameToDatName = root.booleanSetting("renameToDatName", current.renameToDatName),
             backupTargetPath = root.pathSetting("backupTargetPath", current.backupTargetPath),
+            biosFolderPath = root.pathSetting("biosFolderPath", current.biosFolderPath),
         )
     }
 

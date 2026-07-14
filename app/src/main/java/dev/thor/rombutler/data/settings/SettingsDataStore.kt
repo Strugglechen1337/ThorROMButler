@@ -39,6 +39,7 @@ class SettingsDataStore @Inject constructor(
         val WRITE_M3U = booleanPreferencesKey("write_m3u_playlists")
         val RENAME_TO_DAT = booleanPreferencesKey("rename_to_dat_name")
         val BACKUP_TARGET = stringPreferencesKey("backup_target_path")
+        val BIOS_FOLDER = stringPreferencesKey("bios_folder_path")
     }
 
     override val settings: Flow<AppSettings> = dataStore.data.map { prefs ->
@@ -57,6 +58,7 @@ class SettingsDataStore @Inject constructor(
             writeM3uPlaylists = prefs[Keys.WRITE_M3U] ?: true,
             renameToDatName = prefs[Keys.RENAME_TO_DAT] ?: false,
             backupTargetPath = prefs[Keys.BACKUP_TARGET],
+            biosFolderPath = prefs[Keys.BIOS_FOLDER],
         )
     }
 
@@ -160,6 +162,12 @@ class SettingsDataStore @Inject constructor(
         }
     }
 
+    override suspend fun setBiosFolderPath(path: String?) {
+        dataStore.edit { prefs ->
+            if (path.isNullOrBlank()) prefs.remove(Keys.BIOS_FOLDER) else prefs[Keys.BIOS_FOLDER] = path
+        }
+    }
+
     override suspend fun setCustomSystemPack(json: String?) {
         dataStore.edit { prefs ->
             if (json.isNullOrBlank()) {
@@ -187,6 +195,7 @@ class SettingsDataStore @Inject constructor(
             prefs[Keys.WRITE_M3U] = settings.writeM3uPlaylists
             prefs[Keys.RENAME_TO_DAT] = settings.renameToDatName
             prefs.setOrRemove(Keys.BACKUP_TARGET, settings.backupTargetPath)
+            prefs.setOrRemove(Keys.BIOS_FOLDER, settings.biosFolderPath)
         }
     }
 

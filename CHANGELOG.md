@@ -2,6 +2,28 @@
 
 All notable user-facing changes are documented here.
 
+## 1.7.0
+
+### Deutsch
+
+- BIOS-Einsortierung: Erkannte BIOS-/Firmware-Dateien (PS1 scph*, GBA/NDS,
+  Dreamcast, Kickstart, syscard, …) bekommen im Scan eine eigene Karte und
+  wandern mit einem Tipp in einen frei wählbaren BIOS-Ordner (z. B. den
+  System-Ordner des Emulators).
+- Nichts wird überschrieben (Namenskollisionen bekommen ein `(1)`-Suffix),
+  der Lauf steht als eine Aktion im Log und lässt sich rückgängig machen.
+- Neuer optionaler BIOS-Ordner in den Einstellungen neben dem DAT-Ordner.
+
+### English
+
+- BIOS sorting: detected BIOS/firmware files (PS1 scph*, GBA/NDS,
+  Dreamcast, Kickstart, syscard, …) get their own card in the scan and
+  move to a freely chosen BIOS folder with one tap (e.g. your emulator's
+  system folder).
+- Nothing is overwritten (name collisions get a `(1)` suffix), the run is
+  logged as one action and can be undone.
+- New optional BIOS folder in Settings next to the DAT folder.
+
 ## 1.6.0
 
 ### Deutsch

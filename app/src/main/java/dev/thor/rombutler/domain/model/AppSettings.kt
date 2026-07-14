@@ -51,6 +51,8 @@ data class AppSettings(
     val renameToDatName: Boolean = false,
     /** Target folder of the incremental ROM library backup (null = unset). */
     val backupTargetPath: String? = null,
+    /** Folder BIOS/firmware files get sorted into (null = feature off). */
+    val biosFolderPath: String? = null,
 ) {
     /** Setup is complete once both folders are configured. */
     val isSetupComplete: Boolean

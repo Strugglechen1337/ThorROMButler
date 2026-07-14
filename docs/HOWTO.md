@@ -110,6 +110,11 @@ anders überlegst.
   Systemordner, legt der Butler automatisch eine `.m3u`-Playlist an —
   ein Eintrag im Frontend, Disc-Wechsel funktioniert. Abschaltbar in den
   Einstellungen; vorhandene Playlists werden nie überschrieben.
+- **BIOS-Dateien**: Erkannte BIOS-/Firmware-Dateien (z. B. `scph1001.bin`,
+  `gba_bios.bin`) zeigt der Scan als eigene Karte. Lege in den
+  Einstellungen einen BIOS-Ordner fest (z. B. den System-Ordner deines
+  Emulators) — dann verschiebt ein Tipp alle auf einmal, rückgängig
+  machbar über das Log.
 - **Weitere Systeme**: Einstellungen → „System-Packs & eigene Systeme".
   Dort kannst du Definitionen anlegen, bearbeiten und als
   `ThorRomButler-system-pack.json` im Download-Ordner exportieren. Zum Import
@@ -248,6 +253,10 @@ your mind.
   folder, the butler automatically writes a `.m3u` playlist — one frontend
   entry, working disc swap. Can be disabled in Settings; existing playlists
   are never overwritten.
+- **BIOS files**: detected BIOS/firmware files (e.g. `scph1001.bin`,
+  `gba_bios.bin`) appear as their own card in the scan. Set a BIOS folder
+  in Settings (e.g. your emulator's system folder) — one tap then moves
+  them all at once, undoable from the log.
 - **More systems**: Settings → "System packs & custom systems". Create or edit
   definitions there and export them as `ThorRomButler-system-pack.json` in the
   download folder. To import, place that file in the download folder; importing

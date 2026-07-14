@@ -66,6 +66,9 @@ interface SettingsRepository {
     /** Persists the ROM backup target folder (null/blank = unset). */
     suspend fun setBackupTargetPath(path: String?)
 
+    /** Persists the BIOS target folder (null/blank = unset). */
+    suspend fun setBiosFolderPath(path: String?)
+
     /** Persists a validated custom system pack; `null` removes all custom systems. */
     suspend fun setCustomSystemPack(json: String?)
 

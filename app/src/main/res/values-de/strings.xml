@@ -16,7 +16,7 @@
 
     <!-- What's new (pro Release aktualisieren!) -->
     <string name="whatsnew_title">Neu in Version %s</string>
-    <string name="whatsnew_body">• Frischer Look: neue Display-Schrift, weichere Formen, aufgeräumte Einstellungen (Erklärungen hinter ⓘ)\n• Federnde Animationen: Screen-Übergänge, Gamepad-Fokus und ein goldener Erfolgs-Moment nach dem Einsortieren\n• Neuer Scan- und Aufgeräumt-Zustand mit pulsierendem Blitz\n\nAlle Details im Changelog auf GitHub.</string>
+    <string name="whatsnew_body">• BIOS-Einsortierung: erkannte BIOS-Dateien bekommen eine eigene Karte und wandern mit einem Tipp in deinen BIOS-Ordner (rückgängig machbar)\n• Neuer optionaler BIOS-Ordner in den Einstellungen\n\nAlle Details im Changelog auf GitHub.</string>
 
     <!-- Setup screen -->
     <string name="setup_title">Einrichtung</string>
@@ -55,6 +55,13 @@
     <string name="scan_found_count">%d Funde</string>
     <string name="scan_loose_title">Lose ROM-Dateien (%d)</string>
     <string name="scan_rar5_unsupported">RAR5 wird nicht unterstützt – bitte als ZIP oder 7z laden.</string>
+
+    <!-- BIOS sorting -->
+    <string name="scan_bios_title">BIOS-Dateien (%d)</string>
+    <string name="scan_bios_move">In BIOS-Ordner verschieben</string>
+    <string name="scan_bios_no_folder">Lege in den Einstellungen einen BIOS-Ordner fest, um sie einzusortieren.</string>
+    <string name="settings_bios_title">BIOS-Ordner</string>
+    <string name="settings_bios_hint">Optional: Beim Scan gefundene BIOS-/Firmware-Dateien lassen sich mit einem Tipp hierher verschieben (z. B. der System-Ordner deines Emulators).</string>
 
     <!-- ROM patches (IPS/UPS/BPS) -->
     <string name="scan_patch_title">ROM-Patches (%d)</string>

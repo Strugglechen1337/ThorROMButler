@@ -122,6 +122,7 @@ fun SettingsScreen(
     var showFolderOverrides by remember { mutableStateOf(false) }
     var showFrontendProfiles by remember { mutableStateOf(false) }
     var showBackupTargetPicker by remember { mutableStateOf(false) }
+    var showBiosPicker by remember { mutableStateOf(false) }
     var showRestoreConfirm by remember { mutableStateOf(false) }
 
     // Load the manifest info whenever the backup target changes
@@ -235,6 +236,36 @@ fun SettingsScreen(
                     }
                     if (settings.datFolderPath != null) {
                         IconButton(onClick = { viewModel.setDatFolderPath(null) }) {
+                            Icon(
+                                imageVector = Icons.Filled.Delete,
+                                contentDescription = stringResource(R.string.settings_sources_remove),
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                    }
+                }
+                Spacer(Modifier.size(12.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Column(
+                        modifier = Modifier
+                            .weight(1f)
+                            .clickable { showBiosPicker = true },
+                    ) {
+                        Text(
+                            text = stringResource(R.string.settings_bios_title),
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onSurface,
+                        )
+                        Text(
+                            text = settings.biosFolderPath
+                                ?: stringResource(R.string.settings_bios_hint),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            maxLines = 2,
+                        )
+                    }
+                    if (settings.biosFolderPath != null) {
+                        IconButton(onClick = { viewModel.setBiosFolderPath(null) }) {
                             Icon(
                                 imageVector = Icons.Filled.Delete,
                                 contentDescription = stringResource(R.string.settings_sources_remove),
@@ -1103,6 +1134,17 @@ fun SettingsScreen(
                 showDatPicker = false
             },
             onDismiss = { showDatPicker = false },
+        )
+    }
+    if (showBiosPicker) {
+        FolderPickerDialog(
+            title = stringResource(R.string.settings_bios_title),
+            initialPath = settings.biosFolderPath ?: settings.romBasePath,
+            onSelect = {
+                viewModel.setBiosFolderPath(it)
+                showBiosPicker = false
+            },
+            onDismiss = { showBiosPicker = false },
         )
     }
     if (showSourcePicker) {
