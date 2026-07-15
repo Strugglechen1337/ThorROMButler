@@ -131,9 +131,13 @@ anders überlegst.
   (z. B. SD-Karte oder USB) und „Jetzt sichern". Der Butler spiegelt das
   komplette ROM-Verzeichnis 1:1; beim nächsten Lauf wird nur Neues kopiert.
   „Wiederherstellen" holt fehlende Dateien zurück und überschreibt nie etwas.
-- **Exakte Duplikate**: Nach der normalen Bibliotheks-Prüfung kannst du optional
+- **Bibliotheks-Doktor**: Einstellungen → „Bibliotheks-Doktor öffnen". Ein Lauf
+  prüft Fehlzuordnungen, M3U-/CUE-Verweise, gepackte Arcade-/Neo-Geo-Sets sowie
+  BIOS-, DAT- und Sicherungsstatus. Befunde zeigen Details, lassen sich für den
+  Lauf ausblenden oder über die sichere Review-Ansicht korrigieren.
+- **Exakte Duplikate**: Im Bibliotheks-Doktor kannst du optional
   einen SHA-256-Abgleich starten. Nur gleich große Kandidaten werden gelesen;
-  gelöscht wird nichts. Pfade und Prüfsummen stehen im Sammlungsexport.
+  gelöscht wird nichts. Pfade und Prüfsummen stehen im Gesundheitsbericht.
 - **Diagnose teilen**: Der Diagnosebericht in den Einstellungen sammelt App-,
   Geräte-, Speicher-, Berechtigungs- und LAN-Status. ROM-Namen und der geheime
   Sitzungscode werden nicht aufgenommen.
@@ -275,9 +279,13 @@ your mind.
   folder (e.g. SD card or USB) and tap "Back up now". The butler mirrors the
   complete ROM folder 1:1; the next run only copies what is new. "Restore"
   brings missing files back and never overwrites anything.
-- **Exact duplicates**: after the regular library check, optionally run a
-  SHA-256 comparison. Only same-sized candidates are read and nothing is
-  deleted. Paths and hashes are included in the collection export.
+- **Library Doctor**: Settings → "Open Library Doctor". One run checks
+  misplacements, M3U/CUE references, packed Arcade/Neo Geo sets, and BIOS, DAT,
+  and backup status. Findings show details and can be hidden for the run or
+  repaired through the safe review flow.
+- **Exact duplicates**: optionally run a SHA-256 comparison in the Library
+  Doctor. Only same-sized candidates are read and nothing is
+  deleted. Paths and hashes are included in the health report.
 - **Share diagnostics**: the report in Settings collects app, device, storage,
   permission, and LAN status. ROM names and the protected session code are
   omitted.

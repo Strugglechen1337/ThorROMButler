@@ -73,6 +73,7 @@ import dev.thor.rombutler.ui.components.FolderPickerDialog
 fun SettingsScreen(
     onBack: () -> Unit,
     onOpenReview: () -> Unit,
+    onOpenDoctor: () -> Unit,
     viewModel: SettingsViewModel = hiltViewModel(),
 ) {
     val settings by viewModel.settings.collectAsStateWithLifecycle()
@@ -621,6 +622,19 @@ fun SettingsScreen(
                     color = MaterialTheme.colorScheme.onSurface,
                 )
                 Spacer(Modifier.size(10.dp))
+                Button(
+                    onClick = onOpenDoctor,
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Text(stringResource(R.string.doctor_open))
+                }
+                Text(
+                    text = stringResource(R.string.doctor_entry_hint),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(top = 6.dp),
+                )
+                Spacer(Modifier.size(12.dp))
                 when (val lib = libraryState) {
                     LibraryCheckState.Idle -> OutlinedButton(
                         onClick = viewModel::checkLibrary,

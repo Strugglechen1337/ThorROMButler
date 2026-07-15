@@ -16,7 +16,7 @@
 
     <!-- What's new (pro Release aktualisieren!) -->
     <string name="whatsnew_title">Neu in Version %s</string>
-    <string name="whatsnew_body">• Beim „Rückgängig" eines Multi-Disc-Spiels wird jetzt auch die automatisch erzeugte .m3u-Playlist entfernt\n• Geteilte Dateien mit gleichem Namen wie eine vorhandene bekommen ein (1)-Suffix, statt verworfen zu werden\n\nAlle Details im Changelog auf GitHub.</string>
+    <string name="whatsnew_body">• Neuer Bibliotheks-Doktor mit zentralem Gesundheitsbericht\n• Erkennt falsch einsortierte ROMs, defekte M3U-/CUE-Verweise und unlesbare gepackte Sets\n• Zeigt BIOS-, DAT- und Sicherungsbereitschaft mit sicheren Folgeaktionen\n\nAlle Details im Changelog auf GitHub.</string>
 
     <!-- Setup screen -->
     <string name="setup_title">Einrichtung</string>
@@ -217,6 +217,84 @@
     <string name="settings_library_exact_summary">%1$d Gruppen · %2$d identische Dateien · bis zu %3$s freigebbar</string>
     <string name="settings_library_exact_none">Keine bytegleichen ROM-Dateien gefunden.</string>
     <string name="settings_library_exact_details">Dateipfade und SHA-256-Prüfsummen stehen im Sammlungsexport.</string>
+    <string name="doctor_title">Bibliotheks-Doktor</string>
+    <string name="doctor_entry_hint">Gesundheitsprüfung für Einsortierung, Playlists, gepackte Sets, BIOS, DAT-Dateien und Sicherungen.</string>
+    <string name="doctor_open">Bibliotheks-Doktor öffnen</string>
+    <string name="doctor_scanning">Bibliothekszustand wird geprüft…</string>
+    <string name="doctor_retry">Erneut prüfen</string>
+    <string name="doctor_summary">%1$d ROMs · %2$s</string>
+    <plurals name="doctor_problem_count">
+        <item quantity="one">1 struktureller Befund braucht Aufmerksamkeit</item>
+        <item quantity="other">%d strukturelle Befunde brauchen Aufmerksamkeit</item>
+    </plurals>
+    <string name="doctor_no_problems">Keine strukturellen Probleme gefunden.</string>
+    <plurals name="doctor_ignored_count">
+        <item quantity="one">1 Befund für diesen Lauf ausgeblendet</item>
+        <item quantity="other">%d Befunde für diesen Lauf ausgeblendet</item>
+    </plurals>
+    <plurals name="doctor_misplaced_title">
+        <item quantity="one">1 ROM liegt im falschen Systemordner</item>
+        <item quantity="other">%d ROMs liegen im falschen Systemordner</item>
+    </plurals>
+    <string name="doctor_misplaced_text">Die Dateisignatur weist eindeutig auf ein anderes System.</string>
+    <string name="doctor_review">Reparatur prüfen</string>
+    <string name="doctor_ignore">Diesen Lauf ignorieren</string>
+    <string name="doctor_details">Details</string>
+    <string name="doctor_less">Weniger anzeigen</string>
+    <string name="doctor_reference_empty">Die Steuerdatei enthält keinen spielbaren Dateiverweis.</string>
+    <string name="doctor_reference_missing">Referenzierte Dateien fehlen.</string>
+    <string name="doctor_reference_unreadable">Die Steuerdatei konnte nicht sicher gelesen werden.</string>
+    <string name="doctor_missing_prefix">Fehlt: %s</string>
+    <string name="doctor_archive_empty">Das gepackte ROM-Set enthält keine Einträge.</string>
+    <string name="doctor_archive_unreadable">Das ZIP-Verzeichnis ist beschädigt oder nicht lesbar.</string>
+    <plurals name="doctor_variants_title">
+        <item quantity="one">1 Spiel liegt in mehreren Varianten vor</item>
+        <item quantity="other">%d Spiele liegen in mehreren Varianten vor</item>
+    </plurals>
+    <string name="doctor_variants_text">Regionen und Revisionen stehen im Bericht; automatisch gelöscht wird nichts.</string>
+    <string name="doctor_readiness_title">Bereitschaft</string>
+    <string name="doctor_bios_title">BIOS</string>
+    <string name="doctor_bios_not_configured">Kein BIOS-Ordner konfiguriert</string>
+    <string name="doctor_bios_folder_missing">Konfigurierter BIOS-Ordner ist nicht erreichbar</string>
+    <string name="doctor_bios_none">Keine bekannten BIOS-Dateien erkannt</string>
+    <plurals name="doctor_bios_ready">
+        <item quantity="one">1 bekannte BIOS-Datei erkannt</item>
+        <item quantity="other">%d bekannte BIOS-Dateien erkannt</item>
+    </plurals>
+    <string name="doctor_dat_title">DAT-Verifizierung</string>
+    <string name="doctor_dat_not_configured">Kein DAT-Ordner konfiguriert</string>
+    <string name="doctor_dat_folder_missing">Konfigurierter DAT-Ordner ist nicht erreichbar</string>
+    <string name="doctor_dat_none">Keine DAT-Dateien gefunden</string>
+    <string name="doctor_dat_unusable">DAT-Dateien enthalten keine nutzbaren CRC-Einträge</string>
+    <plurals name="doctor_dat_ready">
+        <item quantity="one">1 DAT-Datei bereit</item>
+        <item quantity="other">%d DAT-Dateien bereit</item>
+    </plurals>
+    <string name="doctor_backup_title">ROM-Sicherung</string>
+    <string name="doctor_backup_not_configured">Kein Sicherungsziel konfiguriert</string>
+    <string name="doctor_backup_folder_missing">Sicherungsziel ist nicht erreichbar</string>
+    <string name="doctor_backup_none">Noch keine abgeschlossene Sicherung gefunden</string>
+    <string name="doctor_backup_different">Sicherung gehört zu einem anderen ROM-Ordner</string>
+    <string name="doctor_backup_outdated">Sicherung ist älter als die Bibliothek</string>
+    <string name="doctor_backup_current">Sicherung ist aktuell</string>
+    <string name="doctor_backup_last">Letzter Lauf: %s</string>
+    <string name="doctor_backup_run">Jetzt sichern</string>
+    <string name="doctor_backup_done">ROM-Sicherung abgeschlossen.</string>
+    <string name="doctor_backup_failed">Einige ROM-Dateien konnten nicht gesichert werden.</string>
+    <string name="doctor_backup_cancelled">ROM-Sicherung abgebrochen; fertige Dateien wurden behalten.</string>
+    <string name="doctor_configure">In Einstellungen konfigurieren</string>
+    <string name="doctor_exact_title">Duplikat-Tiefenprüfung</string>
+    <string name="doctor_exact_hint">SHA-256 wird nur für gleich große Kandidaten berechnet.</string>
+    <string name="doctor_exact_run">Bytegleiche Dateien suchen</string>
+    <string name="doctor_exact_running">Dateiinhalte werden verglichen…</string>
+    <string name="doctor_exact_none">Keine bytegleichen ROM-Dateien gefunden.</string>
+    <plurals name="doctor_exact_groups">
+        <item quantity="one">1 Duplikatgruppe · %2$d Dateien · %3$s freigebbar</item>
+        <item quantity="other">%1$d Duplikatgruppen · %2$d Dateien · %3$s freigebbar</item>
+    </plurals>
+    <string name="doctor_export">Gesundheitsbericht exportieren</string>
+    <string name="doctor_export_done">Gesundheitsbericht im Download-Ordner gespeichert.</string>
+    <string name="doctor_export_failed">Gesundheitsbericht konnte nicht gespeichert werden.</string>
     <string name="settings_system_packs_title">System-Packs &amp; eigene Systeme</string>
     <plurals name="settings_system_packs_count">
         <item quantity="one">1 eigenes System installiert</item>

@@ -10,6 +10,8 @@ import dev.thor.rombutler.domain.model.DetectedRom
 import dev.thor.rombutler.domain.repository.LibraryReport
 import dev.thor.rombutler.domain.repository.LibraryRepository
 import dev.thor.rombutler.domain.repository.ExactDuplicateReport
+import dev.thor.rombutler.domain.repository.LibraryArchiveIssue
+import dev.thor.rombutler.domain.repository.LibraryReferenceIssue
 import dev.thor.rombutler.domain.repository.SettingsRepository
 import dev.thor.rombutler.domain.repository.SystemStat
 import kotlinx.coroutines.CoroutineDispatcher
@@ -54,11 +56,27 @@ class LibraryChecker @Inject constructor(
         val stats = mutableListOf<SystemStat>()
         val misplaced = mutableListOf<DetectedRom>()
         val duplicates = mutableListOf<dev.thor.rombutler.domain.repository.DuplicateGroup>()
+        val referenceIssues = mutableListOf<LibraryReferenceIssue>()
+        val archiveIssues = mutableListOf<LibraryArchiveIssue>()
+        var newestLibraryFileMillis = 0L
 
         for (dir in base.listFiles()?.filter { it.isDirectory }.orEmpty()) {
             val system = folderToSystem[dir.name.lowercase()] ?: continue
-            val romFiles = mutableListOf<File>()
-            collectRomFiles(dir, depth = 0, into = romFiles)
+            val libraryFiles = mutableListOf<File>()
+            collectLibraryFiles(dir, depth = 0, into = libraryFiles)
+            newestLibraryFileMillis = maxOf(
+                newestLibraryFileMillis,
+                libraryFiles.maxOfOrNull { it.lastModified() } ?: 0L,
+            )
+            val romFiles = libraryFiles.filter {
+                (engine.isRomFileName(it.name) ||
+                    (system.id in PACKED_ZIP_SYSTEMS && it.extension.equals("zip", true))) &&
+                    !biosDetector.isBios(it.name)
+            }
+            referenceIssues += LibraryHealthInspector.inspectReferences(libraryFiles)
+            if (system.id in PACKED_ZIP_SYSTEMS) {
+                archiveIssues += LibraryHealthInspector.inspectPackedArchives(romFiles)
+            }
 
             stats += SystemStat(
                 systemId = system.id,
@@ -108,6 +126,15 @@ class LibraryChecker @Inject constructor(
             stats = stats.sortedByDescending { it.totalBytes },
             misplaced = misplaced.sortedBy { it.group.primary.lowercase() },
             duplicates = duplicates.sortedBy { it.title },
+            referenceIssues = referenceIssues,
+            archiveIssues = archiveIssues,
+            biosHealth = LibraryHealthInspector.biosHealth(settings.biosFolderPath, biosDetector),
+            datHealth = LibraryHealthInspector.datHealth(settings.datFolderPath),
+            backupHealth = LibraryHealthInspector.backupHealth(
+                romBase = base,
+                backupPath = settings.backupTargetPath,
+                newestLibraryFileMillis = newestLibraryFileMillis,
+            ),
         )
     }
 
@@ -118,26 +145,33 @@ class LibraryChecker @Inject constructor(
         val base = File(basePath)
         if (!base.isDirectory) throw IllegalStateException("ROM-Basisordner nicht gefunden: $basePath")
 
-        val knownFolders = registry.systems.mapTo(mutableSetOf()) { system ->
+        val knownFolders = registry.systems.associateBy { system ->
             (settings.folderOverrides[system.id] ?: system.esdeFolder).lowercase()
         }
         val files = mutableListOf<File>()
         base.listFiles()
             .orEmpty()
-            .filter { it.isDirectory && it.name.lowercase() in knownFolders }
-            .forEach { collectRomFiles(it, depth = 0, into = files) }
+            .filter { it.isDirectory && it.name.lowercase() in knownFolders.keys }
+            .forEach { dir ->
+                val system = knownFolders.getValue(dir.name.lowercase())
+                val libraryFiles = mutableListOf<File>()
+                collectLibraryFiles(dir, depth = 0, into = libraryFiles)
+                files += libraryFiles.filter {
+                    (engine.isRomFileName(it.name) ||
+                        (system.id in PACKED_ZIP_SYSTEMS && it.extension.equals("zip", true))) &&
+                        !biosDetector.isBios(it.name)
+                }
+            }
         exactDuplicateFinder.find(base, files)
     }
 
-    private fun collectRomFiles(dir: File, depth: Int, into: MutableList<File>) {
+    private fun collectLibraryFiles(dir: File, depth: Int, into: MutableList<File>) {
         for (child in dir.listFiles().orEmpty()) {
             when {
                 child.isDirectory && depth < MAX_DEPTH && !child.name.startsWith(".") ->
-                    collectRomFiles(child, depth + 1, into)
+                    collectLibraryFiles(child, depth + 1, into)
 
-                child.isFile &&
-                    engine.isRomFileName(child.name) &&
-                    !biosDetector.isBios(child.name) -> into += child
+                child.isFile && !child.name.startsWith(".") -> into += child
             }
         }
     }
@@ -158,6 +192,7 @@ class LibraryChecker @Inject constructor(
 
     companion object {
         private const val MAX_DEPTH = 2 // system folder + per-game subfolders
+        private val PACKED_ZIP_SYSTEMS = setOf("arcade", "neogeo")
 
         private val TAG_GROUPS = Regex("""[(\[][^)\]]*[)\]]""")
         private val MULTI_SPACE = Regex("""\s+""")

@@ -61,9 +61,10 @@ läuft aber auf jedem Android-Smartphone ab Android 13.
 - 👁️ **Wächter-Modus** (optional): prüft den Download-Ordner im Hintergrund
   und benachrichtigt bei neuen Funden — einsortiert wird weiterhin nur nach
   deiner Bestätigung
-- 🧹 **Bibliotheks-Prüfung**: Statistik pro System, Erkennung falsch
-  einsortierter ROMs und Duplikat-Übersicht (Regionen/Revisionen). Optional
-  findet ein speicherschonender SHA-256-Lauf bytegleiche Dateien.
+- 🩺 **Bibliotheks-Doktor**: zentraler Gesundheitscheck für falsch
+  einsortierte ROMs, defekte M3U-/CUE-Verweise, unlesbare Arcade-/Neo-Geo-ZIPs,
+  Varianten sowie BIOS-, DAT- und Sicherungsbereitschaft. Sichere Reparaturen,
+  Details, Ausblenden pro Lauf, Markdown-Bericht und optionaler SHA-256-Lauf.
 - 💾 **ROM-Sicherung mit Wiederherstellung**: das komplette ROM-Verzeichnis
   als 1:1-Ordnerspiegel auf SD-Karte/USB sichern — inkrementell, Folgeläufe
   kopieren nur Neues. Die Wiederherstellung ergänzt fehlende Dateien und
@@ -247,9 +248,10 @@ newer.
 - 👁️ **Watcher mode** (optional): checks the download folder in the
   background and notifies you about new finds — sorting still only happens
   after your confirmation
-- 🧹 **Library check**: per-system statistics, detection of misplaced
-  ROMs and a duplicate overview (regions/revisions). An optional,
-  memory-efficient SHA-256 pass finds byte-identical files.
+- 🩺 **Library Doctor**: central health check for misplaced ROMs, broken
+  M3U/CUE references, unreadable Arcade/Neo Geo ZIPs, variants, and BIOS, DAT,
+  and backup readiness. Safe repairs, per-run hiding, a Markdown report, and
+  an optional memory-efficient SHA-256 pass.
 - 💾 **ROM library backup & restore**: mirror the complete ROM folder 1:1
   to SD card/USB — incrementally, follow-up runs only copy what is new.
   Restoring adds missing files back and never overwrites anything.

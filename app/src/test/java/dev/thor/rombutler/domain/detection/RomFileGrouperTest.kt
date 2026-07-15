@@ -83,6 +83,13 @@ class RomFileGrouperTest {
     }
 
     @Test
+    fun `cue reference parsing handles unquoted names`() {
+        val refs = RomFileGrouper.parseCueReferences("FILE track01.bin BINARY")
+
+        assertThat(refs).containsExactly("track01.bin")
+    }
+
+    @Test
     fun `references with path prefixes resolve to plain names`() {
         val groups = grouper.group(
             fileNames = listOf("game.cue", "game.bin"),

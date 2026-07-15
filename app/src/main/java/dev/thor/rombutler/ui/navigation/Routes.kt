@@ -10,4 +10,5 @@ object Routes {
     const val REVIEW = "review"
     const val LOG = "log"
     const val SETTINGS = "settings"
+    const val DOCTOR = "doctor"
 }

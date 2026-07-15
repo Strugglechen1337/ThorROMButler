@@ -2,6 +2,44 @@
 
 All notable user-facing changes are documented here.
 
+## 1.8.0
+
+### Deutsch
+
+- Neuer Bibliotheks-Doktor als eigener Bildschirm: Ein Lauf bündelt
+  Sammlungsstatistik, falsch einsortierte ROMs, Varianten, BIOS-/DAT-Status
+  und Sicherungsbereitschaft in einer ruhigen, handlungsorientierten Ansicht.
+- `.m3u`-Playlists und `.cue`-Dateien werden auf leere, unlesbare oder fehlende
+  Verweise geprüft. Relative Unterordner, Kommentare, URLs sowie zitierte und
+  einfache CUE-Dateinamen werden korrekt behandelt.
+- Gepackte Arcade- und Neo-Geo-ZIPs werden über ihr Verzeichnis geprüft, ohne
+  Inhalte zu entpacken. Diese Sets zählen jetzt außerdem korrekt in Statistik
+  und SHA-256-Duplikatprüfung.
+- Befunde bieten Details und können für den aktuellen Lauf ausgeblendet
+  werden. Eindeutige Fehlzuordnungen gehen in die bestehende Review-Reparatur;
+  eine fällige konfigurierte ROM-Sicherung lässt sich direkt starten.
+- Der zweisprachige Markdown-Gesundheitsbericht enthält alle Befunde und auf
+  Wunsch die Ergebnisse der separaten SHA-256-Tiefenprüfung. Die App löscht
+  weiterhin nichts automatisch und erfindet keine fehlenden Disc-Dateien.
+
+### English
+
+- New dedicated Library Doctor screen: one run combines collection statistics,
+  misplaced ROMs, variants, BIOS/DAT status, and backup readiness in a calm,
+  action-oriented view.
+- `.m3u` playlists and `.cue` sheets are checked for empty, unreadable, or
+  missing references. Relative subfolders, comments, URLs, and both quoted and
+  simple CUE file names are handled correctly.
+- Packed Arcade and Neo Geo ZIPs are checked through their directory without
+  extracting content. These sets are now also counted correctly in statistics
+  and the SHA-256 duplicate scan.
+- Findings provide details and can be hidden for the current run. Certain
+  misplacements open the existing review repair; a due configured ROM backup
+  can be started directly.
+- The bilingual Markdown health report includes every finding and optionally
+  the separate SHA-256 deep-scan results. The app still deletes nothing
+  automatically and never invents missing disc files.
+
 ## 1.7.3
 
 ### Deutsch

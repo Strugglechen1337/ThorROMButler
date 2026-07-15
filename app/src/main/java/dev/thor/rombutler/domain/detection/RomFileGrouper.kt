@@ -94,11 +94,18 @@ class RomFileGrouper @Inject constructor() {
     }
 
     companion object {
-        private val CUE_FILE_LINE = Regex("""FILE\s+"([^"]+)"""", RegexOption.IGNORE_CASE)
+        private val CUE_FILE_LINE = Regex(
+            pattern = """^\s*FILE\s+(?:"([^"]+)"|(\S+))""",
+            options = setOf(RegexOption.IGNORE_CASE, RegexOption.MULTILINE),
+        )
 
         /** File names referenced by `FILE "..."` lines of a cue sheet. */
         fun parseCueReferences(cueContent: String): List<String> =
-            CUE_FILE_LINE.findAll(cueContent).map { it.groupValues[1].trim() }.toList()
+            CUE_FILE_LINE.findAll(cueContent)
+                .map { match ->
+                    (match.groupValues[1].ifEmpty { match.groupValues[2] }).trim()
+                }
+                .toList()
 
         /** Non-comment, non-blank lines of an m3u playlist. */
         fun parsePlaylistReferences(m3uContent: String): List<String> =

@@ -39,6 +39,61 @@ data class ExactDuplicateReport(
     val groups: List<ExactDuplicateGroup>,
 )
 
+/** Text descriptor whose referenced game files are checked by the doctor. */
+enum class LibraryReferenceType { M3U, CUE }
+
+/** Why a playlist or cue sheet needs attention. */
+enum class LibraryReferenceProblem { EMPTY, MISSING_FILES, UNREADABLE }
+
+data class LibraryReferenceIssue(
+    val filePath: String,
+    val type: LibraryReferenceType,
+    val problem: LibraryReferenceProblem,
+    val missingReferences: List<String> = emptyList(),
+)
+
+/** Packed ROM set whose ZIP directory cannot be used safely. */
+enum class LibraryArchiveProblem { EMPTY, UNREADABLE }
+
+data class LibraryArchiveIssue(
+    val filePath: String,
+    val problem: LibraryArchiveProblem,
+)
+
+enum class LibraryBiosState { NOT_CONFIGURED, FOLDER_MISSING, NONE_DETECTED, READY }
+
+data class LibraryBiosHealth(
+    val state: LibraryBiosState,
+    val knownFileCount: Int = 0,
+)
+
+enum class LibraryDatState {
+    NOT_CONFIGURED,
+    FOLDER_MISSING,
+    NO_DAT_FILES,
+    NO_USABLE_ENTRIES,
+    READY,
+}
+
+data class LibraryDatHealth(
+    val state: LibraryDatState,
+    val datFileCount: Int = 0,
+)
+
+enum class LibraryBackupState {
+    NOT_CONFIGURED,
+    FOLDER_MISSING,
+    NO_MANIFEST,
+    DIFFERENT_LIBRARY,
+    OUTDATED,
+    CURRENT,
+}
+
+data class LibraryBackupHealth(
+    val state: LibraryBackupState,
+    val lastBackupMillis: Long? = null,
+)
+
 /**
  * Result of a library check.
  *
@@ -53,7 +108,17 @@ data class LibraryReport(
     val stats: List<SystemStat>,
     val misplaced: List<DetectedRom>,
     val duplicates: List<DuplicateGroup> = emptyList(),
-)
+    val referenceIssues: List<LibraryReferenceIssue> = emptyList(),
+    val archiveIssues: List<LibraryArchiveIssue> = emptyList(),
+    val biosHealth: LibraryBiosHealth = LibraryBiosHealth(LibraryBiosState.NOT_CONFIGURED),
+    val datHealth: LibraryDatHealth = LibraryDatHealth(LibraryDatState.NOT_CONFIGURED),
+    val backupHealth: LibraryBackupHealth =
+        LibraryBackupHealth(LibraryBackupState.NOT_CONFIGURED),
+) {
+    /** Findings that point to an actual broken or misplaced library item. */
+    val problemCount: Int
+        get() = misplaced.size + referenceIssues.size + archiveIssues.size
+}
 
 /**
  * Inspects the existing ROM library below the ROM base folder.

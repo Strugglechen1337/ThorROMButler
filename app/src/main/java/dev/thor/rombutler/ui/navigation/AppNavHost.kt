@@ -13,6 +13,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import dev.thor.rombutler.ui.log.LogScreen
+import dev.thor.rombutler.ui.doctor.LibraryDoctorScreen
 import dev.thor.rombutler.ui.review.ReviewScreen
 import dev.thor.rombutler.ui.scan.ScanScreen
 import dev.thor.rombutler.ui.settings.SettingsScreen
@@ -72,6 +73,13 @@ fun AppNavHost(
         }
         composable(Routes.SETTINGS) {
             SettingsScreen(
+                onBack = { navController.popBackStack() },
+                onOpenReview = { navController.navigate(Routes.REVIEW) },
+                onOpenDoctor = { navController.navigate(Routes.DOCTOR) },
+            )
+        }
+        composable(Routes.DOCTOR) {
+            LibraryDoctorScreen(
                 onBack = { navController.popBackStack() },
                 onOpenReview = { navController.navigate(Routes.REVIEW) },
             )

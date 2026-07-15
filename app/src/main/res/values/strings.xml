@@ -17,7 +17,7 @@
 
     <!-- What's new (update every release!) -->
     <string name="whatsnew_title">New in version %s</string>
-    <string name="whatsnew_body">• Undoing a multi-disc game now also removes its auto-generated .m3u playlist\n• Shared files that share a name with an existing one get a (1) suffix instead of being dropped\n\nFull details in the changelog on GitHub.</string>
+    <string name="whatsnew_body">• New Library Doctor with one central health report\n• Detects misplaced ROMs, broken M3U/CUE references, and unreadable packed sets\n• Shows BIOS, DAT, and backup readiness with safe follow-up actions\n\nFull details in the changelog on GitHub.</string>
 
     <!-- Setup screen -->
     <string name="setup_title">Setup</string>
@@ -218,6 +218,84 @@
     <string name="settings_library_exact_summary">%1$d groups · %2$d identical files · up to %3$s reclaimable</string>
     <string name="settings_library_exact_none">No byte-identical ROM files found.</string>
     <string name="settings_library_exact_details">File paths and SHA-256 hashes are included in the collection export.</string>
+    <string name="doctor_title">Library Doctor</string>
+    <string name="doctor_entry_hint">Health check for sorting, playlists, packed sets, BIOS, DAT files, and backups.</string>
+    <string name="doctor_open">Open Library Doctor</string>
+    <string name="doctor_scanning">Checking library health…</string>
+    <string name="doctor_retry">Check again</string>
+    <string name="doctor_summary">%1$d ROMs · %2$s</string>
+    <plurals name="doctor_problem_count">
+        <item quantity="one">1 structural finding needs attention</item>
+        <item quantity="other">%d structural findings need attention</item>
+    </plurals>
+    <string name="doctor_no_problems">No structural problems found.</string>
+    <plurals name="doctor_ignored_count">
+        <item quantity="one">1 finding hidden for this run</item>
+        <item quantity="other">%d findings hidden for this run</item>
+    </plurals>
+    <plurals name="doctor_misplaced_title">
+        <item quantity="one">1 ROM in the wrong system folder</item>
+        <item quantity="other">%d ROMs in the wrong system folder</item>
+    </plurals>
+    <string name="doctor_misplaced_text">The file signature clearly points to another system.</string>
+    <string name="doctor_review">Review repair</string>
+    <string name="doctor_ignore">Ignore this run</string>
+    <string name="doctor_details">Details</string>
+    <string name="doctor_less">Show less</string>
+    <string name="doctor_reference_empty">The descriptor contains no playable file reference.</string>
+    <string name="doctor_reference_missing">Referenced files are missing.</string>
+    <string name="doctor_reference_unreadable">The descriptor could not be read safely.</string>
+    <string name="doctor_missing_prefix">Missing: %s</string>
+    <string name="doctor_archive_empty">The packed ROM set contains no entries.</string>
+    <string name="doctor_archive_unreadable">The ZIP directory is damaged or unreadable.</string>
+    <plurals name="doctor_variants_title">
+        <item quantity="one">1 game has multiple variants</item>
+        <item quantity="other">%d games have multiple variants</item>
+    </plurals>
+    <string name="doctor_variants_text">Regions and revisions are listed in the report; nothing is deleted automatically.</string>
+    <string name="doctor_readiness_title">Readiness</string>
+    <string name="doctor_bios_title">BIOS</string>
+    <string name="doctor_bios_not_configured">No BIOS folder configured</string>
+    <string name="doctor_bios_folder_missing">Configured BIOS folder is unavailable</string>
+    <string name="doctor_bios_none">No known BIOS files detected</string>
+    <plurals name="doctor_bios_ready">
+        <item quantity="one">1 known BIOS file detected</item>
+        <item quantity="other">%d known BIOS files detected</item>
+    </plurals>
+    <string name="doctor_dat_title">DAT verification</string>
+    <string name="doctor_dat_not_configured">No DAT folder configured</string>
+    <string name="doctor_dat_folder_missing">Configured DAT folder is unavailable</string>
+    <string name="doctor_dat_none">No DAT files found</string>
+    <string name="doctor_dat_unusable">DAT files contain no usable CRC entries</string>
+    <plurals name="doctor_dat_ready">
+        <item quantity="one">1 DAT file ready</item>
+        <item quantity="other">%d DAT files ready</item>
+    </plurals>
+    <string name="doctor_backup_title">ROM backup</string>
+    <string name="doctor_backup_not_configured">No backup target configured</string>
+    <string name="doctor_backup_folder_missing">Backup target is unavailable</string>
+    <string name="doctor_backup_none">No completed backup found</string>
+    <string name="doctor_backup_different">Backup belongs to another ROM folder</string>
+    <string name="doctor_backup_outdated">Backup is older than the library</string>
+    <string name="doctor_backup_current">Backup is current</string>
+    <string name="doctor_backup_last">Last run: %s</string>
+    <string name="doctor_backup_run">Back up now</string>
+    <string name="doctor_backup_done">ROM backup completed.</string>
+    <string name="doctor_backup_failed">Some ROM files could not be backed up.</string>
+    <string name="doctor_backup_cancelled">ROM backup cancelled; completed files were kept.</string>
+    <string name="doctor_configure">Configure in Settings</string>
+    <string name="doctor_exact_title">Deep duplicate check</string>
+    <string name="doctor_exact_hint">SHA-256 is calculated only for same-sized candidates.</string>
+    <string name="doctor_exact_run">Find byte-identical files</string>
+    <string name="doctor_exact_running">Comparing file contents…</string>
+    <string name="doctor_exact_none">No byte-identical ROM files found.</string>
+    <plurals name="doctor_exact_groups">
+        <item quantity="one">1 duplicate group · %2$d files · %3$s reclaimable</item>
+        <item quantity="other">%1$d duplicate groups · %2$d files · %3$s reclaimable</item>
+    </plurals>
+    <string name="doctor_export">Export health report</string>
+    <string name="doctor_export_done">Health report saved in the download folder.</string>
+    <string name="doctor_export_failed">Health report could not be saved.</string>
     <string name="settings_system_packs_title">System packs &amp; custom systems</string>
     <plurals name="settings_system_packs_count">
         <item quantity="one">1 custom system installed</item>
