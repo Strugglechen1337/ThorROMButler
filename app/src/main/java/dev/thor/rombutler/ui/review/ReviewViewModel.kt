@@ -9,6 +9,9 @@ import dev.thor.rombutler.domain.model.ArchiveType
 import dev.thor.rombutler.domain.model.DetectionResult
 import dev.thor.rombutler.domain.model.Confidence
 import dev.thor.rombutler.domain.model.DetectedRom
+import dev.thor.rombutler.domain.model.AssignmentAdvisor
+import dev.thor.rombutler.domain.model.AppSettings
+import dev.thor.rombutler.domain.model.MatchSource
 import dev.thor.rombutler.domain.model.SystemDefinition
 import dev.thor.rombutler.domain.repository.RomFolderRepository
 import dev.thor.rombutler.domain.repository.SettingsRepository
@@ -24,6 +27,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -113,6 +117,8 @@ data class ReviewItem(
     val targetExists: Boolean? = null,
     val targetOccupied: Boolean = false,
     val overwrite: Boolean = false,
+    /** True only when a successful run should reinforce local learning. */
+    val learnSelection: Boolean = false,
 )
 
 /** One-shot feedback after a folder-creation run (formatted by the UI). */
@@ -160,7 +166,7 @@ class ReviewViewModel @Inject constructor(
     val uiState: StateFlow<ReviewUiState> = _uiState.asStateFlow()
 
     init {
-        loadFromSession()
+        viewModelScope.launch { loadFromSession() }
         // Mirror the app-scoped extraction run into the screen state. The
         // run itself lives in ExtractionManager and survives navigation.
         viewModelScope.launch {
@@ -173,6 +179,7 @@ class ReviewViewModel @Inject constructor(
                         _uiState.update { it.copy(moving = true, progress = runState.progress) }
 
                     is ExtractionRunState.Finished -> {
+                        rememberSuccessfulChoices(runState.processedIds)
                         _uiState.update { s ->
                             s.copy(
                                 moving = false,
@@ -190,7 +197,8 @@ class ReviewViewModel @Inject constructor(
         }
     }
 
-    private fun loadFromSession() {
+    private suspend fun loadFromSession() {
+        val settings = settingsRepository.settings.first()
         val archiveItems = session.analyses.flatMap { analysis ->
             if (analysis.roms.isEmpty()) {
                 val memberNames = analysis.fallbackMembers.map {
@@ -239,6 +247,7 @@ class ReviewViewModel @Inject constructor(
         }
         // Items needing a decision come first (UNKNOWN > PROBABLE > CERTAIN)
         val items = (archiveItems + looseItems)
+            .map { it.withLearnedSuggestion(settings) }
             .sortedByDescending { it.rom.detection.confidence.ordinal }
         _uiState.value = ReviewUiState(items = items)
 
@@ -263,7 +272,11 @@ class ReviewViewModel @Inject constructor(
     }
 
     /** Applies the user's (or the CERTAIN prefill's) system choice. */
-    fun selectSystem(itemId: String, systemId: String) {
+    fun selectSystem(
+        itemId: String,
+        systemId: String,
+        rememberChoice: Boolean = false,
+    ) {
         val system = registry.byId(systemId) ?: return
         viewModelScope.launch {
             val item = _uiState.value.items.find { it.id == itemId } ?: return@launch
@@ -286,6 +299,7 @@ class ReviewViewModel @Inject constructor(
                                 targetExists = exists,
                                 targetOccupied = occupied,
                                 overwrite = false,
+                                learnSelection = rememberChoice,
                             )
                         } else {
                             current
@@ -303,7 +317,11 @@ class ReviewViewModel @Inject constructor(
             if (item.selectedSystemId == null &&
                 item.rom.detection.confidence == Confidence.PROBABLE
             ) {
-                selectSystem(item.id, system.id)
+                selectSystem(
+                    itemId = item.id,
+                    systemId = system.id,
+                    rememberChoice = item.rom.detection.source == MatchSource.LEARNED_ASSIGNMENT,
+                )
             }
         }
     }
@@ -331,6 +349,7 @@ class ReviewViewModel @Inject constructor(
                             targetExists = null,
                             targetOccupied = false,
                             overwrite = false,
+                            learnSelection = false,
                         )
                     } else {
                         item
@@ -359,7 +378,11 @@ class ReviewViewModel @Inject constructor(
             }
             val affected = _uiState.value.items.filter { it.selectedSystemId != null }
             for (item in affected) {
-                selectSystem(item.id, item.selectedSystemId!!)
+                selectSystem(
+                    itemId = item.id,
+                    systemId = item.selectedSystemId!!,
+                    rememberChoice = item.learnSelection,
+                )
             }
             _uiState.update {
                 it.copy(
@@ -448,6 +471,54 @@ class ReviewViewModel @Inject constructor(
                 renameToDatName = currentSettings.renameToDatName,
             )
         }
+    }
+
+    /** Learns only choices whose file operation actually completed successfully. */
+    private suspend fun rememberSuccessfulChoices(processedIds: Set<String>) {
+        _uiState.value.items
+            .filter { it.id in processedIds && it.learnSelection }
+            .forEach { item ->
+                val extension = item.learningExtension() ?: return@forEach
+                val systemId = item.selectedSystemId ?: return@forEach
+                try {
+                    settingsRepository.rememberAssignment(extension, systemId)
+                } catch (error: CancellationException) {
+                    throw error
+                } catch (_: Exception) {
+                    // Learning is optional and must never block a completed sort run.
+                }
+            }
+    }
+
+    private fun ReviewItem.withLearnedSuggestion(settings: AppSettings): ReviewItem {
+        if (!settings.assignmentLearningEnabled ||
+            rom.detection.confidence != Confidence.UNKNOWN
+        ) {
+            return this
+        }
+        val extension = learningExtension() ?: return this
+        val learned = AssignmentAdvisor.suggestion(extension, settings.learnedAssignments)
+            ?: return this
+        val system = registry.byId(learned.systemId) ?: return this
+        return copy(
+            rom = rom.copy(
+                detection = DetectionResult(
+                    system = system,
+                    confidence = Confidence.PROBABLE,
+                    source = MatchSource.LEARNED_ASSIGNMENT,
+                ),
+            ),
+        )
+    }
+
+    private fun ReviewItem.learningExtension(): String? {
+        if (source !is RomSource.ArchiveFallback) {
+            return AssignmentAdvisor.extensionOf(rom.group.primary)
+        }
+        return rom.group.members
+            .mapNotNull(AssignmentAdvisor::extensionOf)
+            .distinct()
+            .singleOrNull()
     }
 
     /** Cancels the running extraction (current group is rolled back). */

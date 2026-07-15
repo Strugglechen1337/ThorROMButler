@@ -173,6 +173,14 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
+    fun setAssignmentLearningEnabled(enabled: Boolean) {
+        viewModelScope.launch { settingsRepository.setAssignmentLearningEnabled(enabled) }
+    }
+
+    fun clearLearnedAssignments() {
+        viewModelScope.launch { settingsRepository.clearLearnedAssignments() }
+    }
+
     /** LAN receive mode (see [ReceiveManager]). */
     val receiveState = receiveManager.state
 

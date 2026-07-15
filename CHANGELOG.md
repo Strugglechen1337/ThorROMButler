@@ -2,6 +2,48 @@
 
 All notable user-facing changes are documented here.
 
+## 1.9.0
+
+### Deutsch
+
+- Neuer Sammlungs-Assistent: Erfolgreich einsortierte, ausdrücklich manuelle
+  Systementscheidungen werden als kleine Endungs-/Systemstatistik nur lokal auf
+  dem Gerät gespeichert. Abgebrochene oder fehlgeschlagene Vorgänge werden
+  nicht gelernt.
+- Spätere unbekannte Dateien können dadurch einen klar gekennzeichneten
+  „Gelernten Vorschlag" erhalten. Er bleibt `WAHRSCHEINLICH`, wird nie
+  automatisch ausgewählt und muss weiterhin bestätigt werden. Bei
+  widersprüchlichen gleich starken Erfahrungen wird absichtlich nichts
+  vorgeschlagen.
+- Das Lernen lässt sich in den Einstellungen abschalten; der gesamte lokale
+  Lernstand kann separat gelöscht werden. Einstellungs-Export und -Import
+  sichern die validierten, auf 256 Beziehungen begrenzten Lerndaten mit.
+- Der Bibliotheks-Doktor empfiehlt bei gleichnamigen Varianten unverbindlich
+  eine Version anhand von Gerätesprache, Region, bekannten Bad-Dump-Markern und
+  Revision. Gründe stehen in der Detailansicht und im zweisprachigen Bericht;
+  bei Gleichstand gibt es keine willkürliche Empfehlung.
+- Der Assistent verschiebt weiterhin nichts ohne Bestätigung und löscht keine
+  vermeintlich schlechtere Variante.
+
+### English
+
+- New collection assistant: successfully processed, explicitly manual system
+  choices are stored as a small extension/system statistic only on the device.
+  Cancelled or failed operations are never learned.
+- Later unknown files may receive a clearly labelled "Learned suggestion".
+  It remains `PROBABLE`, is never selected automatically, and still requires
+  confirmation. Equally strong conflicting experience deliberately produces
+  no suggestion.
+- Learning can be disabled in Settings and all local learning can be cleared
+  separately. Settings export/import includes the validated learning data,
+  bounded to 256 relationships.
+- For same-title variants, Library Doctor can recommend one version based on
+  device language, region, known bad-dump markers, and revision. Reasons are
+  included in details and the bilingual report; ties produce no arbitrary
+  recommendation.
+- The assistant still moves nothing without confirmation and never deletes a
+  supposedly inferior variant.
+
 ## 1.8.0
 
 ### Deutsch

@@ -258,6 +258,9 @@ class SystemPackCodecTest {
         override suspend fun setBackupTargetPath(path: String?) = unused()
         override suspend fun setBiosFolderPath(path: String?) = unused()
         override suspend fun setCustomSystemPack(json: String?) = unused()
+        override suspend fun setAssignmentLearningEnabled(enabled: Boolean) = unused()
+        override suspend fun rememberAssignment(extension: String, systemId: String) = unused()
+        override suspend fun clearLearnedAssignments() = unused()
         override suspend fun replaceSettings(settings: AppSettings) = unused()
 
         private fun unused(): Nothing = error("Not used by this test")

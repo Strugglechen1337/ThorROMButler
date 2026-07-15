@@ -13,6 +13,9 @@ enum class MatchSource {
     /** Folder name hinted at the system (e.g. an "SNES/" dir in the archive). */
     FOLDER_HINT,
 
+    /** Local history from successful user-confirmed assignments. */
+    LEARNED_ASSIGNMENT,
+
     /** Nothing matched. */
     NONE,
 }

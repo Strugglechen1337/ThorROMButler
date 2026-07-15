@@ -2,6 +2,7 @@ package dev.thor.rombutler.data.settings
 
 import com.google.common.truth.Truth.assertThat
 import dev.thor.rombutler.domain.model.AppSettings
+import dev.thor.rombutler.domain.model.LearnedAssignment
 import org.junit.Test
 
 class SettingsBackupCodecTest {
@@ -20,6 +21,8 @@ class SettingsBackupCodecTest {
             datFolderPath = "/storage/emulated/0/DATs",
             themeId = "odin",
             customSystemPackJson = VALID_PACK,
+            assignmentLearningEnabled = false,
+            learnedAssignments = listOf(LearnedAssignment("ciso", "gamecube", 4)),
         )
 
         val decoded = SettingsBackupCodec.decode(
@@ -100,6 +103,26 @@ class SettingsBackupCodecTest {
                 """.trimIndent(),
                 current = AppSettings(),
                 canonicalizeCustomPack = { error("Invalid pack") },
+            )
+        }
+
+        assertThat(result.isFailure).isTrue()
+    }
+
+    @Test
+    fun `invalid learned assignment rejects the complete backup`() {
+        val result = runCatching {
+            SettingsBackupCodec.decode(
+                json = """
+                    {
+                      "schemaVersion": 1,
+                      "learnedAssignments": [
+                        { "extension": "../iso", "systemId": "ps2", "confirmations": 1 }
+                      ]
+                    }
+                """.trimIndent(),
+                current = AppSettings(),
+                canonicalizeCustomPack = { it },
             )
         }
 

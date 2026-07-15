@@ -34,6 +34,10 @@ läuft aber auf jedem Android-Smartphone ab Android 13.
 - 🧠 **Detection Engine**: bestimmt das Zielsystem über Dateiendungen und Magic
   Bytes (inkl. ISO-, RVZ- und CHD-Header) - mit ehrlichen Confidence-Leveln
   (*sicher* / *wahrscheinlich* / *unbekannt*)
+- 🧭 **Sammlungs-Assistent**: lernt lokal aus erfolgreich ausgeführten
+  manuellen Zuordnungen und bietet ähnliche unbekannte Dateien später als
+  ausdrücklich gelben, bestätigungspflichtigen Vorschlag an. Widersprüche
+  bleiben unbekannt; Lernen ist abschaltbar und vollständig löschbar.
 - 🧩 **System-Packs & eigene Systeme**: zusätzliche Systeme lokal in den
   Einstellungen anlegen oder als geprüftes JSON-Pack importieren/exportieren.
   Vor dem Import zeigt eine Vorschau Inhalt und Konflikte; Mehrdeutigkeiten
@@ -65,6 +69,8 @@ läuft aber auf jedem Android-Smartphone ab Android 13.
   einsortierte ROMs, defekte M3U-/CUE-Verweise, unlesbare Arcade-/Neo-Geo-ZIPs,
   Varianten sowie BIOS-, DAT- und Sicherungsbereitschaft. Sichere Reparaturen,
   Details, Ausblenden pro Lauf, Markdown-Bericht und optionaler SHA-256-Lauf.
+  Bei mehreren Regionen/Revisionen empfiehlt er unverbindlich eine zur
+  Gerätesprache passende, saubere und möglichst aktuelle Variante.
 - 💾 **ROM-Sicherung mit Wiederherstellung**: das komplette ROM-Verzeichnis
   als 1:1-Ordnerspiegel auf SD-Karte/USB sichern — inkrementell, Folgeläufe
   kopieren nur Neues. Die Wiederherstellung ergänzt fehlende Dateien und
@@ -224,6 +230,10 @@ newer.
 - 🧠 **Detection engine**: identifies the target system from file extensions and
   magic bytes, including ISO, RVZ, and CHD headers, with honest confidence levels
   (*certain* / *probable* / *unknown*)
+- 🧭 **Collection assistant**: learns locally from successfully processed
+  manual assignments and later offers similar unknown files as explicitly
+  gold, confirmation-required suggestions. Conflicts stay unknown; learning
+  can be disabled and cleared completely.
 - 🧩 **System packs & custom systems**: add systems locally in Settings or
   import/export them as a validated JSON pack. A preview shows contents and
   conflicts before installation; ambiguities are never assigned automatically.
@@ -251,7 +261,9 @@ newer.
 - 🩺 **Library Doctor**: central health check for misplaced ROMs, broken
   M3U/CUE references, unreadable Arcade/Neo Geo ZIPs, variants, and BIOS, DAT,
   and backup readiness. Safe repairs, per-run hiding, a Markdown report, and
-  an optional memory-efficient SHA-256 pass.
+  an optional memory-efficient SHA-256 pass. For multiple regions or revisions
+  it can recommend a clean, current variant suited to the device language,
+  without deleting anything.
 - 💾 **ROM library backup & restore**: mirror the complete ROM folder 1:1
   to SD card/USB — incrementally, follow-up runs only copy what is new.
   Restoring adds missing files back and never overwrites anything.

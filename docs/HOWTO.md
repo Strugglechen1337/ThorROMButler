@@ -76,6 +76,13 @@ Duplikate werden erkannt und übersprungen, außer du wählst „Ersetzen". Beim
 Ersetzen bleibt die vorhandene Datei gesichert, bis die neue vollständig
 geschrieben und geprüft wurde.
 
+Der **Sammlungs-Assistent** merkt sich nur manuelle Zuordnungen, deren
+Einsortierung wirklich erfolgreich abgeschlossen wurde. Eine spätere
+unbekannte Datei mit derselben Endung kann dann als „Gelernter Vorschlag"
+erscheinen. Der Vorschlag bleibt gelb und wird niemals ohne Bestätigung
+übernommen. Unter Einstellungen kannst du das Lernen pausieren oder den rein
+lokalen Lernstand löschen.
+
 <img src="screenshots/v2-assign.png" alt="Zuordnung" width="600">
 
 ### Schritt 5: Einsortieren
@@ -134,7 +141,10 @@ anders überlegst.
 - **Bibliotheks-Doktor**: Einstellungen → „Bibliotheks-Doktor öffnen". Ein Lauf
   prüft Fehlzuordnungen, M3U-/CUE-Verweise, gepackte Arcade-/Neo-Geo-Sets sowie
   BIOS-, DAT- und Sicherungsstatus. Befunde zeigen Details, lassen sich für den
-  Lauf ausblenden oder über die sichere Review-Ansicht korrigieren.
+  Lauf ausblenden oder über die sichere Review-Ansicht korrigieren. Bei
+  Varianten empfiehlt der Assistent anhand von Gerätesprache, Region,
+  Dump-Qualität und Revision unverbindlich einen Kandidaten; gelöscht wird
+  nichts.
 - **Exakte Duplikate**: Im Bibliotheks-Doktor kannst du optional
   einen SHA-256-Abgleich starten. Nur gleich große Kandidaten werden gelesen;
   gelöscht wird nichts. Pfade und Prüfsummen stehen im Gesundheitsbericht.
@@ -226,6 +236,12 @@ Every ROM gets an honest confidence rating:
 detected and skipped unless you opt into replacing them. During replacement,
 the existing file stays backed up until the new copy is complete and verified.
 
+The **collection assistant** remembers only manual assignments whose sorting
+operation actually completed successfully. A later unknown file with the same
+extension may then appear as a "Learned suggestion". It remains gold and is
+never accepted without confirmation. Learning can be paused or its entirely
+local history cleared in Settings.
+
 <img src="screenshots/v2-assign.png" alt="Review" width="600">
 
 ### Step 5: Sort
@@ -282,7 +298,9 @@ your mind.
 - **Library Doctor**: Settings → "Open Library Doctor". One run checks
   misplacements, M3U/CUE references, packed Arcade/Neo Geo sets, and BIOS, DAT,
   and backup status. Findings show details and can be hidden for the run or
-  repaired through the safe review flow.
+  repaired through the safe review flow. For variants, the assistant can
+  recommend a candidate based on device language, region, dump quality, and
+  revision; nothing is deleted.
 - **Exact duplicates**: optionally run a SHA-256 comparison in the Library
   Doctor. Only same-sized candidates are read and nothing is
   deleted. Paths and hashes are included in the health report.

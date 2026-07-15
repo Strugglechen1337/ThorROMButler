@@ -2,6 +2,8 @@ package dev.thor.rombutler.data.settings
 
 import dev.thor.rombutler.domain.detection.SystemPackCodec
 import dev.thor.rombutler.domain.model.AppSettings
+import dev.thor.rombutler.domain.model.AssignmentAdvisor
+import dev.thor.rombutler.domain.model.LearnedAssignment
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -28,6 +30,23 @@ object SettingsBackupCodec {
         .put("renameToDatName", settings.renameToDatName)
         .put("backupTargetPath", settings.backupTargetPath ?: JSONObject.NULL)
         .put("biosFolderPath", settings.biosFolderPath ?: JSONObject.NULL)
+        .put("assignmentLearningEnabled", settings.assignmentLearningEnabled)
+        .put(
+            "learnedAssignments",
+            JSONArray().apply {
+                settings.learnedAssignments
+                    .filter(AssignmentAdvisor::isValid)
+                    .takeLast(AssignmentAdvisor.MAX_ASSIGNMENTS)
+                    .forEach { assignment ->
+                        put(
+                            JSONObject()
+                                .put("extension", assignment.extension)
+                                .put("systemId", assignment.systemId)
+                                .put("confirmations", assignment.confirmations),
+                        )
+                    }
+            },
+        )
         .toString(2)
 
     /**
@@ -86,6 +105,11 @@ object SettingsBackupCodec {
             renameToDatName = root.booleanSetting("renameToDatName", current.renameToDatName),
             backupTargetPath = root.pathSetting("backupTargetPath", current.backupTargetPath),
             biosFolderPath = root.pathSetting("biosFolderPath", current.biosFolderPath),
+            assignmentLearningEnabled = root.booleanSetting(
+                "assignmentLearningEnabled",
+                current.assignmentLearningEnabled,
+            ),
+            learnedAssignments = root.learnedAssignmentsSetting(current.learnedAssignments),
         )
     }
 
@@ -144,6 +168,30 @@ object SettingsBackupCodec {
         if (!has("customSystemPack")) return fallback
         if (isNull("customSystemPack")) return null
         return canonicalize(getJSONObject("customSystemPack").toString())
+    }
+
+    private fun JSONObject.learnedAssignmentsSetting(
+        fallback: List<LearnedAssignment>,
+    ): List<LearnedAssignment> {
+        if (!has("learnedAssignments")) return fallback
+        val values = getJSONArray("learnedAssignments")
+        require(values.length() <= AssignmentAdvisor.MAX_ASSIGNMENTS) {
+            "Too many learned assignments"
+        }
+        return buildList {
+            for (index in 0 until values.length()) {
+                val value = values.getJSONObject(index)
+                val assignment = LearnedAssignment(
+                    extension = value.getString("extension").lowercase(),
+                    systemId = value.getString("systemId"),
+                    confirmations = value.getInt("confirmations"),
+                )
+                require(AssignmentAdvisor.isValid(assignment)) {
+                    "Invalid learned assignment[$index]"
+                }
+                add(assignment)
+            }
+        }
     }
 
     private fun isValidAbsolutePath(value: String): Boolean =

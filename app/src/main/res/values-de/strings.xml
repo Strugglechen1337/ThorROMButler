@@ -16,7 +16,7 @@
 
     <!-- What's new (pro Release aktualisieren!) -->
     <string name="whatsnew_title">Neu in Version %s</string>
-    <string name="whatsnew_body">• Neuer Bibliotheks-Doktor mit zentralem Gesundheitsbericht\n• Erkennt falsch einsortierte ROMs, defekte M3U-/CUE-Verweise und unlesbare gepackte Sets\n• Zeigt BIOS-, DAT- und Sicherungsbereitschaft mit sicheren Folgeaktionen\n\nAlle Details im Changelog auf GitHub.</string>
+    <string name="whatsnew_body">• Neuer Sammlungs-Assistent lernt lokal aus erfolgreichen manuellen Zuordnungen\n• Gelernte Treffer bleiben gelbe Vorschläge und brauchen immer deine Bestätigung\n• Der Bibliotheks-Doktor empfiehlt eine passende Region/Revision, ohne etwas zu löschen\n\nAlle Details im Changelog auf GitHub.</string>
 
     <!-- Setup screen -->
     <string name="setup_title">Einrichtung</string>
@@ -105,6 +105,7 @@
     <string name="review_pick_system">System wählen</string>
     <string name="review_pick_other">Anderes …</string>
     <string name="review_accept_suggestion">Vorschlag: %s</string>
+    <string name="review_accept_learned_suggestion">Gelernter Vorschlag: %s</string>
     <string name="review_change_system">System ändern</string>
     <string name="review_folder_missing">Ordner fehlt – wird beim Anlegen erstellt</string>
     <string name="review_assigned_count">%1$d von %2$d ROMs zugeordnet</string>
@@ -203,6 +204,15 @@
     <string name="settings_backup_failed">Fehlgeschlagen – liegt die Backup-Datei im Download-Ordner?</string>
     <string name="settings_watcher">Wächter-Modus</string>
     <string name="settings_watcher_hint">Prüft ca. alle 30 Minuten im Hintergrund den Download-Ordner und benachrichtigt bei neuen Funden. Einsortiert wird weiterhin nur nach deiner Bestätigung.</string>
+    <string name="settings_assignment_learning">Aus meinen Zuordnungen lernen</string>
+    <string name="settings_assignment_learning_hint">Speichert erfolgreiche manuelle Entscheidungen nur auf diesem Gerät und nutzt sie für gelbe Vorschläge. Gelerntes wird nie automatisch bestätigt.</string>
+    <plurals name="settings_assignment_learning_count">
+        <item quantity="one">1 gelernte Endungs-/Systembeziehung lokal gespeichert</item>
+        <item quantity="other">%d gelernte Endungs-/Systembeziehungen lokal gespeichert</item>
+    </plurals>
+    <string name="settings_assignment_learning_clear">Gelernte Zuordnungen löschen</string>
+    <string name="settings_assignment_learning_clear_title">Lokalen Lernstand löschen?</string>
+    <string name="settings_assignment_learning_clear_text">Nur gelernte Endungsvorschläge werden entfernt. ROMs, Log, Systeme und andere Einstellungen bleiben unverändert.</string>
     <string name="settings_library_title">Bibliothek</string>
     <string name="settings_library_check">Bibliothek prüfen</string>
     <string name="settings_library_summary">%1$d ROMs · %2$s</string>
@@ -251,7 +261,12 @@
         <item quantity="one">1 Spiel liegt in mehreren Varianten vor</item>
         <item quantity="other">%d Spiele liegen in mehreren Varianten vor</item>
     </plurals>
-    <string name="doctor_variants_text">Regionen und Revisionen stehen im Bericht; automatisch gelöscht wird nichts.</string>
+    <string name="doctor_variants_text">Der Assistent kann anhand von Gerätesprache, Region, Dump-Qualität und Revision eine Variante empfehlen. Automatisch gelöscht wird nichts.</string>
+    <string name="doctor_variant_recommendation">Empfehlung: %1$s · %2$s</string>
+    <string name="doctor_variant_reason_language">bevorzugte Sprache</string>
+    <string name="doctor_variant_reason_region">bevorzugte Region</string>
+    <string name="doctor_variant_reason_clean">sauberer Dump</string>
+    <string name="doctor_variant_reason_revision">neuere Revision</string>
     <string name="doctor_readiness_title">Bereitschaft</string>
     <string name="doctor_bios_title">BIOS</string>
     <string name="doctor_bios_not_configured">Kein BIOS-Ordner konfiguriert</string>

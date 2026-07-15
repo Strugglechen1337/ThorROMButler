@@ -53,6 +53,10 @@ data class AppSettings(
     val backupTargetPath: String? = null,
     /** Folder BIOS/firmware files get sorted into (null = feature off). */
     val biosFolderPath: String? = null,
+    /** Locally learn from successful user-confirmed system assignments. */
+    val assignmentLearningEnabled: Boolean = true,
+    /** Bounded local history used only for confirmable PROBABLE suggestions. */
+    val learnedAssignments: List<LearnedAssignment> = emptyList(),
 ) {
     /** Setup is complete once both folders are configured. */
     val isSetupComplete: Boolean

@@ -62,6 +62,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.thor.rombutler.R
 import dev.thor.rombutler.domain.model.ArchiveType
 import dev.thor.rombutler.domain.model.Confidence
+import dev.thor.rombutler.domain.model.MatchSource
 import dev.thor.rombutler.ui.components.ConfidenceChip
 import dev.thor.rombutler.ui.components.SystemPickerDialog
 import dev.thor.rombutler.ui.components.formatFileSize
@@ -229,7 +230,14 @@ fun ReviewScreen(
                     item = item,
                     onPickSystem = { pickerItemId = item.id },
                     onAcceptSuggestion = {
-                        item.rom.detection.system?.let { viewModel.selectSystem(item.id, it.id) }
+                        item.rom.detection.system?.let {
+                            viewModel.selectSystem(
+                                itemId = item.id,
+                                systemId = it.id,
+                                rememberChoice = item.rom.detection.source ==
+                                    MatchSource.LEARNED_ASSIGNMENT,
+                            )
+                        }
                     },
                     onSetOverwrite = { viewModel.setOverwrite(item.id, it) },
                 )
@@ -241,7 +249,7 @@ fun ReviewScreen(
         SystemPickerDialog(
             systems = viewModel.registry.systems,
             onSelect = { system ->
-                viewModel.selectSystem(itemId, system.id)
+                viewModel.selectSystem(itemId, system.id, rememberChoice = true)
                 pickerItemId = null
             },
             onDismiss = { pickerItemId = null },
@@ -593,7 +601,14 @@ private fun TargetRow(
         ) {
             OutlinedButton(onClick = onAcceptSuggestion, modifier = Modifier.weight(1f)) {
                 Text(
-                    text = stringResource(R.string.review_accept_suggestion, suggestion.displayName),
+                    text = stringResource(
+                        if (item.rom.detection.source == MatchSource.LEARNED_ASSIGNMENT) {
+                            R.string.review_accept_learned_suggestion
+                        } else {
+                            R.string.review_accept_suggestion
+                        },
+                        suggestion.displayName,
+                    ),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )

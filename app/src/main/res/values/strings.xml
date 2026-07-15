@@ -17,7 +17,7 @@
 
     <!-- What's new (update every release!) -->
     <string name="whatsnew_title">New in version %s</string>
-    <string name="whatsnew_body">• New Library Doctor with one central health report\n• Detects misplaced ROMs, broken M3U/CUE references, and unreadable packed sets\n• Shows BIOS, DAT, and backup readiness with safe follow-up actions\n\nFull details in the changelog on GitHub.</string>
+    <string name="whatsnew_body">• New collection assistant learns from successful manual assignments locally\n• Learned matches remain gold suggestions and always require confirmation\n• Library Doctor recommends a suitable region/revision without deleting anything\n\nFull details in the changelog on GitHub.</string>
 
     <!-- Setup screen -->
     <string name="setup_title">Setup</string>
@@ -103,6 +103,7 @@
     <string name="review_pick_system">Choose system</string>
     <string name="review_pick_other">Other …</string>
     <string name="review_accept_suggestion">Suggestion: %s</string>
+    <string name="review_accept_learned_suggestion">Learned suggestion: %s</string>
     <string name="review_accept_all">Accept all (%d)</string>
     <string name="review_change_system">Change system</string>
     <string name="review_folder_missing">Folder missing – will be created</string>
@@ -204,6 +205,15 @@
     <string name="settings_backup_failed">Failed – is the backup file in the download folder?</string>
     <string name="settings_watcher">Watcher mode</string>
     <string name="settings_watcher_hint">Checks the download folder in the background roughly every 30 minutes and notifies you about new finds. Sorting still only happens after your confirmation.</string>
+    <string name="settings_assignment_learning">Learn from my assignments</string>
+    <string name="settings_assignment_learning_hint">Stores successful manual choices only on this device and uses them for gold suggestions. Learned choices are never accepted automatically.</string>
+    <plurals name="settings_assignment_learning_count">
+        <item quantity="one">1 learned extension/system relationship stored locally</item>
+        <item quantity="other">%d learned extension/system relationships stored locally</item>
+    </plurals>
+    <string name="settings_assignment_learning_clear">Clear learned assignments</string>
+    <string name="settings_assignment_learning_clear_title">Clear local learning?</string>
+    <string name="settings_assignment_learning_clear_text">This removes only learned extension suggestions. ROMs, logs, systems, and other settings stay unchanged.</string>
     <string name="settings_library_title">Library</string>
     <string name="settings_library_check">Check library</string>
     <string name="settings_library_summary">%1$d ROMs · %2$s</string>
@@ -252,7 +262,12 @@
         <item quantity="one">1 game has multiple variants</item>
         <item quantity="other">%d games have multiple variants</item>
     </plurals>
-    <string name="doctor_variants_text">Regions and revisions are listed in the report; nothing is deleted automatically.</string>
+    <string name="doctor_variants_text">The assistant can recommend a variant based on device language, region, dump quality, and revision. Nothing is deleted automatically.</string>
+    <string name="doctor_variant_recommendation">Recommendation: %1$s · %2$s</string>
+    <string name="doctor_variant_reason_language">preferred language</string>
+    <string name="doctor_variant_reason_region">preferred region</string>
+    <string name="doctor_variant_reason_clean">clean dump</string>
+    <string name="doctor_variant_reason_revision">newer revision</string>
     <string name="doctor_readiness_title">Readiness</string>
     <string name="doctor_bios_title">BIOS</string>
     <string name="doctor_bios_not_configured">No BIOS folder configured</string>

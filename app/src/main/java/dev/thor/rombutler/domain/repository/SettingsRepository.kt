@@ -72,6 +72,15 @@ interface SettingsRepository {
     /** Persists a validated custom system pack; `null` removes all custom systems. */
     suspend fun setCustomSystemPack(json: String?)
 
+    /** Enables or disables local learning from successful manual assignments. */
+    suspend fun setAssignmentLearningEnabled(enabled: Boolean)
+
+    /** Records one successfully processed, user-confirmed extension assignment. */
+    suspend fun rememberAssignment(extension: String, systemId: String)
+
+    /** Deletes every locally learned assignment. */
+    suspend fun clearLearnedAssignments()
+
     /** Replaces all user-configurable settings in one atomic DataStore transaction. */
     suspend fun replaceSettings(settings: AppSettings)
 }

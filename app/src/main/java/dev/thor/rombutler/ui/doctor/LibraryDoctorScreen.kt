@@ -64,6 +64,7 @@ import dev.thor.rombutler.domain.repository.LibraryDatState
 import dev.thor.rombutler.domain.repository.LibraryReferenceIssue
 import dev.thor.rombutler.domain.repository.LibraryReferenceProblem
 import dev.thor.rombutler.domain.repository.LibraryReport
+import dev.thor.rombutler.domain.library.VariantRecommendationReason
 import dev.thor.rombutler.ui.components.formatFileSize
 import java.io.File
 
@@ -276,8 +277,23 @@ private fun DoctorReport(
                         report.duplicates.size,
                     ),
                     message = stringResource(R.string.doctor_variants_text),
-                    details = report.duplicates.take(20).map { group ->
-                        "${group.systemName}: ${group.variants.joinToString()}"
+                    details = buildList {
+                        for (group in report.duplicates.take(20)) {
+                            add("${group.systemName}: ${group.title}")
+                            group.recommendation?.let { recommendation ->
+                                val reasons = recommendation.reasons
+                                    .map { reason -> stringResource(reason.stringResourceId()) }
+                                    .joinToString()
+                                add(
+                                    stringResource(
+                                        R.string.doctor_variant_recommendation,
+                                        recommendation.fileName,
+                                        reasons,
+                                    ),
+                                )
+                            }
+                            group.variants.forEach { add("  $it") }
+                        }
                     },
                     onIgnore = { onIgnore(LibraryDoctorViewModel.VARIANTS_ID) },
                 )
@@ -323,6 +339,13 @@ private fun DoctorReport(
             }
         }
     }
+}
+
+private fun VariantRecommendationReason.stringResourceId(): Int = when (this) {
+    VariantRecommendationReason.PREFERRED_LANGUAGE -> R.string.doctor_variant_reason_language
+    VariantRecommendationReason.PREFERRED_REGION -> R.string.doctor_variant_reason_region
+    VariantRecommendationReason.CLEAN_DUMP -> R.string.doctor_variant_reason_clean
+    VariantRecommendationReason.NEWER_REVISION -> R.string.doctor_variant_reason_revision
 }
 
 @Composable

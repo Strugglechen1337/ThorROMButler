@@ -8,6 +8,8 @@ import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import dev.thor.rombutler.domain.detection.SystemPackCodec
 import dev.thor.rombutler.domain.model.AppSettings
+import dev.thor.rombutler.domain.model.AssignmentAdvisor
+import dev.thor.rombutler.domain.model.LearnedAssignment
 import dev.thor.rombutler.domain.repository.SettingsRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -40,6 +42,8 @@ class SettingsDataStore @Inject constructor(
         val RENAME_TO_DAT = booleanPreferencesKey("rename_to_dat_name")
         val BACKUP_TARGET = stringPreferencesKey("backup_target_path")
         val BIOS_FOLDER = stringPreferencesKey("bios_folder_path")
+        val ASSIGNMENT_LEARNING = booleanPreferencesKey("assignment_learning_enabled")
+        val LEARNED_ASSIGNMENTS = stringPreferencesKey("learned_assignments")
     }
 
     override val settings: Flow<AppSettings> = dataStore.data.map { prefs ->
@@ -59,6 +63,8 @@ class SettingsDataStore @Inject constructor(
             renameToDatName = prefs[Keys.RENAME_TO_DAT] ?: false,
             backupTargetPath = prefs[Keys.BACKUP_TARGET],
             biosFolderPath = prefs[Keys.BIOS_FOLDER],
+            assignmentLearningEnabled = prefs[Keys.ASSIGNMENT_LEARNING] ?: true,
+            learnedAssignments = prefs[Keys.LEARNED_ASSIGNMENTS].parseLearnedAssignments(),
         )
     }
 
@@ -178,6 +184,26 @@ class SettingsDataStore @Inject constructor(
         }
     }
 
+    override suspend fun setAssignmentLearningEnabled(enabled: Boolean) {
+        dataStore.edit { it[Keys.ASSIGNMENT_LEARNING] = enabled }
+    }
+
+    override suspend fun rememberAssignment(extension: String, systemId: String) {
+        dataStore.edit { prefs ->
+            if (prefs[Keys.ASSIGNMENT_LEARNING] == false) return@edit
+            val updated = AssignmentAdvisor.remember(
+                assignments = prefs[Keys.LEARNED_ASSIGNMENTS].parseLearnedAssignments(),
+                extension = extension,
+                systemId = systemId,
+            )
+            prefs[Keys.LEARNED_ASSIGNMENTS] = updated.toJson()
+        }
+    }
+
+    override suspend fun clearLearnedAssignments() {
+        dataStore.edit { it.remove(Keys.LEARNED_ASSIGNMENTS) }
+    }
+
     override suspend fun replaceSettings(settings: AppSettings) {
         dataStore.edit { prefs ->
             prefs.setOrRemove(Keys.ROM_BASE_PATH, settings.romBasePath)
@@ -196,6 +222,11 @@ class SettingsDataStore @Inject constructor(
             prefs[Keys.RENAME_TO_DAT] = settings.renameToDatName
             prefs.setOrRemove(Keys.BACKUP_TARGET, settings.backupTargetPath)
             prefs.setOrRemove(Keys.BIOS_FOLDER, settings.biosFolderPath)
+            prefs[Keys.ASSIGNMENT_LEARNING] = settings.assignmentLearningEnabled
+            prefs[Keys.LEARNED_ASSIGNMENTS] = settings.learnedAssignments
+                .filter(AssignmentAdvisor::isValid)
+                .takeLast(AssignmentAdvisor.MAX_ASSIGNMENTS)
+                .toJson()
         }
     }
 
@@ -231,5 +262,34 @@ class SettingsDataStore @Inject constructor(
                 }
             }.getOrDefault(emptyMap())
         }
+
+        fun String?.parseLearnedAssignments(): List<LearnedAssignment> {
+            if (this.isNullOrBlank()) return emptyList()
+            return runCatching {
+                val array = org.json.JSONArray(this)
+                buildList {
+                    for (index in 0 until minOf(array.length(), AssignmentAdvisor.MAX_ASSIGNMENTS)) {
+                        val value = array.getJSONObject(index)
+                        val assignment = LearnedAssignment(
+                            extension = value.getString("extension").lowercase(),
+                            systemId = value.getString("systemId"),
+                            confirmations = value.optInt("confirmations", 1),
+                        )
+                        if (AssignmentAdvisor.isValid(assignment)) add(assignment)
+                    }
+                }
+            }.getOrDefault(emptyList())
+        }
+
+        fun List<LearnedAssignment>.toJson(): String = org.json.JSONArray().apply {
+            for (assignment in this@toJson) {
+                put(
+                    org.json.JSONObject()
+                        .put("extension", assignment.extension)
+                        .put("systemId", assignment.systemId)
+                        .put("confirmations", assignment.confirmations),
+                )
+            }
+        }.toString()
     }
 }

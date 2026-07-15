@@ -1,6 +1,7 @@
 package dev.thor.rombutler.domain.repository
 
 import dev.thor.rombutler.domain.model.DetectedRom
+import dev.thor.rombutler.domain.library.VariantRecommendation
 
 /** Per-system statistics of the ROM library. */
 data class SystemStat(
@@ -22,6 +23,7 @@ data class DuplicateGroup(
     val title: String,
     val systemName: String,
     val variants: List<String>,
+    val recommendation: VariantRecommendation? = null,
 )
 
 /** Files with identical size and SHA-256 content hash. */

@@ -5,6 +5,7 @@ import dev.thor.rombutler.domain.detection.BiosDetector
 import dev.thor.rombutler.domain.detection.DetectionEngine
 import dev.thor.rombutler.domain.detection.RomFileGrouper
 import dev.thor.rombutler.domain.detection.SystemRegistry
+import dev.thor.rombutler.domain.library.VariantAdvisor
 import dev.thor.rombutler.domain.model.Confidence
 import dev.thor.rombutler.domain.model.DetectedRom
 import dev.thor.rombutler.domain.repository.LibraryReport
@@ -18,6 +19,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import java.io.File
+import java.util.Locale
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -90,10 +92,17 @@ class LibraryChecker @Inject constructor(
                 .groupBy { normalizeTitle(it.name) }
                 .filterValues { it.size > 1 && it.first().extension.lowercase() != "bin" }
                 .forEach { (title, files) ->
+                    val variants = files.map { it.name }.sorted()
+                    val locale = Locale.getDefault()
                     duplicates += dev.thor.rombutler.domain.repository.DuplicateGroup(
                         title = title,
                         systemName = system.displayName,
-                        variants = files.map { it.name }.sorted(),
+                        variants = variants,
+                        recommendation = VariantAdvisor.recommend(
+                            variants = variants,
+                            localeLanguage = locale.language,
+                            localeCountry = locale.country,
+                        ),
                     )
                 }
 

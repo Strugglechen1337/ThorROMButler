@@ -51,6 +51,27 @@ class SettingsDataStoreTest {
         assertThat(dataStore.updateCount).isEqualTo(0)
     }
 
+    @Test
+    fun `assignment learning counts successful choices and can be cleared`() = runTest {
+        val repository = SettingsDataStore(TrackingPreferencesDataStore())
+
+        repository.rememberAssignment("CISO", "gamecube")
+        repository.rememberAssignment("ciso", "gamecube")
+        repository.rememberAssignment("ciso", "wii")
+
+        assertThat(repository.settings.first().learnedAssignments).containsExactly(
+            dev.thor.rombutler.domain.model.LearnedAssignment("ciso", "gamecube", 2),
+            dev.thor.rombutler.domain.model.LearnedAssignment("ciso", "wii", 1),
+        )
+
+        repository.setAssignmentLearningEnabled(false)
+        repository.rememberAssignment("iso", "ps2")
+        assertThat(repository.settings.first().learnedAssignments).hasSize(2)
+
+        repository.clearLearnedAssignments()
+        assertThat(repository.settings.first().learnedAssignments).isEmpty()
+    }
+
     private class TrackingPreferencesDataStore : DataStore<Preferences> {
         private val state = MutableStateFlow<Preferences>(emptyPreferences())
         override val data: Flow<Preferences> = state

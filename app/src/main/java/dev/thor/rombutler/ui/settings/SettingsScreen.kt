@@ -54,6 +54,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -126,6 +127,7 @@ fun SettingsScreen(
     var showBackupTargetPicker by remember { mutableStateOf(false) }
     var showBiosPicker by remember { mutableStateOf(false) }
     var showRestoreConfirm by remember { mutableStateOf(false) }
+    var showClearLearningConfirm by remember { mutableStateOf(false) }
 
     // Load the manifest info whenever the backup target changes
     LaunchedEffect(settings.backupTargetPath) {
@@ -396,6 +398,46 @@ fun SettingsScreen(
                         checked = settings.watcherEnabled,
                         onCheckedChange = viewModel::setWatcherEnabled,
                     )
+                }
+                Spacer(Modifier.size(14.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = stringResource(R.string.settings_assignment_learning),
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onSurface,
+                        )
+                        Text(
+                            text = stringResource(R.string.settings_assignment_learning_hint),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                    Spacer(Modifier.width(12.dp))
+                    Switch(
+                        checked = settings.assignmentLearningEnabled,
+                        onCheckedChange = viewModel::setAssignmentLearningEnabled,
+                    )
+                }
+                if (settings.learnedAssignments.isNotEmpty()) {
+                    Spacer(Modifier.size(8.dp))
+                    Text(
+                        text = pluralStringResource(
+                            R.plurals.settings_assignment_learning_count,
+                            settings.learnedAssignments.size,
+                            settings.learnedAssignments.size,
+                        ),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    OutlinedButton(
+                        onClick = { showClearLearningConfirm = true },
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        Icon(Icons.Filled.Delete, contentDescription = null)
+                        Spacer(Modifier.width(8.dp))
+                        Text(stringResource(R.string.settings_assignment_learning_clear))
+                    }
                 }
                 Spacer(Modifier.size(14.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -1252,6 +1294,24 @@ fun SettingsScreen(
                 androidx.compose.material3.TextButton(onClick = { showRestoreConfirm = false }) {
                     Text(stringResource(R.string.action_cancel))
                 }
+            },
+        )
+    }
+    if (showClearLearningConfirm) {
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { showClearLearningConfirm = false },
+            title = { Text(stringResource(R.string.settings_assignment_learning_clear_title)) },
+            text = { Text(stringResource(R.string.settings_assignment_learning_clear_text)) },
+            confirmButton = {
+                Button(onClick = {
+                    viewModel.clearLearnedAssignments()
+                    showClearLearningConfirm = false
+                }) { Text(stringResource(R.string.settings_assignment_learning_clear)) }
+            },
+            dismissButton = {
+                androidx.compose.material3.TextButton(
+                    onClick = { showClearLearningConfirm = false },
+                ) { Text(stringResource(R.string.action_cancel)) }
             },
         )
     }

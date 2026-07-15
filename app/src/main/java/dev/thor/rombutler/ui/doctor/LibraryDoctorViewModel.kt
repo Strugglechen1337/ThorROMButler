@@ -180,6 +180,13 @@ class LibraryDoctorViewModel @Inject constructor(
             appendLine("## Varianten / Variants (1G1R)")
             for (group in report.duplicates) {
                 appendLine("- **${group.title}** (${group.systemName})")
+                group.recommendation?.let { recommendation ->
+                    val reasons = recommendation.reasons.joinToString { variantReason(it) }
+                    appendLine(
+                        "  - Empfehlung / recommendation: ${recommendation.fileName}" +
+                            if (reasons.isEmpty()) "" else " ($reasons)",
+                    )
+                }
                 group.variants.forEach { appendLine("  - $it") }
             }
         }
@@ -239,6 +246,19 @@ class LibraryDoctorViewModel @Inject constructor(
         LibraryBackupState.DIFFERENT_LIBRARY -> "andere Bibliothek / different library"
         LibraryBackupState.OUTDATED -> "veraltet / outdated"
         LibraryBackupState.CURRENT -> "aktuell / current"
+    }
+
+    private fun variantReason(
+        reason: dev.thor.rombutler.domain.library.VariantRecommendationReason,
+    ): String = when (reason) {
+        dev.thor.rombutler.domain.library.VariantRecommendationReason.PREFERRED_LANGUAGE ->
+            "Sprache / language"
+        dev.thor.rombutler.domain.library.VariantRecommendationReason.PREFERRED_REGION ->
+            "Region / region"
+        dev.thor.rombutler.domain.library.VariantRecommendationReason.CLEAN_DUMP ->
+            "sauberer Dump / clean dump"
+        dev.thor.rombutler.domain.library.VariantRecommendationReason.NEWER_REVISION ->
+            "neuere Revision / newer revision"
     }
 
     companion object {
