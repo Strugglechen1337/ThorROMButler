@@ -82,6 +82,30 @@ class CommonsArchiveAnalyzerTest {
     }
 
     @Test
+    fun `corrupt archive is reported as failed, never thrown`() = runTest {
+        // 7z magic followed by garbage: the reader throws while listing —
+        // the analyzer must catch it (Throwable, incl. OOM) and return
+        // Failed so a single bad archive can't crash the whole scan.
+        val brokenFile = tempFolder.newFile("broken.7z")
+        brokenFile.writeBytes(
+            byteArrayOf(0x37, 0x7A, 0xBC.toByte(), 0xAF.toByte(), 0x27, 0x1C) + ByteArray(64) { 0x7F },
+        )
+
+        val analysis = buildAnalyzer(StandardTestDispatcher(testScheduler))
+            .analyze(
+                RomArchive(
+                    path = brokenFile.absolutePath,
+                    fileName = brokenFile.name,
+                    sizeBytes = brokenFile.length(),
+                    lastModifiedMillis = brokenFile.lastModified(),
+                    type = ArchiveType.SEVEN_ZIP,
+                ),
+            )
+
+        assertThat(analysis).isInstanceOf(ArchiveAnalysis.Failed::class.java)
+    }
+
+    @Test
     fun `groups bin and cue via cue content`() = runTest {
         val cueContent = "FILE \"FF7 Track 1.bin\" BINARY\n  TRACK 01 MODE2/2352"
         val zipFile = tempFolder.newFile("ps1.zip")

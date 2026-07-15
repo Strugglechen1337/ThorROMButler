@@ -16,7 +16,7 @@
 
     <!-- What's new (pro Release aktualisieren!) -->
     <string name="whatsnew_title">Neu in Version %s</string>
-    <string name="whatsnew_body">• Der BIOS-Ordner schlägt sich jetzt selbst vor: bekannte Orte werden erkannt, Ordner mit vorhandenen BIOS-Dateien bevorzugt\n• Dreamcast-BIOS landet automatisch im dc/-Unterordner (Flycast-Konvention)\n\nAlle Details im Changelog auf GitHub.</string>
+    <string name="whatsnew_body">• Behoben: Der goldene „einsortiert!"-Blitz konnte hängen bleiben und zwang zum Schließen der App — er verschwindet jetzt von selbst und lässt sich antippen\n• Behoben: Große Ordner konnten die App zum Absturz bringen, wenn ein Archiv bei der Analyse den Speicher sprengte — es wird jetzt als fehlgeschlagen gemeldet, der Scan läuft weiter\n\nAlle Details im Changelog auf GitHub.</string>
 
     <!-- Setup screen -->
     <string name="setup_title">Einrichtung</string>

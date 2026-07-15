@@ -1,5 +1,6 @@
 package dev.thor.rombutler.ui.review
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -122,22 +123,36 @@ fun ReviewScreen(
     }
     // Successful runs celebrate briefly, then go to the log. Failed
     // items stay on review for retry.
+    //
+    // IMPORTANT: do NOT consume the summary in the success+moved branch —
+    // consuming it flips moveSummary to null, which is a key of this
+    // effect and would cancel it mid-celebration (the v1.6 freeze bug).
+    // The celebration owns the delay and triggers navigation via onDone.
     var celebrating by remember { mutableStateOf<Int?>(null) }
-    LaunchedEffect(state.moveSummary, moveFailureText) {
-        val summary = state.moveSummary
-        if (summary != null && summary.failed == 0) {
-            viewModel.consumeMoveSummary()
-            if (summary.moved > 0) {
-                celebrating = summary.moved
-                kotlinx.coroutines.delay(1300)
+    LaunchedEffect(state.moveSummary) {
+        val summary = state.moveSummary ?: return@LaunchedEffect
+        when {
+            summary.failed == 0 && summary.moved > 0 -> celebrating = summary.moved
+            summary.failed == 0 -> {
+                viewModel.consumeMoveSummary()
+                onMoved()
             }
-            onMoved()
-        } else if (summary != null) {
-            snackbarHostState.showSnackbar(moveFailureText.orEmpty())
-            viewModel.consumeMoveSummary()
+            else -> {
+                snackbarHostState.showSnackbar(moveFailureText.orEmpty())
+                viewModel.consumeMoveSummary()
+            }
         }
     }
-    celebrating?.let { moved -> SuccessCelebration(moved) }
+    celebrating?.let { moved ->
+        SuccessCelebration(
+            movedCount = moved,
+            onDone = {
+                celebrating = null
+                viewModel.consumeMoveSummary()
+                onMoved()
+            },
+        )
+    }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -609,16 +624,29 @@ private fun usableSpaceForPath(path: String): Long? {
 
 /**
  * One-shot success moment after a clean sorting run: the bolt pops in
- * with a bouncy spring inside a gold-glowing badge, then the screen
- * moves on to the log. Rendered as a dialog so no layout changes.
+ * with a bouncy spring inside a gold-glowing badge, then [onDone] moves
+ * the screen on to the log. Auto-dismisses after a short beat; a tap or
+ * back press also finishes it, so it can never get stuck (defense in
+ * depth after the v1.6 freeze bug). [onDone] runs exactly once.
  */
 @Composable
-private fun SuccessCelebration(movedCount: Int) {
+private fun SuccessCelebration(movedCount: Int, onDone: () -> Unit) {
+    var finished by remember { mutableStateOf(false) }
+    val finish: () -> Unit = {
+        if (!finished) {
+            finished = true
+            onDone()
+        }
+    }
+    LaunchedEffect(Unit) {
+        kotlinx.coroutines.delay(1300)
+        finish()
+    }
     androidx.compose.ui.window.Dialog(
-        onDismissRequest = {},
+        onDismissRequest = finish,
         properties = androidx.compose.ui.window.DialogProperties(
-            dismissOnBackPress = false,
-            dismissOnClickOutside = false,
+            dismissOnBackPress = true,
+            dismissOnClickOutside = true,
         ),
     ) {
         var shown by remember { mutableStateOf(false) }
@@ -633,10 +661,16 @@ private fun SuccessCelebration(movedCount: Int) {
         )
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.graphicsLayer {
-                scaleX = scale
-                scaleY = scale
-            },
+            modifier = Modifier
+                .clickable(
+                    interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() },
+                    indication = null,
+                    onClick = finish,
+                )
+                .graphicsLayer {
+                    scaleX = scale
+                    scaleY = scale
+                },
         ) {
             Surface(
                 shape = androidx.compose.foundation.shape.CircleShape,

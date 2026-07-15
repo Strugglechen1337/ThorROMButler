@@ -237,14 +237,27 @@ class ScanViewModel @Inject constructor(
      */
     private suspend fun analyzeWithTimeout(archive: RomArchive): ArchiveAnalysis {
         val deferred = viewModelScope.async { archiveAnalyzer.analyze(archive) }
-        return withTimeoutOrNull(ANALYSIS_TIMEOUT_MS) { deferred.await() }
-            ?: run {
-                deferred.cancel()
-                ArchiveAnalysis.Failed(
-                    archive,
-                    "Zeitlimit überschritten – Archiv beschädigt oder extrem komprimiert?",
-                )
-            }
+        // Safety net: the analyzer already maps errors to Failed, but a
+        // stray Throwable (e.g. OOM surfacing at await) must never take
+        // down the whole scan — one bad archive stays one failed card.
+        return try {
+            withTimeoutOrNull(ANALYSIS_TIMEOUT_MS) { deferred.await() }
+                ?: run {
+                    deferred.cancel()
+                    ArchiveAnalysis.Failed(
+                        archive,
+                        "Zeitlimit überschritten – Archiv beschädigt oder extrem komprimiert?",
+                    )
+                }
+        } catch (cancellation: kotlinx.coroutines.CancellationException) {
+            throw cancellation
+        } catch (error: Throwable) {
+            deferred.cancel()
+            ArchiveAnalysis.Failed(
+                archive,
+                error.message ?: "Analyse fehlgeschlagen",
+            )
+        }
     }
 
     private companion object {

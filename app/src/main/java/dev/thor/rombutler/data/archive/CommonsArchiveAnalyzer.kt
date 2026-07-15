@@ -133,15 +133,27 @@ class CommonsArchiveAnalyzer @Inject constructor(
                     emptyList()
                 },
             )
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
+            // Throwable, not Exception: a large/solid 7z can exhaust memory
+            // while a header prefix is decompressed. That is an *Error*, not
+            // an Exception — letting it escape crashed the whole scan on
+            // big folders. Report the archive as failed instead.
             ArchiveAnalysis.Failed(archive, e.toUserMessage())
         }
     }
 
-    /** Maps library exceptions to actionable German messages. */
-    private fun Exception.toUserMessage(): String {
+    /** Maps library throwables to actionable German messages. */
+    private fun Throwable.toUserMessage(): String {
         val name = javaClass.simpleName
         return when {
+            this is OutOfMemoryError -> "Zu wenig Arbeitsspeicher für die Analyse – " +
+                "Archiv nutzt vermutlich sehr große 7z/LZMA2-Kompression. Am PC mit " +
+                "kleinerem Dictionary (z. B. 32 MB) neu packen."
+
+            this is org.apache.commons.compress.MemoryLimitException ->
+                "7z-Archiv braucht zu viel Arbeitsspeicher (${memoryNeededInKb / 1024} MB). " +
+                    "Am PC mit kleinerem Dictionary neu packen."
+
             this is org.apache.commons.compress.PasswordRequiredException ||
                 "Encrypted" in name || "Password" in name ->
                 "Archiv ist passwortgeschützt"

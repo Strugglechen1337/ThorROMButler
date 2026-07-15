@@ -2,6 +2,30 @@
 
 All notable user-facing changes are documented here.
 
+## 1.7.2
+
+### Deutsch
+
+- Fehler behoben, durch den der goldene „einsortiert!"-Blitz nach dem
+  Einsortieren hängen blieb und sich nicht wegtippen ließ — die App musste
+  geschlossen werden. Der Erfolgs-Moment verschwindet jetzt von selbst und
+  lässt sich zusätzlich durch Antippen sofort schließen.
+- Absturz bei großen Ordnern behoben: Ein Archiv, dessen Analyse den
+  Arbeitsspeicher sprengt (sehr große 7z/LZMA2-Kompression), wird jetzt
+  sauber als fehlgeschlagen angezeigt, statt die ganze App zu beenden. Ein
+  einzelnes problematisches Archiv bleibt eine Fehlerkarte — der Rest des
+  Scans läuft weiter.
+
+### English
+
+- Fixed a bug where the golden "sorted in!" bolt froze after sorting and
+  couldn't be tapped away — the app had to be closed. The success moment
+  now dismisses itself and can also be tapped to close instantly.
+- Fixed a crash on large folders: an archive whose analysis exhausts memory
+  (very large 7z/LZMA2 compression) is now cleanly reported as failed
+  instead of taking down the whole app. A single problematic archive stays
+  one error card — the rest of the scan continues.
+
 ## 1.7.1
 
 ### Deutsch

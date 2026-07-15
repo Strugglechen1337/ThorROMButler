@@ -17,7 +17,7 @@
 
     <!-- What's new (update every release!) -->
     <string name="whatsnew_title">New in version %s</string>
-    <string name="whatsnew_body">• The BIOS folder now suggests itself: known locations are detected, folders that already contain BIOS files are preferred\n• Dreamcast BIOS automatically lands in the dc/ subfolder (Flycast convention)\n\nFull details in the changelog on GitHub.</string>
+    <string name="whatsnew_body">• Fixed: the golden "sorted in!" bolt could freeze and force you to close the app — it now dismisses itself and closes on tap\n• Fixed: large folders could crash the app when an archive exhausted memory during analysis — it is now reported as failed and the scan continues\n\nFull details in the changelog on GitHub.</string>
 
     <!-- Setup screen -->
     <string name="setup_title">Setup</string>
