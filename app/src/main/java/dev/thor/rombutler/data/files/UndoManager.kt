@@ -45,16 +45,19 @@ class UndoManager @Inject constructor(
                 "Quellarchiv existiert nicht mehr – Rückgängig würde die einzige Kopie löschen",
             )
         }
-        info.createdFiles.forEach { File(it).delete() }
+        val removed = info.createdFiles.map(::File)
+        removed.forEach { it.delete() }
+        // A generated .m3u that now references a deleted disc would be a
+        // dangling playlist — remove it as part of the undo.
+        removeStalePlaylists(removed)
         // Remove a now-empty per-game subfolder (Dreamcast etc.)
-        info.createdFiles.firstOrNull()?.let { first ->
-            File(first).parentFile
-                ?.takeIf { it.listFiles()?.isEmpty() == true }
-                ?.delete()
-        }
+        removed.firstOrNull()?.parentFile
+            ?.takeIf { it.listFiles()?.isEmpty() == true }
+            ?.delete()
     }
 
     private fun undoMove(info: UndoInfo) {
+        val restored = mutableListOf<File>()
         for ((index, targetPath) in info.createdFiles.withIndex()) {
             val target = File(targetPath)
             val original = File(info.restoreTo.getOrNull(index) ?: continue)
@@ -73,6 +76,33 @@ class UndoManager @Inject constructor(
                 }
                 target.delete()
             }
+            restored += target
+        }
+        // The files left their targets — drop playlists that referenced them.
+        removeStalePlaylists(restored)
+    }
+
+    /**
+     * Deletes `.m3u` playlists next to [removedFiles] that reference any of
+     * those (now-missing) file names, so undo does not leave dangling
+     * multi-disc playlists behind.
+     */
+    private fun removeStalePlaylists(removedFiles: List<File>) {
+        removedFiles.groupBy { it.parentFile }.forEach { (dir, files) ->
+            if (dir == null) return@forEach
+            val removedNames = files.map { it.name.lowercase() }.toSet()
+            dir.listFiles { f: File -> f.isFile && f.extension.equals("m3u", ignoreCase = true) }
+                .orEmpty()
+                .forEach { playlist ->
+                    val references = runCatching { playlist.readLines() }
+                        .getOrDefault(emptyList())
+                        .map {
+                            it.trim().replace('\\', '/').substringAfterLast('/').lowercase()
+                        }
+                    if (references.any { it in removedNames }) {
+                        playlist.delete()
+                    }
+                }
         }
     }
 }

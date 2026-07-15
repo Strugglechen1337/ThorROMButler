@@ -35,4 +35,33 @@ class UndoManagerTest {
         assertThat(result.isSuccess).isTrue()
         assertThat(extracted.exists()).isFalse()
     }
+
+    @Test
+    fun `undo removes a playlist that referenced the deleted discs`() = runTest {
+        val downloadDir = tempFolder.newFolder("downloads")
+        File(downloadDir, "game.zip").writeBytes(byteArrayOf(1)) // source still present
+        val psxDir = tempFolder.newFolder("roms", "psx")
+        val disc1 = File(psxDir, "Game (Disc 1).chd").apply { writeBytes(byteArrayOf(2)) }
+        val disc2 = File(psxDir, "Game (Disc 2).chd").apply { writeBytes(byteArrayOf(3)) }
+        val playlist = File(psxDir, "Game.m3u").apply {
+            writeText("Game (Disc 1).chd\nGame (Disc 2).chd\n")
+        }
+        // An unrelated playlist in the same folder must survive.
+        val otherPlaylist = File(psxDir, "Other.m3u").apply { writeText("Other (Disc 1).chd\n") }
+        val manager = UndoManager(StandardTestDispatcher(testScheduler))
+
+        val result = manager.undo(
+            UndoInfo(
+                kind = UndoKind.EXTRACTED,
+                createdFiles = listOf(disc1.absolutePath, disc2.absolutePath),
+                sourceArchivePath = File(downloadDir, "game.zip").absolutePath,
+            ),
+        )
+
+        assertThat(result.isSuccess).isTrue()
+        assertThat(disc1.exists()).isFalse()
+        assertThat(disc2.exists()).isFalse()
+        assertThat(playlist.exists()).isFalse() // dangling playlist removed
+        assertThat(otherPlaylist.exists()).isTrue() // unrelated one kept
+    }
 }

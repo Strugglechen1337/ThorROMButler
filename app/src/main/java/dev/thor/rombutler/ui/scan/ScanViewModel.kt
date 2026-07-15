@@ -250,6 +250,10 @@ class ScanViewModel @Inject constructor(
                     )
                 }
         } catch (cancellation: kotlinx.coroutines.CancellationException) {
+            // Scan was cancelled (e.g. rescan): the result would be
+            // discarded anyway, but signal the detached analysis to stop
+            // so it doesn't keep churning in the background.
+            deferred.cancel()
             throw cancellation
         } catch (error: Throwable) {
             deferred.cancel()

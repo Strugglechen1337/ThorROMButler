@@ -2,6 +2,28 @@
 
 All notable user-facing changes are documented here.
 
+## 1.7.3
+
+### Deutsch
+
+- Aufräumarbeiten nach einem Code-Review: Beim „Rückgängig" eines
+  Multi-Disc-Spiels wird jetzt auch die automatisch erzeugte
+  `.m3u`-Playlist entfernt, statt als Leiche zurückzubleiben.
+- Per „Teilen → Thor ROM Butler" gesendete Dateien mit gleichem Namen wie
+  eine vorhandene Datei bekommen jetzt ein `(1)`-Suffix, statt still
+  verworfen zu werden.
+- Abgebrochene Archiv-Analysen (z. B. beim erneuten Scannen) werden früher
+  gestoppt und laufen nicht mehr unnötig im Hintergrund weiter.
+
+### English
+
+- Cleanup after a code review: undoing a multi-disc game now also removes
+  the auto-generated `.m3u` playlist instead of leaving it dangling.
+- Files sent via "Share → Thor ROM Butler" that share a name with an
+  existing file now get a `(1)` suffix instead of being silently dropped.
+- Cancelled archive analyses (e.g. on rescan) are stopped sooner and no
+  longer keep churning in the background.
+
 ## 1.7.2
 
 ### Deutsch

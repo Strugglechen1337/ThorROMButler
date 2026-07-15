@@ -85,8 +85,9 @@ class MainViewModel @Inject constructor(
                 runCatching {
                     val rawName = queryDisplayName(uri) ?: uri.lastPathSegment ?: "shared.bin"
                     val name = IncomingFile.sanitizeName(rawName) ?: return@runCatching
-                    val target = IncomingFile.resolveTarget(downloadDir, name) ?: return@runCatching
-                    if (target.exists()) return@runCatching // never overwrite silently
+                    // A same-named download must not silently vanish — get a
+                    // "(1)" suffix like every other incoming-file path.
+                    val target = IncomingFile.uniqueTarget(downloadDir, name) ?: return@runCatching
                     context.contentResolver.openInputStream(uri)?.use { input ->
                         IncomingFile.copyAtomically(input, target)
                         copied++

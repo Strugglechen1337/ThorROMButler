@@ -16,7 +16,7 @@
 
     <!-- What's new (pro Release aktualisieren!) -->
     <string name="whatsnew_title">Neu in Version %s</string>
-    <string name="whatsnew_body">• Behoben: Der goldene „einsortiert!"-Blitz konnte hängen bleiben und zwang zum Schließen der App — er verschwindet jetzt von selbst und lässt sich antippen\n• Behoben: Große Ordner konnten die App zum Absturz bringen, wenn ein Archiv bei der Analyse den Speicher sprengte — es wird jetzt als fehlgeschlagen gemeldet, der Scan läuft weiter\n\nAlle Details im Changelog auf GitHub.</string>
+    <string name="whatsnew_body">• Beim „Rückgängig" eines Multi-Disc-Spiels wird jetzt auch die automatisch erzeugte .m3u-Playlist entfernt\n• Geteilte Dateien mit gleichem Namen wie eine vorhandene bekommen ein (1)-Suffix, statt verworfen zu werden\n\nAlle Details im Changelog auf GitHub.</string>
 
     <!-- Setup screen -->
     <string name="setup_title">Einrichtung</string>

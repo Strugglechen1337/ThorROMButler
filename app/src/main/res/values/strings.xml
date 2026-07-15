@@ -17,7 +17,7 @@
 
     <!-- What's new (update every release!) -->
     <string name="whatsnew_title">New in version %s</string>
-    <string name="whatsnew_body">• Fixed: the golden "sorted in!" bolt could freeze and force you to close the app — it now dismisses itself and closes on tap\n• Fixed: large folders could crash the app when an archive exhausted memory during analysis — it is now reported as failed and the scan continues\n\nFull details in the changelog on GitHub.</string>
+    <string name="whatsnew_body">• Undoing a multi-disc game now also removes its auto-generated .m3u playlist\n• Shared files that share a name with an existing one get a (1) suffix instead of being dropped\n\nFull details in the changelog on GitHub.</string>
 
     <!-- Setup screen -->
     <string name="setup_title">Setup</string>
