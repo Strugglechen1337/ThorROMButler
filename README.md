@@ -9,9 +9,9 @@
 
 ## Screenshots
 
-| Archive & Patches / Archives & patches | Zuordnung / Review | LAN-Empfang / LAN receive | Einstellungen / Settings |
-|----------------------------------------|--------------------|---------------------------|--------------------------|
-| <img src="docs/screenshots/v2-scan.png" alt="Thor ROM Butler scan screen with ROM patch card" width="240"> | <img src="docs/screenshots/v2-assign.png" alt="Thor ROM Butler review screen" width="240"> | <img src="docs/screenshots/v2-receive.png" alt="Thor ROM Butler LAN receive session with QR code" width="240"> | <img src="docs/screenshots/v2-settings.png" alt="Thor ROM Butler settings screen" width="240"> |
+| Scan & Patches / Scan & patches | Zuordnung / Review | Bibliotheks-Doktor / Library Doctor | LAN-Empfang / LAN receive |
+|---------------------------------|--------------------|-------------------------------------|---------------------------|
+| <img src="docs/screenshots/v2-scan.png" alt="Thor ROM Butler scan screen with ROM patch card" width="240"> | <img src="docs/screenshots/v2-assign.png" alt="Thor ROM Butler review screen with confidence levels" width="240"> | <img src="docs/screenshots/v9-doctor.png" alt="Thor ROM Butler Library Doctor health check" width="240"> | <img src="docs/screenshots/v2-receive.png" alt="Thor ROM Butler LAN receive session with QR code" width="240"> |
 
 ## Deutsch
 
