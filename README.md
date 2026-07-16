@@ -57,7 +57,9 @@ läuft aber auf jedem Android-Smartphone ab Android 13.
   transaktional geschrieben: vorhandene ROMs bleiben bis zur erfolgreichen
   Prüfung gesichert. Speicherplatz wird vorab geprüft; Quellarchive bleiben
   standardmäßig erhalten und können optional gelöscht oder nach
-  `.thor_trash` verschoben werden.
+  `.thor_trash` verschoben werden. Ein kleines Transaktionsjournal räumt nach
+  einem unerwarteten Prozessabbruch große Teildateien beim nächsten Versuch
+  auf und stellt nötigenfalls eine bereits verschobene lose ROM wieder her.
 - 🕹️ **Arcade-Sets bleiben gepackt**: ZIPs, die ausdrücklich Arcade oder
   Neo Geo zugeordnet werden, wandern als Ganzes nach `roms/arcade` bzw.
   `roms/neogeo`. 7z-/RAR-Archive werden dagegen immer entpackt.
@@ -250,7 +252,9 @@ newer.
   cancellation, and CRC checks. New and replaced files are written as a
   transaction: existing ROMs stay backed up until verification succeeds.
   Storage space is checked beforehand; source archives are kept by default
-  and can optionally be deleted or moved to `.thor_trash`.
+  and can optionally be deleted or moved to `.thor_trash`. A small transaction
+  journal cleans large partial files before the next attempt after an
+  unexpected process interruption and restores a staged loose ROM if needed.
 - 🕹️ **Arcade sets stay packed**: ZIPs explicitly assigned to Arcade or
   Neo Geo are moved as complete sets to `roms/arcade` or `roms/neogeo`.
   7z and RAR archives are always extracted instead.

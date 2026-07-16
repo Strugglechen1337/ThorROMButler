@@ -17,7 +17,7 @@
 
     <!-- What's new (update every release!) -->
     <string name="whatsnew_title">New in version %s</string>
-    <string name="whatsnew_body">• New collection assistant learns from successful manual assignments locally\n• Learned matches remain gold suggestions and always require confirmation\n• Library Doctor recommends a suitable region/revision without deleting anything\n\nFull details in the changelog on GitHub.</string>
+    <string name="whatsnew_body">• More resilient sorting after an unexpected app or process interruption\n• Large partial files are cleaned automatically before the next attempt\n• Interrupted loose-ROM moves can be restored safely\n\nFull details in the changelog on GitHub.</string>
 
     <!-- Setup screen -->
     <string name="setup_title">Setup</string>

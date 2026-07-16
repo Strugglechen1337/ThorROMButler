@@ -2,6 +2,37 @@
 
 All notable user-facing changes are documented here.
 
+## 1.9.1
+
+### Deutsch
+
+- Einsortierungen führen jetzt ein kleines Transaktionsjournal. Wird die App
+  oder ihr Prozess während einer großen Extraktion unerwartet beendet, werden
+  unvollständige Archivdaten vor dem nächsten Versuch sofort erkannt und
+  entfernt, statt bis zu 24 Stunden versteckten Speicher zu belegen.
+- Bei einer im kritischen Moment bereits temporär verschobenen losen ROM kann
+  die Quelle anhand des Journals sicher an ihren ursprünglichen Ort
+  zurückgebracht werden. Unterbrochene Kopien behalten weiterhin ihre Quelle.
+- Emulator-Belastungstest mit 4.641 Funden, beschädigten Archiven, RAR5,
+  wiederholten Scans, App-Wechseln und Drehungen sowie einer vollständig
+  gestreamten 3-GB-ZIP-Extraktion. Die Speicherplatzsperre bei zu wenig freiem
+  Platz und die Wiederholung nach hartem Prozessabbruch wurden ebenfalls
+  geprüft.
+
+### English
+
+- Sorting operations now keep a small transaction journal. If the app or its
+  process is interrupted during a large extraction, incomplete archive data is
+  detected and removed before the next attempt instead of occupying hidden
+  storage for up to 24 hours.
+- If a loose ROM had already been staged during the critical interruption
+  window, the journal can safely restore it to its original location.
+  Interrupted copies continue to preserve their source.
+- Emulator stress test with 4,641 findings, damaged archives, RAR5, repeated
+  scans, app switching and rotations, plus a fully streamed 3 GB ZIP
+  extraction. Low-space blocking and retry after a hard process interruption
+  were verified as well.
+
 ## 1.9.0
 
 ### Deutsch

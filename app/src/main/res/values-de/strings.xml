@@ -16,7 +16,7 @@
 
     <!-- What's new (pro Release aktualisieren!) -->
     <string name="whatsnew_title">Neu in Version %s</string>
-    <string name="whatsnew_body">• Neuer Sammlungs-Assistent lernt lokal aus erfolgreichen manuellen Zuordnungen\n• Gelernte Treffer bleiben gelbe Vorschläge und brauchen immer deine Bestätigung\n• Der Bibliotheks-Doktor empfiehlt eine passende Region/Revision, ohne etwas zu löschen\n\nAlle Details im Changelog auf GitHub.</string>
+    <string name="whatsnew_body">• Stabileres Einsortieren nach einem unerwarteten App- oder Prozessabbruch\n• Große Teildateien werden beim nächsten Versuch automatisch aufgeräumt\n• Unterbrochene Verschiebungen loser ROMs können sicher wiederhergestellt werden\n\nAlle Details im Changelog auf GitHub.</string>
 
     <!-- Setup screen -->
     <string name="setup_title">Einrichtung</string>

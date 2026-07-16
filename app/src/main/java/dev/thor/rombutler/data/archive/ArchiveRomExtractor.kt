@@ -6,7 +6,9 @@ import dev.thor.rombutler.domain.repository.RomExtractor
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import java.io.File
+import java.io.FileOutputStream
 import java.io.IOException
+import java.util.Properties
 import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -46,11 +48,16 @@ class ArchiveRomExtractor @Inject constructor(
                 File(dir, entryPath.replace('\\', '/').substringAfterLast('/'))
             }
             validateTargets(targets.values, replaceExisting)
-            val transactions = targets.values.associateWith { target ->
-                StagedTarget(target = target, staged = createStagingFile(dir))
-            }
+            val transactions = linkedMapOf<File, StagedTarget>()
 
             try {
+                targets.values.forEach { target ->
+                    transactions[target] = createStagedTarget(
+                        dir = dir,
+                        target = target,
+                        kind = TransactionKind.EXTRACT,
+                    )
+                }
                 sourceFactory.forType(archiveType).extractEntries(
                     archiveFile,
                     targets.mapValues { (_, target) -> transactions.getValue(target).staged },
@@ -61,6 +68,7 @@ class ArchiveRomExtractor @Inject constructor(
             } catch (e: Throwable) {
                 rollbackCommit(transactions.values)
                 transactions.values.forEach { it.staged.delete() }
+                cleanupJournals(transactions.values)
                 throw e.toUserFacingExtractionError()
             }
             targets.values.map { it.absolutePath }
@@ -88,9 +96,11 @@ class ArchiveRomExtractor @Inject constructor(
                 for ((source, target) in targets) {
                     val item = PreparedMove(
                         source = source,
-                        transaction = StagedTarget(
+                        transaction = createStagedTarget(
+                            dir = dir,
                             target = target,
-                            staged = createStagingFile(dir),
+                            kind = TransactionKind.MOVE,
+                            source = source,
                         ),
                     )
                     prepared += item
@@ -117,6 +127,7 @@ class ArchiveRomExtractor @Inject constructor(
             } catch (e: Throwable) {
                 rollbackCommit(prepared.map { it.transaction })
                 restoreMoveSources(prepared)
+                cleanupJournals(prepared.map { it.transaction })
                 throw e
             }
             targets.values.map { it.absolutePath }
@@ -203,6 +214,7 @@ class ArchiveRomExtractor @Inject constructor(
         items.forEach { item ->
             item.backup?.delete()
             item.backup = null
+            item.journal.delete()
         }
     }
 
@@ -246,8 +258,43 @@ class ArchiveRomExtractor @Inject constructor(
         }
     }
 
-    private fun createStagingFile(dir: File): File =
-        File(dir, ".thor-${UUID.randomUUID()}.partial")
+    /**
+     * Persists recovery metadata before a staged file can contain data.
+     * A hard process kill can therefore distinguish disposable extraction
+     * bytes from a moved source file that must be restored.
+     */
+    private fun createStagedTarget(
+        dir: File,
+        target: File,
+        kind: TransactionKind,
+        source: File? = null,
+    ): StagedTarget {
+        val id = UUID.randomUUID().toString()
+        val staged = File(dir, ".thor-$id.partial")
+        val journal = File(dir, ".thor-$id$TRANSACTION_SUFFIX")
+        val journalTemp = File(dir, ".thor-$id$TRANSACTION_TEMP_SUFFIX")
+        val properties = Properties().apply {
+            setProperty(JOURNAL_KIND, kind.id)
+            setProperty(JOURNAL_STAGED_NAME, staged.name)
+            setProperty(JOURNAL_TARGET_PATH, target.absolutePath)
+            source?.let { setProperty(JOURNAL_SOURCE_PATH, it.absolutePath) }
+        }
+
+        try {
+            FileOutputStream(journalTemp).use { output ->
+                properties.store(output, null)
+                output.fd.sync()
+            }
+            if (!journalTemp.renameTo(journal)) {
+                throw IOException("Transaktionsjournal konnte nicht angelegt werden")
+            }
+        } catch (error: Throwable) {
+            journalTemp.delete()
+            journal.delete()
+            throw error
+        }
+        return StagedTarget(target = target, staged = staged, journal = journal)
+    }
 
     private fun backupFileFor(target: File): File =
         File(target.parentFile, ".${target.name}$BACKUP_SUFFIX")
@@ -258,6 +305,10 @@ class ArchiveRomExtractor @Inject constructor(
      * new file was already committed and the stale backup can be discarded.
      */
     private fun recoverInterruptedTransactions(dir: File) {
+        dir.listFiles().orEmpty()
+            .filter { it.isFile && it.name.startsWith(".thor-") && it.name.endsWith(TRANSACTION_SUFFIX) }
+            .forEach { recoverTransaction(it, dir) }
+
         dir.listFiles().orEmpty()
             .filter { it.isFile && it.name.startsWith('.') && it.name.endsWith(BACKUP_SUFFIX) }
             .forEach { backup ->
@@ -274,10 +325,74 @@ class ArchiveRomExtractor @Inject constructor(
             .filter {
                 it.isFile &&
                     it.name.startsWith(".thor-") &&
-                    it.name.endsWith(".partial") &&
+                    (it.name.endsWith(".partial") || it.name.endsWith(TRANSACTION_TEMP_SUFFIX)) &&
                     it.lastModified() < cutoff
             }
             .forEach { it.delete() }
+    }
+
+    /** Recovers one journal left by a process kill; malformed journals stay untouched. */
+    private fun recoverTransaction(journal: File, dir: File) {
+        runCatching {
+            val properties = Properties().apply {
+                journal.inputStream().use(::load)
+            }
+            val stagedName = properties.getProperty(JOURNAL_STAGED_NAME)
+                ?.takeIf { '/' !in it && '\\' !in it }
+                ?: throw IOException("Ungültiger Staging-Name")
+            val staged = File(dir, stagedName)
+            val target = File(
+                properties.getProperty(JOURNAL_TARGET_PATH)
+                    ?: throw IOException("Ziel im Transaktionsjournal fehlt"),
+            )
+            if (target.parentFile?.canonicalFile != dir.canonicalFile) {
+                throw IOException("Ziel liegt außerhalb des Transaktionsordners")
+            }
+
+            when (properties.getProperty(JOURNAL_KIND)) {
+                TransactionKind.EXTRACT.id -> deleteRecoveredFile(staged)
+                TransactionKind.MOVE.id -> recoverInterruptedMove(
+                    staged = staged,
+                    target = target,
+                    sourcePath = properties.getProperty(JOURNAL_SOURCE_PATH),
+                )
+                else -> throw IOException("Unbekannte Transaktionsart")
+            }
+            journal.delete()
+        }
+    }
+
+    /** Restores a staged source, or drops a partial copy when the source still exists. */
+    private fun recoverInterruptedMove(staged: File, target: File, sourcePath: String?) {
+        if (!staged.isFile) return
+        val source = sourcePath?.let(::File)
+            ?: throw IOException("Quelle im Transaktionsjournal fehlt")
+        when {
+            target.isFile || source.isFile -> deleteRecoveredFile(staged)
+            else -> {
+                source.parentFile?.let { parent ->
+                    if (!parent.isDirectory && !parent.mkdirs()) {
+                        throw IOException("Quellordner konnte nicht wiederhergestellt werden")
+                    }
+                }
+                if (!staged.renameTo(source)) {
+                    copyVerified(staged, source) {}
+                    if (!staged.delete()) {
+                        throw IOException("Temporäre Quelldatei konnte nicht entfernt werden")
+                    }
+                }
+            }
+        }
+    }
+
+    private fun deleteRecoveredFile(file: File) {
+        if (file.exists() && !file.delete()) {
+            throw IOException("Temporäre Datei konnte nicht entfernt werden: ${file.absolutePath}")
+        }
+    }
+
+    private fun cleanupJournals(items: Collection<StagedTarget>) {
+        items.forEach { it.journal.delete() }
     }
 
     private fun copyVerified(source: File, target: File, onBytes: (Long) -> Unit) {
@@ -317,12 +432,25 @@ class ArchiveRomExtractor @Inject constructor(
         /** Safety margin so the volume is not filled to the last byte. */
         private const val SPACE_MARGIN_BYTES = 64L * MB
         private const val BACKUP_SUFFIX = ".thor-backup"
+        private const val TRANSACTION_SUFFIX = ".txn"
+        private const val TRANSACTION_TEMP_SUFFIX = ".txn.tmp"
         private const val PARTIAL_RETENTION_MILLIS = 24L * 60 * 60 * 1000
+
+        private const val JOURNAL_KIND = "kind"
+        private const val JOURNAL_STAGED_NAME = "stagedName"
+        private const val JOURNAL_TARGET_PATH = "targetPath"
+        private const val JOURNAL_SOURCE_PATH = "sourcePath"
+    }
+
+    private enum class TransactionKind(val id: String) {
+        EXTRACT("extract"),
+        MOVE("move"),
     }
 
     private data class StagedTarget(
         val target: File,
         val staged: File,
+        val journal: File,
         var backup: File? = null,
         var committed: Boolean = false,
     )
