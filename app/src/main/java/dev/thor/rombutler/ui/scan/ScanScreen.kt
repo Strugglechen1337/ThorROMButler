@@ -178,7 +178,18 @@ fun ScanScreen(
         },
     ) { innerPadding ->
         // Crossfade between scanning / empty / results
+        // Soft theme-colored glow at the top fading into the background —
+        // gives the flat dark surface some depth.
+        val glowTop = MaterialTheme.colorScheme.primary.copy(alpha = 0.10f)
         AnimatedContent(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    androidx.compose.ui.graphics.Brush.verticalGradient(
+                        colors = listOf(glowTop, androidx.compose.ui.graphics.Color.Transparent),
+                        endY = 900f,
+                    ),
+                ),
             targetState = state,
             transitionSpec = { fadeIn(tween(250)) togetherWith fadeOut(tween(250)) },
             contentKey = { it::class },
@@ -188,6 +199,11 @@ fun ScanScreen(
                 ScanUiState.Scanning -> ScanningIndicator(Modifier.padding(innerPadding))
                 ScanUiState.PermissionMissing -> PermissionMissingState(Modifier.padding(innerPadding))
                 ScanUiState.Empty -> EmptyState(Modifier.padding(innerPadding))
+                is ScanUiState.Failed -> ScanFailedState(
+                    message = s.message,
+                    onRetry = viewModel::rescan,
+                    modifier = Modifier.padding(innerPadding),
+                )
                 is ScanUiState.Found -> ArchiveList(
                     items = s.items,
                     looseRoms = s.looseRoms,
@@ -292,6 +308,38 @@ private fun PermissionMissingState(modifier: Modifier = Modifier) {
         }) {
             Text(stringResource(R.string.setup_permission_button))
         }
+    }
+}
+
+/** Shown when the folder scan threw — explains and offers a retry. */
+@Composable
+private fun ScanFailedState(message: String, onRetry: () -> Unit, modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(horizontal = 32.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Icon(
+            imageVector = Icons.Filled.Warning,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.error,
+            modifier = Modifier.size(48.dp),
+        )
+        Spacer(Modifier.size(12.dp))
+        Text(
+            text = stringResource(R.string.scan_failed_title),
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.onBackground,
+        )
+        Text(
+            text = message,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Spacer(Modifier.size(16.dp))
+        Button(onClick = onRetry) { Text(stringResource(R.string.scan_failed_retry)) }
     }
 }
 

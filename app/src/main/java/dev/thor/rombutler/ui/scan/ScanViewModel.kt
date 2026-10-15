@@ -49,6 +49,9 @@ sealed interface ScanUiState {
     /** All-files permission was revoked after setup — scanning is impossible. */
     data object PermissionMissing : ScanUiState
 
+    /** The folder scan itself failed (I/O or permission problem). */
+    data class Failed(val message: String) : ScanUiState
+
     /** Scan finished without finding any archives or loose ROMs. */
     data object Empty : ScanUiState
 
@@ -159,13 +162,23 @@ class ScanViewModel @Inject constructor(
         scanJob = viewModelScope.launch {
             // The four folder walks are independent and I/O bound — running
             // them concurrently cuts the wait on big libraries noticeably.
-            val (archives, looseRoms, patches, biosScan) = coroutineScope {
-                val a = async { archiveRepository.scanForArchives() }
-                val l = async { looseRomRepository.scanAndDetect() }
-                val p = async { patchScanner.findPairs() }
-                val b = async { biosSorter.scan() }
-                ScanResults(a.await(), l.await(), p.await(), b.await())
+            // An unreadable folder or odd file must show an error card with
+            // a retry button — never take the whole app down.
+            val results = try {
+                coroutineScope {
+                    val a = async { archiveRepository.scanForArchives() }
+                    val l = async { looseRomRepository.scanAndDetect() }
+                    val p = async { patchScanner.findPairs() }
+                    val b = async { biosSorter.scan() }
+                    ScanResults(a.await(), l.await(), p.await(), b.await())
+                }
+            } catch (cancellation: kotlinx.coroutines.CancellationException) {
+                throw cancellation
+            } catch (error: Exception) {
+                _uiState.value = ScanUiState.Failed(error.message ?: error.javaClass.simpleName)
+                return@launch
             }
+            val (archives, looseRoms, patches, biosScan) = results
             if (archives.isEmpty() && looseRoms.isEmpty() && patches.isEmpty() &&
                 biosScan.files.isEmpty()
             ) {

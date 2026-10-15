@@ -47,7 +47,8 @@ class LooseRomScanner @Inject constructor(
                 val byName = dirFiles.associateBy { it.name }
                 val textContents = dirFiles
                     .filter { it.extension.lowercase() in TEXT_EXTENSIONS && it.length() <= MAX_TEXT_BYTES }
-                    .associate { it.name to it.readText() }
+                    .mapNotNull { f -> runCatching { f.name to f.readText() }.getOrNull() }
+                    .toMap()
 
                 grouper.group(byName.keys.toList(), textContents).map { group ->
                     val primary = byName.getValue(group.primary)

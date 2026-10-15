@@ -40,7 +40,8 @@ class FileLogRepository @Inject constructor(
     override val entries: StateFlow<List<LogEntry>> = _entries
 
     init {
-        scope.launch { _entries.value = load() }
+        // A corrupt/unreadable log must never crash the app at start-up
+        scope.launch { _entries.value = runCatching { load() }.getOrDefault(emptyList()) }
     }
 
     override suspend fun append(level: LogLevel, message: String, undo: UndoInfo?) =
@@ -53,11 +54,14 @@ class FileLogRepository @Inject constructor(
                     undo = undo,
                 )
                 val updated = (listOf(entry) + _entries.value).take(MAX_ENTRIES)
-                if (updated.size < _entries.value.size + 1) {
-                    // Rotation kicked in: rewrite the file with the kept set
-                    rewrite(updated)
-                } else {
-                    logFile.appendText(entry.toLine() + "\n")
+                // Disk full / IO error: keep the in-memory entry, never crash the caller
+                runCatching {
+                    if (updated.size < _entries.value.size + 1) {
+                        // Rotation kicked in: rewrite the file with the kept set
+                        rewrite(updated)
+                    } else {
+                        logFile.appendText(entry.toLine() + "\n")
+                    }
                 }
                 _entries.value = updated
             }

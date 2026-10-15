@@ -100,6 +100,8 @@ Full details in the changelog on GitHub.</string>
     <!-- Review screen -->
     <string name="scan_to_review">Review assignments</string>
     <string name="scan_analyzing_wait">Analysis running …</string>
+    <string name="scan_failed_title">The scan failed</string>
+    <string name="scan_failed_retry">Try again</string>
     <string name="scan_analyzing_progress">Analysis running … %1$d / %2$d</string>
     <string name="review_title">Assignment</string>
     <string name="review_source">from %1$s · %2$s</string>
