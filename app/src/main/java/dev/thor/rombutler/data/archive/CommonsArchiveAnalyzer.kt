@@ -37,7 +37,20 @@ class CommonsArchiveAnalyzer @Inject constructor(
     // runInterruptible: on timeout/rescan the blocked read is interrupted
     // instead of lingering in the background and piling up threads/memory.
     override suspend fun analyze(archive: RomArchive): ArchiveAnalysis =
-        runInterruptible(ioDispatcher) { analyzeBlocking(archive) }
+        runInterruptible(ioDispatcher) {
+            // LZMA/Deflate decoding is CPU heavy; at normal priority it can
+            // starve the UI thread on handhelds and make the app look frozen.
+            runCatching {
+                android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND)
+            }
+            try {
+                analyzeBlocking(archive)
+            } finally {
+                runCatching {
+                    android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_DEFAULT)
+                }
+            }
+        }
 
     private fun analyzeBlocking(archive: RomArchive): ArchiveAnalysis {
         if (!archive.type.supported) {

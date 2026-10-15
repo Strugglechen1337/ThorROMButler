@@ -378,6 +378,24 @@ private fun ArchiveList(
                 modifier = Modifier.padding(bottom = 4.dp),
             )
         }
+        if (items.any { it.analysis == null }) {
+            item(key = "progress", span = { GridItemSpan(maxLineSpan) }) {
+                val done = items.count { it.analysis != null }
+                androidx.compose.foundation.layout.Column {
+                    Text(
+                        text = stringResource(R.string.scan_analyzing_progress, done, items.size),
+                        style = MaterialTheme.typography.titleSmall,
+                        color = MaterialTheme.colorScheme.primary,
+                    )
+                    Spacer(Modifier.size(6.dp))
+                    androidx.compose.material3.LinearProgressIndicator(
+                        progress = { done.toFloat() / items.size.coerceAtLeast(1) },
+                        modifier = Modifier.fillMaxWidth(),
+                        color = MaterialTheme.colorScheme.primary,
+                    )
+                }
+            }
+        }
         if (patches.isNotEmpty()) {
             item(key = "patches") {
                 PatchesCard(

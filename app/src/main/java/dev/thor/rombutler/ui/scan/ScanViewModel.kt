@@ -7,6 +7,7 @@ import dev.thor.rombutler.data.patch.PatchPair
 import dev.thor.rombutler.data.patch.PatchScanner
 import dev.thor.rombutler.data.update.UpdateAvailability
 import dev.thor.rombutler.domain.model.ArchiveAnalysis
+import dev.thor.rombutler.domain.model.ArchiveType
 import dev.thor.rombutler.domain.model.DetectedRom
 import dev.thor.rombutler.domain.model.RomArchive
 import dev.thor.rombutler.domain.repository.ArchiveAnalyzer
@@ -187,6 +188,8 @@ class ScanViewModel @Inject constructor(
             // result re-diffed the whole grid per archive and froze the UI.
             // Results are therefore collected and flushed in batches.
             val semaphore = Semaphore(2)
+            // Solid 7z/LZMA2 needs lots of RAM and CPU — never two at once.
+            val sevenZipSemaphore = Semaphore(1)
             val pending = LinkedHashMap<String, ArchiveAnalysis>()
             fun flush() {
                 val batch = synchronized(pending) {
@@ -213,7 +216,11 @@ class ScanViewModel @Inject constructor(
                 val workers = archives.map { archive ->
                     launch {
                         semaphore.withPermit {
-                            val analysis = analyzeWithTimeout(archive)
+                            val analysis = if (archive.type == ArchiveType.SEVEN_ZIP) {
+                                sevenZipSemaphore.withPermit { analyzeWithTimeout(archive) }
+                            } else {
+                                analyzeWithTimeout(archive)
+                            }
                             synchronized(pending) { pending[archive.path] = analysis }
                         }
                     }
