@@ -2,6 +2,22 @@
 
 All notable user-facing changes are documented here.
 
+## 1.9.5
+
+### Deutsch
+
+- Kein Einfrieren mehr bei der Zuordnung großer Sammlungen: Zuordnung in
+  Paketen, Ordnerprüfung nur einmal pro System.
+- „Alle übernehmen“ und „Fehlende Ordner anlegen“ deutlich schneller.
+- Fehlender ROM-Basisordner führt nicht mehr zum Absturz.
+
+### English
+
+- No more freezing when assigning large collections: batched assignment,
+  one folder check per system.
+- "Accept all" and "Create missing folders" are much faster.
+- A missing ROM base folder no longer crashes the app.
+
 ## 1.9.4
 
 ### Deutsch

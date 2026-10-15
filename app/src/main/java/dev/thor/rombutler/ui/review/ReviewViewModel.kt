@@ -96,6 +96,9 @@ internal fun ReviewItem.resolveTask(system: SystemDefinition): ResolvedReviewTas
 
 private val PACKED_ARCHIVE_SYSTEM_IDS = setOf("arcade", "neogeo")
 
+/** Items per published UI-state update while applying many selections. */
+private const val SELECTION_CHUNK = 250
+
 /**
  * One ROM (group) awaiting user review.
  *
@@ -252,10 +255,62 @@ class ReviewViewModel @Inject constructor(
         _uiState.value = ReviewUiState(items = items)
 
         // Core rule: only CERTAIN detections get their target prefilled.
-        for (item in items) {
-            val system = item.rom.detection.system
-            if (system != null && item.rom.detection.confidence == Confidence.CERTAIN) {
-                selectSystem(item.id, system.id)
+        // One batched pass — launching a coroutine plus a full list copy per
+        // item froze the screen on libraries with thousands of ROMs.
+        applySelections(
+            items.mapNotNull { item ->
+                val system = item.rom.detection.system
+                if (system != null && item.rom.detection.confidence == Confidence.CERTAIN) {
+                    Selection(item.id, system.id, remember = false)
+                } else {
+                    null
+                }
+            },
+        )
+    }
+
+    /** One system choice for one review item. */
+    private data class Selection(val itemId: String, val systemId: String, val remember: Boolean)
+
+    /**
+     * Applies many system choices at once: folder lookups are cached per
+     * system and the UI state is published in chunks instead of per item.
+     */
+    private suspend fun applySelections(selections: List<Selection>) {
+        if (selections.isEmpty()) return
+        val existsCache = HashMap<String, Boolean>()
+        for (chunk in selections.chunked(SELECTION_CHUNK)) {
+            val updates = HashMap<String, ReviewItem>(chunk.size)
+            val current = _uiState.value.items.associateBy { it.id }
+            for (selection in chunk) {
+                val system = registry.byId(selection.systemId) ?: continue
+                val item = current[selection.itemId] ?: continue
+                val updated = try {
+                    val path = targetDirFor(item, system)
+                    val exists = existsCache.getOrPut(system.id) { folderRepository.folderExists(system) }
+                    val targetNames = if (item.resolveTask(system).keepsArchivePacked) {
+                        listOf((item.source as RomSource.ArchiveFallback).archiveFileName)
+                    } else {
+                        item.rom.group.members
+                    }
+                    item.copy(
+                        selectedSystemId = system.id,
+                        targetPath = path,
+                        targetExists = exists,
+                        targetOccupied = folderRepository.anyFileExists(path, targetNames),
+                        overwrite = false,
+                        learnSelection = selection.remember,
+                    )
+                } catch (error: CancellationException) {
+                    throw error
+                } catch (_: Exception) {
+                    // e.g. ROM base folder not configured — leave item unassigned
+                    null
+                }
+                if (updated != null) updates[item.id] = updated
+            }
+            _uiState.update { state ->
+                state.copy(items = state.items.map { updates[it.id] ?: it })
             }
         }
     }
@@ -277,53 +332,29 @@ class ReviewViewModel @Inject constructor(
         systemId: String,
         rememberChoice: Boolean = false,
     ) {
-        val system = registry.byId(systemId) ?: return
+        if (registry.byId(systemId) == null) return
         viewModelScope.launch {
-            val item = _uiState.value.items.find { it.id == itemId } ?: return@launch
-            val path = targetDirFor(item, system)
-            val exists = folderRepository.folderExists(system)
-            val resolved = item.resolveTask(system)
-            val targetNames = if (resolved.keepsArchivePacked) {
-                listOf((item.source as RomSource.ArchiveFallback).archiveFileName)
-            } else {
-                item.rom.group.members
-            }
-            val occupied = folderRepository.anyFileExists(path, targetNames)
-            _uiState.update { state ->
-                state.copy(
-                    items = state.items.map { current ->
-                        if (current.id == itemId) {
-                            current.copy(
-                                selectedSystemId = system.id,
-                                targetPath = path,
-                                targetExists = exists,
-                                targetOccupied = occupied,
-                                overwrite = false,
-                                learnSelection = rememberChoice,
-                            )
-                        } else {
-                            current
-                        }
-                    },
-                )
-            }
+            applySelections(listOf(Selection(itemId, systemId, rememberChoice)))
         }
     }
 
     /** Confirms every open PROBABLE suggestion in one go. */
     fun acceptAllSuggestions() {
-        for (item in _uiState.value.items) {
-            val system = item.rom.detection.system ?: continue
+        val selections = _uiState.value.items.mapNotNull { item ->
+            val system = item.rom.detection.system ?: return@mapNotNull null
             if (item.selectedSystemId == null &&
                 item.rom.detection.confidence == Confidence.PROBABLE
             ) {
-                selectSystem(
+                Selection(
                     itemId = item.id,
                     systemId = system.id,
-                    rememberChoice = item.rom.detection.source == MatchSource.LEARNED_ASSIGNMENT,
+                    remember = item.rom.detection.source == MatchSource.LEARNED_ASSIGNMENT,
                 )
+            } else {
+                null
             }
         }
+        viewModelScope.launch { applySelections(selections) }
     }
 
     /** User decision to replace existing duplicate files at the target. */
@@ -376,14 +407,11 @@ class ReviewViewModel @Inject constructor(
                     .onSuccess { created++ }
                     .onFailure { failed++ }
             }
-            val affected = _uiState.value.items.filter { it.selectedSystemId != null }
-            for (item in affected) {
-                selectSystem(
-                    itemId = item.id,
-                    systemId = item.selectedSystemId!!,
-                    rememberChoice = item.learnSelection,
-                )
-            }
+            applySelections(
+                _uiState.value.items.mapNotNull { item ->
+                    item.selectedSystemId?.let { Selection(item.id, it, item.learnSelection) }
+                },
+            )
             _uiState.update {
                 it.copy(
                     creatingFolders = false,

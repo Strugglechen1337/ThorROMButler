@@ -226,7 +226,7 @@ fun ReviewScreen(
             }
             items(state.items, key = { it.id }) { item ->
                 ReviewItemCard(
-                    modifier = Modifier.animateItem(),
+                    modifier = Modifier,
                     item = item,
                     onPickSystem = { pickerItemId = item.id },
                     onAcceptSuggestion = {
