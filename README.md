@@ -30,7 +30,8 @@ läuft aber auf jedem Android-Smartphone ab Android 13.
 ### Features
 
 - 🔍 **Scanner**: findet ROM-Archive (ZIP, 7z, RAR4) **und lose ROM-Dateien**
-  im Download-Ordner und beliebigen weiteren Quellordnern
+  im Download-Ordner und beliebigen weiteren Quellordnern.
+  Auch riesige Sammlungen mit tausenden Archiven bleiben bedienbar (Fortschrittsbalken, geringe Analyse-Priorität).
 - 🧠 **Detection Engine**: bestimmt das Zielsystem über Dateiendungen und Magic
   Bytes (inkl. ISO-, RVZ- und CHD-Header) - mit ehrlichen Confidence-Leveln
   (*sicher* / *wahrscheinlich* / *unbekannt*)
@@ -103,8 +104,9 @@ läuft aber auf jedem Android-Smartphone ab Android 13.
 - 🧩 **Anpassbare Systemordner**: Ordnernamen pro System überschreibbar
   (z. B. `roms/ps1` statt `roms/psx`) — oder per **Frontend-Profil** alle
   Ordner in einem Schritt auf Batocera/Knulli oder Onion OS (Miyoo) stellen
-- 🌍 Deutsch & Englisch · 🌙 **Thor-Design**: Dark Mode only, Neonblau & Gold,
-  dezente Glow-Effekte
+- 🌍 Deutsch & Englisch · 🌙 **Thor-Design**: Dark Mode only, fünf Farbthemes
+  (Thor, Odin, CRT, Ragnarök, Aurora), Neon-Look mit
+  dezenten Glow-Effekten
 
 ### Unterstützte Systeme
 
@@ -228,7 +230,8 @@ newer.
 ### Features
 
 - 🔍 **Scanner**: finds ROM archives (ZIP, 7z, RAR4) **and loose ROM files**
-  in the Downloads folder and any number of additional source folders
+  in the Downloads folder and any number of additional source folders.
+  Even huge collections with thousands of archives stay responsive (progress bar, low analysis priority).
 - 🧠 **Detection engine**: identifies the target system from file extensions and
   magic bytes, including ISO, RVZ, and CHD headers, with honest confidence levels
   (*certain* / *probable* / *unknown*)
@@ -295,7 +298,8 @@ newer.
 - 🧩 **Customizable system folders**: override folder names per system
   (e.g. `roms/ps1` instead of `roms/psx`) — or use a **frontend profile**
   to switch all folders to Batocera/Knulli or Onion OS (Miyoo) in one step
-- 🌍 German & English · 🌙 **Thor design**: dark mode only, neon blue and gold,
+- 🌍 German & English · 🌙 **Thor design**: dark mode only, five color themes
+  (Thor, Odin, CRT, Ragnarök, Aurora), neon look with
   subtle glow effects
 
 ### Supported Systems

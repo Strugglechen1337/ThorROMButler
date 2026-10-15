@@ -2,6 +2,22 @@
 
 All notable user-facing changes are documented here.
 
+## 1.9.4
+
+### Deutsch
+
+- Scan-Fehler zeigen eine Fehlerkarte mit „Erneut versuchen“ statt Absturz.
+- Nicht lesbare `.cue`-/`.m3u`-Dateien brechen den Scan nicht mehr ab.
+- Beschädigtes Log oder volles Laufwerk führt nicht mehr zum Absturz.
+- Sanfter Farbverlauf im Scan-Screen.
+
+### English
+
+- Scan errors show an error card with "Try again" instead of crashing.
+- Unreadable `.cue`/`.m3u` files no longer abort the scan.
+- A corrupt log or a full disk no longer causes a crash.
+- Soft color gradient on the scan screen.
+
 ## 1.9.3
 
 ### Deutsch
