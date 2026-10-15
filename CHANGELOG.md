@@ -2,6 +2,24 @@
 
 All notable user-facing changes are documented here.
 
+## 1.9.2
+
+### Deutsch
+
+- Kein Einfrieren mehr beim Analysieren sehr großer ROM-Sammlungen: Ergebnisse
+  werden gebündelt angezeigt, Platzierungsanimationen auf den Karten entfallen.
+- Fortschrittsanzeige „Analyse läuft … x / y“ im Review-Button.
+- Archive, ROMs, Patches und BIOS-Dateien werden parallel gesucht.
+- Hängende Archiv-Analysen werden nach dem Zeitlimit tatsächlich unterbrochen.
+
+### English
+
+- No more freezing while analyzing very large ROM collections: results are
+  shown in batches and per-card placement animations were removed.
+- Progress display "Analysis running … x / y" on the review button.
+- Archives, loose ROMs, patches and BIOS files are searched in parallel.
+- Hanging archive analyses are actually interrupted after the time limit.
+
 ## 1.9.1
 
 ### Deutsch

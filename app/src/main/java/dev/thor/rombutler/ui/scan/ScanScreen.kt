@@ -110,7 +110,11 @@ fun ScanScreen(
                             text = if (found.analysisComplete) {
                                 stringResource(R.string.scan_to_review)
                             } else {
-                                stringResource(R.string.scan_analyzing_wait)
+                                stringResource(
+                                    R.string.scan_analyzing_progress,
+                                    found.analyzedCount,
+                                    found.items.size,
+                                )
                             },
                             style = MaterialTheme.typography.labelLarge,
                         )

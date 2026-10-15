@@ -17,7 +17,12 @@
 
     <!-- What's new (update every release!) -->
     <string name="whatsnew_title">New in version %s</string>
-    <string name="whatsnew_body">• More resilient sorting after an unexpected app or process interruption\n• Large partial files are cleaned automatically before the next attempt\n• Interrupted loose-ROM moves can be restored safely\n\nFull details in the changelog on GitHub.</string>
+    <string name="whatsnew_body">• No more freezing while analyzing very large ROM collections
+• Progress display "Analysis running … x / y"
+• Faster scan: folders are searched in parallel
+• Stuck archive analyses are now cancelled cleanly
+
+Full details in the changelog on GitHub.</string>
 
     <!-- Setup screen -->
     <string name="setup_title">Setup</string>
@@ -95,6 +100,7 @@
     <!-- Review screen -->
     <string name="scan_to_review">Review assignments</string>
     <string name="scan_analyzing_wait">Analysis running …</string>
+    <string name="scan_analyzing_progress">Analysis running … %1$d / %2$d</string>
     <string name="review_title">Assignment</string>
     <string name="review_source">from %1$s · %2$s</string>
     <string name="review_source_with_members">from %1$s · %2$d files · %3$s</string>

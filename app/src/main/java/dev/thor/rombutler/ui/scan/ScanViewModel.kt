@@ -70,6 +70,9 @@ sealed interface ScanUiState {
         /** All analyses finished? */
         val analysisComplete: Boolean get() = items.all { it.analysis != null }
 
+        /** Number of archives whose analysis already finished. */
+        val analyzedCount: Int get() = items.count { it.analysis != null }
+
         /**
          * Anything to review? Unknown non-BIOS archive members can be assigned
          * manually and are extracted unless the user selects a packed system.
@@ -83,6 +86,14 @@ sealed interface ScanUiState {
                 }
     }
 }
+
+/** Results of the concurrent folder walks. */
+private data class ScanResults(
+    val archives: List<RomArchive>,
+    val looseRoms: List<DetectedRom>,
+    val patches: List<PatchPair>,
+    val bios: dev.thor.rombutler.data.files.BiosScan,
+)
 
 @HiltViewModel
 class ScanViewModel @Inject constructor(
@@ -145,10 +156,15 @@ class ScanViewModel @Inject constructor(
         }
         _uiState.value = ScanUiState.Scanning
         scanJob = viewModelScope.launch {
-            val archives = archiveRepository.scanForArchives()
-            val looseRoms = looseRomRepository.scanAndDetect()
-            val patches = patchScanner.findPairs()
-            val biosScan = biosSorter.scan()
+            // The four folder walks are independent and I/O bound — running
+            // them concurrently cuts the wait on big libraries noticeably.
+            val (archives, looseRoms, patches, biosScan) = coroutineScope {
+                val a = async { archiveRepository.scanForArchives() }
+                val l = async { looseRomRepository.scanAndDetect() }
+                val p = async { patchScanner.findPairs() }
+                val b = async { biosSorter.scan() }
+                ScanResults(a.await(), l.await(), p.await(), b.await())
+            }
             if (archives.isEmpty() && looseRoms.isEmpty() && patches.isEmpty() &&
                 biosScan.files.isEmpty()
             ) {
