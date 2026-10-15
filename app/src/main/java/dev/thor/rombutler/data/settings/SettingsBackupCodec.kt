@@ -203,5 +203,5 @@ object SettingsBackupCodec {
     private const val MAX_SOURCE_PATHS = 64
     private const val MAX_FOLDER_OVERRIDES = 256
     private const val MAX_PATH_LENGTH = 4096
-    private val SUPPORTED_THEMES = setOf("thor", "odin", "crt")
+    private val SUPPORTED_THEMES = setOf("thor", "odin", "crt", "ragnarok", "aurora")
 }

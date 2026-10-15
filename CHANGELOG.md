@@ -2,6 +2,24 @@
 
 All notable user-facing changes are documented here.
 
+## 1.9.3
+
+### Deutsch
+
+- Archiv-Analyse mit niedriger Priorität: die Oberfläche bleibt auch bei
+  tausenden Archiven bedienbar.
+- Immer nur ein 7z/LZMA2-Archiv gleichzeitig (weniger Speicherdruck).
+- Fortschrittsbalken „Analyse läuft … x / y“ oben in der Liste.
+- Zwei neue Farbthemes: Ragnarök und Aurora.
+
+### English
+
+- Archive analysis runs at low priority: the UI stays usable even with
+  thousands of archives.
+- Only one 7z/LZMA2 archive is analyzed at a time (less memory pressure).
+- Progress bar "Analysis running … x / y" at the top of the list.
+- Two new color themes: Ragnarök and Aurora.
+
 ## 1.9.2
 
 ### Deutsch

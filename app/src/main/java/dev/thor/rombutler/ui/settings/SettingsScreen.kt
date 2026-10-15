@@ -570,12 +570,16 @@ fun SettingsScreen(
                     color = MaterialTheme.colorScheme.onSurface,
                 )
                 Spacer(Modifier.size(10.dp))
-                Row {
-                    for (theme in dev.thor.rombutler.ui.theme.AppThemes.ALL) {
+                // Three per row so five themes stay readable on narrow phones
+                for (rowThemes in dev.thor.rombutler.ui.theme.AppThemes.ALL.chunked(3)) {
+                Row(modifier = Modifier.padding(bottom = 8.dp)) {
+                    for (theme in rowThemes) {
                         val selected = settings.themeId == theme
                         val label = when (theme) {
                             dev.thor.rombutler.ui.theme.AppThemes.ODIN -> "Odin"
                             dev.thor.rombutler.ui.theme.AppThemes.CRT -> "CRT"
+                            dev.thor.rombutler.ui.theme.AppThemes.RAGNAROK -> "Ragnarök"
+                            dev.thor.rombutler.ui.theme.AppThemes.AURORA -> "Aurora"
                             else -> "Thor"
                         }
                         if (selected) {
@@ -589,10 +593,11 @@ fun SettingsScreen(
                                 modifier = Modifier.weight(1f),
                             ) { Text(label) }
                         }
-                        if (theme != dev.thor.rombutler.ui.theme.AppThemes.ALL.last()) {
+                        if (theme != rowThemes.last()) {
                             Spacer(Modifier.width(8.dp))
                         }
                     }
+                }
                 }
             }
 

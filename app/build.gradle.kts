@@ -26,8 +26,8 @@ android {
         applicationId = "dev.thor.rombutler"
         minSdk = 33
         targetSdk = 37
-        versionCode = 33
-        versionName = "1.9.2"
+        versionCode = 34
+        versionName = "1.9.3"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

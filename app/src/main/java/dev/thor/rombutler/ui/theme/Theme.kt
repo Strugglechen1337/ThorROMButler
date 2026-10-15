@@ -88,12 +88,64 @@ private val CrtColorScheme = ThorColorScheme.copy(
     tertiary = Color(0xFFFDE68A),
 )
 
+/**
+ * Ragnarök variant: glowing ember orange on a deep crimson-black sky.
+ */
+private val RagnarokColorScheme = ThorColorScheme.copy(
+    primary = Color(0xFFFF7A3D),
+    onPrimary = Color(0xFF3A1200),
+    primaryContainer = Color(0xFF8A3A12),
+    onPrimaryContainer = Color(0xFFFFD6BF),
+    secondary = Color(0xFFFFC857),
+    onSecondary = Color(0xFF3A2A00),
+    secondaryContainer = Color(0xFF8A6A1D),
+    onSecondaryContainer = Color(0xFFFFE9B0),
+    tertiary = Color(0xFFFFE9B0),
+    background = Color(0xFF0E0707),
+    surface = Color(0xFF1A0E0C),
+    surfaceVariant = Color(0xFF281613),
+    surfaceContainer = Color(0xFF1A0E0C),
+    surfaceContainerLow = Color(0xFF1A0E0C),
+    surfaceContainerLowest = Color(0xFF0E0707),
+    surfaceContainerHigh = Color(0xFF281613),
+    surfaceContainerHighest = Color(0xFF3A1F19),
+    outline = Color(0xFF5C3328),
+    outlineVariant = Color(0xFF3A1F19),
+)
+
+/**
+ * Aurora variant: teal and magenta northern lights over a deep green-black sky.
+ */
+private val AuroraColorScheme = ThorColorScheme.copy(
+    primary = Color(0xFF2DE2C4),
+    onPrimary = Color(0xFF00382F),
+    primaryContainer = Color(0xFF0F6B5C),
+    onPrimaryContainer = Color(0xFFB4F5EA),
+    secondary = Color(0xFFFF6FD0),
+    onSecondary = Color(0xFF47002F),
+    secondaryContainer = Color(0xFF8A2D6C),
+    onSecondaryContainer = Color(0xFFFFD3F0),
+    tertiary = Color(0xFFFFD3F0),
+    background = Color(0xFF040B0E),
+    surface = Color(0xFF0A1619),
+    surfaceVariant = Color(0xFF112326),
+    surfaceContainer = Color(0xFF0A1619),
+    surfaceContainerLow = Color(0xFF0A1619),
+    surfaceContainerLowest = Color(0xFF040B0E),
+    surfaceContainerHigh = Color(0xFF112326),
+    surfaceContainerHighest = Color(0xFF1A3438),
+    outline = Color(0xFF244A50),
+    outlineVariant = Color(0xFF16302F),
+)
+
 /** Valid theme ids (see AppSettings.themeId). */
 object AppThemes {
     const val THOR = "thor"
     const val ODIN = "odin"
     const val CRT = "crt"
-    val ALL = listOf(THOR, ODIN, CRT)
+    const val RAGNAROK = "ragnarok"
+    const val AURORA = "aurora"
+    val ALL = listOf(THOR, ODIN, CRT, RAGNAROK, AURORA)
 }
 
 /**
@@ -107,6 +159,8 @@ fun ThorRomButlerTheme(themeId: String = AppThemes.THOR, content: @Composable ()
         colorScheme = when (themeId) {
             AppThemes.ODIN -> OdinColorScheme
             AppThemes.CRT -> CrtColorScheme
+            AppThemes.RAGNAROK -> RagnarokColorScheme
+            AppThemes.AURORA -> AuroraColorScheme
             else -> ThorColorScheme
         },
         typography = ThorTypography,
