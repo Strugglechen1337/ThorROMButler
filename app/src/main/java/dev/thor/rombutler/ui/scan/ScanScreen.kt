@@ -402,7 +402,9 @@ private fun ArchiveList(
             }
         }
         items(items, key = { it.archive.path }) { item ->
-            ArchiveCard(item, modifier = Modifier.animateItem())
+            // No animateItem here: with thousands of cards, placement
+            // animations on every batch update made the grid stutter.
+            ArchiveCard(item)
         }
     }
 }

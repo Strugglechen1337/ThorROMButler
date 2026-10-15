@@ -16,6 +16,8 @@ import dev.thor.rombutler.ui.review.ReviewSession
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.withTimeoutOrNull
@@ -164,27 +166,45 @@ class ScanViewModel @Inject constructor(
             // Two analyses in parallel: disk-bound, but one slow/broken
             // archive must not stall all the others. Each card fills in
             // as soon as its analysis finishes.
+            //
+            // On big libraries (thousands of archives) publishing every single
+            // result re-diffed the whole grid per archive and froze the UI.
+            // Results are therefore collected and flushed in batches.
             val semaphore = Semaphore(2)
+            val pending = LinkedHashMap<String, ArchiveAnalysis>()
+            fun flush() {
+                val batch = synchronized(pending) {
+                    if (pending.isEmpty()) return
+                    HashMap(pending).also { pending.clear() }
+                }
+                _uiState.update { state ->
+                    if (state !is ScanUiState.Found) return@update state
+                    state.copy(
+                        items = state.items.map { item ->
+                            val done = batch[item.archive.path]
+                            if (done != null) item.copy(analysis = done) else item
+                        },
+                    )
+                }
+            }
             coroutineScope {
-                for (archive in archives) {
+                val flusher = launch {
+                    while (true) {
+                        delay(FLUSH_INTERVAL_MS)
+                        flush()
+                    }
+                }
+                val workers = archives.map { archive ->
                     launch {
                         semaphore.withPermit {
                             val analysis = analyzeWithTimeout(archive)
-                            _uiState.update { state ->
-                                if (state !is ScanUiState.Found) return@update state
-                                state.copy(
-                                    items = state.items.map { item ->
-                                        if (item.archive.path == archive.path) {
-                                            item.copy(analysis = analysis)
-                                        } else {
-                                            item
-                                        }
-                                    },
-                                )
-                            }
+                            synchronized(pending) { pending[archive.path] = analysis }
                         }
                     }
                 }
+                workers.joinAll()
+                flusher.cancel()
+                flush()
             }
         }
     }
@@ -266,5 +286,6 @@ class ScanViewModel @Inject constructor(
 
     private companion object {
         const val ANALYSIS_TIMEOUT_MS = 90_000L
+        const val FLUSH_INTERVAL_MS = 400L
     }
 }

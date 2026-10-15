@@ -11,7 +11,7 @@ import dev.thor.rombutler.domain.model.DetectedRom
 import dev.thor.rombutler.domain.model.RomArchive
 import dev.thor.rombutler.domain.repository.ArchiveAnalyzer
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.runInterruptible
 import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -34,14 +34,19 @@ class CommonsArchiveAnalyzer @Inject constructor(
     @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ArchiveAnalyzer {
 
-    override suspend fun analyze(archive: RomArchive): ArchiveAnalysis = withContext(ioDispatcher) {
+    // runInterruptible: on timeout/rescan the blocked read is interrupted
+    // instead of lingering in the background and piling up threads/memory.
+    override suspend fun analyze(archive: RomArchive): ArchiveAnalysis =
+        runInterruptible(ioDispatcher) { analyzeBlocking(archive) }
+
+    private fun analyzeBlocking(archive: RomArchive): ArchiveAnalysis {
         if (!archive.type.supported) {
-            return@withContext ArchiveAnalysis.Unsupported(archive)
+            return ArchiveAnalysis.Unsupported(archive)
         }
         val file = File(archive.path)
         val source = sourceFactory.forType(archive.type)
 
-        try {
+        return try {
             val entries = source.listEntries(file)
 
             // BIOS/firmware files are not games — keep them out of review.
