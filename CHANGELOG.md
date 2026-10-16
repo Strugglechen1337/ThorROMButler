@@ -2,6 +2,30 @@
 
 All notable user-facing changes are documented here.
 
+## 1.9.6
+
+### Deutsch
+
+- Acht neue Systeme: MSX, ColecoVision, Vectrex, Pokémon Mini, PICO-8,
+  ZX Spectrum, Amstrad CPC, Game & Watch.
+- Kurze Ordnernamen (FC, SFC, MD, PS, FBA, cps, WSWAN, G&W …) dienen als
+  Hinweis für ROMs und Archive; Vorschläge bleiben bestätigungspflichtig.
+- Arcade-/Neo-Geo-ZIPs in passenden Ordnern erhalten einen Vorschlag.
+- PS1-EBOOT.PBP wird über den Ordnerhinweis zugeordnet.
+- Was-ist-neu-Dialog zeigt wieder die aktuellen Hinweise.
+- Farbverlauf im Review-Screen.
+
+### English
+
+- Eight new systems: MSX, ColecoVision, Vectrex, Pokémon Mini, PICO-8,
+  ZX Spectrum, Amstrad CPC, Game & Watch.
+- Short folder names (FC, SFC, MD, PS, FBA, cps, WSWAN, G&W …) act as a hint
+  for ROMs and archives; suggestions still require confirmation.
+- Arcade / Neo Geo ZIPs in matching folders get a suggestion.
+- PS1 EBOOT.PBP is matched through the folder hint.
+- The "what's new" dialog shows the current notes again.
+- Color gradient on the review screen.
+
 ## 1.9.5
 
 ### Deutsch

@@ -67,7 +67,8 @@
         "cue": "PROBABLE",
         "m3u": "PROBABLE",
         "bin": "UNKNOWN",
-        "chd": "UNKNOWN"
+        "chd": "UNKNOWN",
+        "pbp": "UNKNOWN"
       },
       "magicRuleIds": ["chd-cd"]
     },
@@ -238,6 +239,54 @@
       "displayName": "Neo Geo",
       "folder": "neogeo",
       "extensions": {}
+    },
+    {
+      "id": "msx",
+      "displayName": "MSX",
+      "folder": "msx",
+      "extensions": { "mx1": "CERTAIN", "mx2": "CERTAIN", "rom": "UNKNOWN" }
+    },
+    {
+      "id": "colecovision",
+      "displayName": "ColecoVision",
+      "folder": "colecovision",
+      "extensions": { "col": "CERTAIN" }
+    },
+    {
+      "id": "vectrex",
+      "displayName": "Vectrex",
+      "folder": "vectrex",
+      "extensions": { "vec": "CERTAIN" }
+    },
+    {
+      "id": "pokemini",
+      "displayName": "Pokémon Mini",
+      "folder": "pokemini",
+      "extensions": { "min": "CERTAIN" }
+    },
+    {
+      "id": "pico8",
+      "displayName": "PICO-8",
+      "folder": "pico8",
+      "extensions": { "p8": "CERTAIN" }
+    },
+    {
+      "id": "zxspectrum",
+      "displayName": "ZX Spectrum",
+      "folder": "zxspectrum",
+      "extensions": { "z80": "CERTAIN", "tzx": "CERTAIN", "sna": "CERTAIN" }
+    },
+    {
+      "id": "amstradcpc",
+      "displayName": "Amstrad CPC",
+      "folder": "amstradcpc",
+      "extensions": { "cdt": "CERTAIN" }
+    },
+    {
+      "id": "gameandwatch",
+      "displayName": "Game & Watch",
+      "folder": "gameandwatch",
+      "extensions": { "mgw": "CERTAIN" }
     }
   ]
 }

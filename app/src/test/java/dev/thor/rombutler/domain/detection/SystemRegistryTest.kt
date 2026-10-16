@@ -17,6 +17,8 @@ class SystemRegistryTest {
             "saturn", "atari2600", "arcade", "neogeo",
             "atari7800", "atarilynx", "pcengine", "sega32x",
             "ngp", "ngpc", "wonderswan", "wonderswancolor",
+            "msx", "colecovision", "vectrex", "pokemini", "pico8",
+            "zxspectrum", "amstradcpc", "gameandwatch",
         )
         assertThat(registry.systems.map { it.id }.toSet()).isEqualTo(expected)
     }

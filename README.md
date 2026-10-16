@@ -115,7 +115,12 @@ Nintendo DS · Nintendo 3DS · PlayStation 1 · PlayStation 2 · PSP · GameCube
 Wii · Wii U · Dreamcast · Switch · Amiga · C64 · Mega Drive · Master System ·
 Game Gear · Saturn · Sega 32X · Atari 2600 · Atari 7800 · Atari Lynx ·
 PC Engine / TurboGrafx-16 · Neo Geo Pocket (Color) · WonderSwan (Color) ·
-Arcade (MAME) · Neo Geo
+Arcade (MAME) · Neo Geo · MSX · ColecoVision · Vectrex · Pokémon Mini · PICO-8 ·
+ZX Spectrum · Amstrad CPC · Game & Watch
+
+Kurze Ordnernamen wie `FC`, `SFC`, `MD`, `PS`, `FBA`, `cps` oder `WSWAN`
+(OnionOS-/MiyooCFW-/ArkOS-Sammlungen) werden als Hinweis erkannt: ROMs und
+Archive darin bekommen einen gelben Vorschlag, den du bestätigst.
 
 GameCube- und Wii-Abbilder im CISO-Format werden anhand des enthaltenen
 Disc-Headers unterschieden - auch wenn die CISO-Datei in ZIP, 7z oder RAR4
@@ -309,7 +314,12 @@ Nintendo DS · Nintendo 3DS · PlayStation 1 · PlayStation 2 · PSP · GameCube
 Wii · Wii U · Dreamcast · Switch · Amiga · C64 · Mega Drive · Master System ·
 Game Gear · Saturn · Sega 32X · Atari 2600 · Atari 7800 · Atari Lynx ·
 PC Engine / TurboGrafx-16 · Neo Geo Pocket (Color) · WonderSwan (Color) ·
-Arcade (MAME) · Neo Geo
+Arcade (MAME) · Neo Geo · MSX · ColecoVision · Vectrex · Pokémon Mini · PICO-8 ·
+ZX Spectrum · Amstrad CPC · Game & Watch
+
+Short folder names such as `FC`, `SFC`, `MD`, `PS`, `FBA`, `cps`, or `WSWAN`
+(OnionOS / MiyooCFW / ArkOS style collections) are used as a hint: ROMs and
+archives inside get a yellow suggestion that you confirm.
 
 GameCube and Wii images in CISO format are distinguished through their embedded
 disc header, including CISO files packed inside ZIP, 7z, or RAR4. Invalid or

@@ -1,6 +1,7 @@
 package dev.thor.rombutler.ui.review
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -205,7 +206,17 @@ fun ReviewScreen(
         // Adaptive grid: two+ columns on wide/landscape screens (AYN Thor!)
         LazyVerticalGrid(
             columns = GridCells.Adaptive(minSize = 340.dp),
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    androidx.compose.ui.graphics.Brush.verticalGradient(
+                        colors = listOf(
+                            MaterialTheme.colorScheme.primary.copy(alpha = 0.10f),
+                            androidx.compose.ui.graphics.Color.Transparent,
+                        ),
+                        endY = 900f,
+                    ),
+                ),
             contentPadding = PaddingValues(
                 start = 16.dp,
                 end = 16.dp,

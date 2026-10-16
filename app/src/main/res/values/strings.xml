@@ -17,12 +17,7 @@
 
     <!-- What's new (update every release!) -->
     <string name="whatsnew_title">New in version %s</string>
-    <string name="whatsnew_body">• No more freezing while analyzing very large ROM collections
-• Progress display "Analysis running … x / y"
-• Faster scan: folders are searched in parallel
-• Stuck archive analyses are now cancelled cleanly
-
-Full details in the changelog on GitHub.</string>
+    <string name="whatsnew_body">• 8 new systems: MSX, ColecoVision, Vectrex, Pokémon Mini, PICO-8, ZX Spectrum, Amstrad CPC, Game &amp; Watch\n• Short folder names (FC, SFC, MD, PS, FBA, cps …) are used as a hint\n• Arcade / Neo Geo ZIPs in matching folders get a suggestion right away\n• PS1 EBOOT.PBP files are matched to the right system\n• Fixed: the \"what\'s new\" dialog now shows the current notes\n\nFull details in the changelog on GitHub.</string>
 
     <!-- Setup screen -->
     <string name="setup_title">Setup</string>

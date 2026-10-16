@@ -331,6 +331,64 @@ class DetectionEngineTest {
         assertThat(engine.isRomFileName("noextension")).isFalse()
     }
 
+    // --- handheld-OS style folder collections (OnionOS / MiyooCFW / ArkOS) ---
+
+    @Test
+    fun `new unique extensions are certain`() {
+        val cases = mapOf(
+            "Game.col" to "colecovision",
+            "Asteroids.vec" to "vectrex",
+            "Tetris.min" to "pokemini",
+            "Celeste.p8" to "pico8",
+            "Manic Miner.z80" to "zxspectrum",
+            "Game.mx1" to "msx",
+            "Game.cdt" to "amstradcpc",
+            "Octopus.mgw" to "gameandwatch",
+        )
+        for ((fileName, systemId) in cases) {
+            val result = engine.detect(fileName)
+            assertThat(result.system?.id).isEqualTo(systemId)
+            assertThat(result.confidence).isEqualTo(Confidence.CERTAIN)
+        }
+    }
+
+    @Test
+    fun `pbp is unknown without hint and psx with PS folder`() {
+        assertThat(engine.detect("EBOOT.PBP").confidence).isEqualTo(Confidence.UNKNOWN)
+
+        val hinted = engine.detect("EBOOT.PBP", folderHint = "PS")
+        assertThat(hinted.system?.id).isEqualTo("psx")
+        assertThat(hinted.confidence).isEqualTo(Confidence.PROBABLE)
+        assertThat(hinted.source).isEqualTo(MatchSource.FOLDER_HINT)
+    }
+
+    @Test
+    fun `generic rom extension needs the MSX folder`() {
+        assertThat(engine.detect("Game.rom").confidence).isEqualTo(Confidence.UNKNOWN)
+        assertThat(engine.detect("Game.rom", folderHint = "MSX").system?.id).isEqualTo("msx")
+    }
+
+    @Test
+    fun `short folder names resolve to their system`() {
+        val aliases = mapOf(
+            "FC" to "nes", "SFC" to "snes", "SMD" to "megadrive", "MD" to "megadrive",
+            "PS" to "psx", "FBA" to "arcade", "cps" to "arcade", "MAME" to "arcade",
+            "G&W" to "gameandwatch", "PICO-8" to "pico8", "z80" to "zxspectrum",
+            "AMSTRAD" to "amstradcpc", "COLECOVISION" to "colecovision", "WSWAN" to "wonderswan",
+        )
+        val registry = SystemRegistry()
+        for ((folder, systemId) in aliases) {
+            assertThat(registry.systemForFolderName(folder)?.id).isEqualTo(systemId)
+        }
+    }
+
+    @Test
+    fun `ambiguous bin in MD folder becomes a probable mega drive`() {
+        val result = engine.detect("Sonic.bin", folderHint = "MD")
+        assertThat(result.system?.id).isEqualTo("megadrive")
+        assertThat(result.confidence).isEqualTo(Confidence.PROBABLE)
+    }
+
     private fun cisoHeader(gameCube: Boolean): ByteArray = ByteArray(0x9000).also { header ->
         "CISO".toByteArray(Charsets.US_ASCII).copyInto(header)
         header[6] = 0x20 // 2 MiB block size, little-endian

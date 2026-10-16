@@ -112,6 +112,7 @@ internal object LegacySystemDefinitions {
                 "m3u" to PROBABLE,  // multi-disc playlists: PS1 convention
                 "bin" to UNKNOWN,   // listed for bin+cue grouping only
                 "chd" to UNKNOWN,
+                "pbp" to UNKNOWN,  // PS1 EBOOT.PBP — ambiguous with PSP, folder hint decides
             ),
             magicRules = listOf(
                 // CD-type CHD: PS1 / Saturn / Dreamcast / PCE share the
@@ -383,6 +384,66 @@ internal object LegacySystemDefinitions {
             esdeFolder = "neogeo",
             extensions = emptyMap(),
         ),
+
+        SystemDefinition(
+            id = "msx",
+            displayName = "MSX",
+            esdeFolder = "msx",
+            extensions = mapOf("mx1" to CERTAIN, "mx2" to CERTAIN, "rom" to UNKNOWN),
+        ),
+
+        SystemDefinition(
+            id = "colecovision",
+            displayName = "ColecoVision",
+            esdeFolder = "colecovision",
+            extensions = mapOf("col" to CERTAIN),
+        ),
+
+        SystemDefinition(
+            id = "vectrex",
+            displayName = "Vectrex",
+            esdeFolder = "vectrex",
+            extensions = mapOf("vec" to CERTAIN),
+        ),
+
+        SystemDefinition(
+            id = "pokemini",
+            displayName = "Pokémon Mini",
+            esdeFolder = "pokemini",
+            extensions = mapOf("min" to CERTAIN),
+        ),
+
+        SystemDefinition(
+            id = "pico8",
+            displayName = "PICO-8",
+            esdeFolder = "pico8",
+            extensions = mapOf("p8" to CERTAIN),
+        ),
+
+        SystemDefinition(
+            id = "zxspectrum",
+            displayName = "ZX Spectrum",
+            esdeFolder = "zxspectrum",
+            extensions = mapOf(
+                "z80" to CERTAIN,
+                "tzx" to CERTAIN,
+                "sna" to CERTAIN,
+            ),
+        ),
+
+        SystemDefinition(
+            id = "amstradcpc",
+            displayName = "Amstrad CPC",
+            esdeFolder = "amstradcpc",
+            extensions = mapOf("cdt" to CERTAIN),
+        ),
+
+        SystemDefinition(
+            id = "gameandwatch",
+            displayName = "Game & Watch",
+            esdeFolder = "gameandwatch",
+            extensions = mapOf("mgw" to CERTAIN),
+        ),
     )
 
 }
@@ -466,6 +527,14 @@ class SystemRegistry private constructor(
         "turbografx" to "pcengine", "turbografx16" to "pcengine",
         "tg16" to "pcengine", "pce" to "pcengine", "ws" to "wonderswan",
         "wsc" to "wonderswancolor", "mame" to "arcade",
+        // Folder names used by OnionOS/MiyooCFW/ArkOS-style collections
+        "fc" to "nes", "sfc" to "snes", "smd" to "megadrive", "ps" to "psx",
+        "wswan" to "wonderswan", "fba" to "arcade", "cps" to "arcade",
+        "cps1" to "arcade", "cps2" to "arcade", "cps3" to "arcade",
+        "coleco" to "colecovision", "pico-8" to "pico8", "z80" to "zxspectrum",
+        "zx" to "zxspectrum", "amstrad" to "amstradcpc", "cpc" to "amstradcpc",
+        "g&w" to "gameandwatch", "gw" to "gameandwatch", "pokémon mini" to "pokemini",
+        "ngpc" to "ngpc", "neo-geo" to "neogeo",
     )
 
     init {

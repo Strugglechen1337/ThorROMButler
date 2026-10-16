@@ -76,9 +76,12 @@ class CommonsArchiveAnalyzer @Inject constructor(
 
             // Name-based detection first; collect everything that needs
             // bytes from the archive (cue/m3u texts + magic-byte headers).
+            // Folder hint: directory inside the archive first, then the folder
+            // the archive itself lives in ("MD/", "SFC/", ...) as fallback.
+            val outerHint = file.parentFile?.name?.takeIf { it.isNotEmpty() }
             val nameDetections = romEntries.associate { entry ->
                 val hint = entry.path.entryDirectory().substringAfterLast('/')
-                    .takeIf { it.isNotEmpty() }
+                    .takeIf { it.isNotEmpty() } ?: outerHint
                 entry.path to engine.detect(entry.path.entryFileName(), folderHint = hint)
             }
             val prefixRequests = buildMap {
@@ -127,6 +130,7 @@ class CommonsArchiveAnalyzer @Inject constructor(
                             byName = nameDetections.getValue(primaryEntry.path),
                             entry = primaryEntry,
                             prefixes = prefixes,
+                            outerHint = outerHint,
                         )
                         DetectedRom(
                             group = group,
@@ -189,11 +193,12 @@ class CommonsArchiveAnalyzer @Inject constructor(
         byName: dev.thor.rombutler.domain.model.DetectionResult,
         entry: ArchiveEntry,
         prefixes: Map<String, ByteArray>,
+        outerHint: String?,
     ): dev.thor.rombutler.domain.model.DetectionResult {
         if (byName.confidence == Confidence.CERTAIN) return byName
         val header = prefixes[entry.path] ?: return byName
         val folderHint = entry.path.entryDirectory().substringAfterLast('/')
-            .takeIf { it.isNotEmpty() }
+            .takeIf { it.isNotEmpty() } ?: outerHint
         val byMagic = engine.detect(entry.path.entryFileName(), header, folderHint)
 
         // Keep the better of the two (magic can only upgrade, not downgrade).

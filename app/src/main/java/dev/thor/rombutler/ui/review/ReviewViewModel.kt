@@ -222,7 +222,14 @@ class ReviewViewModel @Inject constructor(
                                 members = memberNames,
                             ),
                             memberEntryPaths = analysis.fallbackMembers.map { it.path },
-                            detection = DetectionResult.UNKNOWN,
+                            // Archive lies in "FBA/", "NEOGEO/", ... → suggest that system
+                            // (still PROBABLE: the user confirms it).
+                            detection = registry
+                                .systemForFolderName(
+                                    java.io.File(analysis.archive.path).parentFile?.name.orEmpty(),
+                                )
+                                ?.let { DetectionResult(it, Confidence.PROBABLE, MatchSource.FOLDER_HINT) }
+                                ?: DetectionResult.UNKNOWN,
                             totalSizeBytes = analysis.fallbackMembers.sumOf { it.sizeBytes },
                         ),
                     ),
