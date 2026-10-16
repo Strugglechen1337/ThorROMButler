@@ -510,19 +510,23 @@ class ReviewViewModel @Inject constructor(
 
     /** Learns only choices whose file operation actually completed successfully. */
     private suspend fun rememberSuccessfulChoices(processedIds: Set<String>) {
-        _uiState.value.items
-            .filter { it.id in processedIds && it.learnSelection }
-            .forEach { item ->
-                val extension = item.learningExtension() ?: return@forEach
-                val systemId = item.selectedSystemId ?: return@forEach
-                try {
-                    settingsRepository.rememberAssignment(extension, systemId)
-                } catch (error: CancellationException) {
-                    throw error
-                } catch (_: Exception) {
-                    // Learning is optional and must never block a completed sort run.
-                }
-            }
+        // Aggregate first: thousands of ROMs share a handful of (extension,
+        // system) pairs, so one batched write replaces one disk write per ROM.
+        val counts = HashMap<Pair<String, String>, Int>()
+        for (item in _uiState.value.items) {
+            if (item.id !in processedIds || !item.learnSelection) continue
+            val extension = item.learningExtension() ?: continue
+            val systemId = item.selectedSystemId ?: continue
+            counts.merge(extension to systemId, 1, Int::plus)
+        }
+        if (counts.isEmpty()) return
+        try {
+            settingsRepository.rememberAssignments(counts)
+        } catch (error: CancellationException) {
+            throw error
+        } catch (_: Exception) {
+            // Learning is optional and must never block a completed sort run.
+        }
     }
 
     private fun ReviewItem.withLearnedSuggestion(settings: AppSettings): ReviewItem {

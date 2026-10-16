@@ -2,6 +2,22 @@
 
 All notable user-facing changes are documented here.
 
+## 1.9.7
+
+### Deutsch
+
+- Schnellerer Abschluss nach dem Einsortieren großer Mengen: Gelerntes wird
+  gebündelt gespeichert statt pro ROM.
+- Das Aktions-Log wird nur noch gelegentlich neu geschrieben.
+- Neuer Konsistenztest für Version, Changelog, Release-Notizen und Was-ist-neu.
+
+### English
+
+- Faster finish after sorting large collections: learning is saved in one
+  batch instead of per ROM.
+- The action log is only compacted occasionally.
+- New consistency test for version, changelog, release notes, and what's new.
+
 ## 1.9.6
 
 ### Deutsch

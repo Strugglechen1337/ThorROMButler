@@ -34,6 +34,9 @@ class FileLogRepository @Inject constructor(
 
     private val logFile: File get() = File(context.filesDir, FILE_NAME)
     private val mutex = Mutex()
+
+    /** Lines currently in the file (guarded by [mutex] after start-up). */
+    private var fileLines = 0
     private val scope = CoroutineScope(SupervisorJob() + ioDispatcher)
 
     private val _entries = MutableStateFlow<List<LogEntry>>(emptyList())
@@ -54,13 +57,15 @@ class FileLogRepository @Inject constructor(
                     undo = undo,
                 )
                 val updated = (listOf(entry) + _entries.value).take(MAX_ENTRIES)
-                // Disk full / IO error: keep the in-memory entry, never crash the caller
+                // Disk full / IO error: keep the in-memory entry, never crash the caller.
+                // Rotation is lazy: the file may grow by ROTATE_SLACK lines before it is
+                // rewritten, so a long sorting run does not rewrite the log per ROM.
                 runCatching {
-                    if (updated.size < _entries.value.size + 1) {
-                        // Rotation kicked in: rewrite the file with the kept set
+                    logFile.appendText(entry.toLine() + "\n")
+                    fileLines++
+                    if (fileLines > MAX_ENTRIES + ROTATE_SLACK) {
                         rewrite(updated)
-                    } else {
-                        logFile.appendText(entry.toLine() + "\n")
+                        fileLines = updated.size
                     }
                 }
                 _entries.value = updated
@@ -77,6 +82,7 @@ class FileLogRepository @Inject constructor(
                 }
             }
             rewrite(updated)
+            fileLines = updated.size
             _entries.value = updated
         }
     }
@@ -84,6 +90,7 @@ class FileLogRepository @Inject constructor(
     override suspend fun clear() = withContext(ioDispatcher) {
         mutex.withLock {
             logFile.delete()
+            fileLines = 0
             _entries.value = emptyList()
         }
     }
@@ -96,9 +103,12 @@ class FileLogRepository @Inject constructor(
 
     private fun load(): List<LogEntry> {
         if (!logFile.isFile) return emptyList()
-        return logFile.readLines()
+        val lines = logFile.readLines()
+        fileLines = lines.size
+        return lines
             .mapNotNull { it.toEntryOrNull() }
             .asReversed() // file is oldest-first, UI wants newest-first
+            .take(MAX_ENTRIES)
     }
 
     companion object {
@@ -106,6 +116,9 @@ class FileLogRepository @Inject constructor(
 
         /** Rotation cap — the log must not grow unbounded. */
         private const val MAX_ENTRIES = 500
+
+        /** Extra lines tolerated in the file before it is compacted. */
+        private const val ROTATE_SLACK = 200
 
         // Line format v2: ts \t level \t undone(0/1) \t undoJson("-" = none) \t message
         // (message last because it is the only free-text field). v1 lines

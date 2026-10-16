@@ -16,7 +16,7 @@
 
     <!-- What's new (pro Release aktualisieren!) -->
     <string name="whatsnew_title">Neu in Version %s</string>
-    <string name="whatsnew_body">• 8 neue Systeme: MSX, ColecoVision, Vectrex, Pokémon Mini, PICO-8, ZX Spectrum, Amstrad CPC, Game &amp; Watch\n• Kurze Ordnernamen (FC, SFC, MD, PS, FBA, cps …) werden als Hinweis erkannt\n• Arcade-/Neo-Geo-ZIPs in passenden Ordnern bekommen direkt einen Vorschlag\n• PS1-EBOOT.PBP wird dem richtigen System zugeordnet\n• Behoben: Der Was-ist-neu-Dialog zeigt jetzt die aktuellen Hinweise\n\nAlle Details im Changelog auf GitHub.</string>
+    <string name="whatsnew_body">• Deutlich schnellerer Abschluss nach dem Einsortieren tausender ROMs\n• Das Aktions-Log schreibt sich nicht mehr bei jedem Eintrag neu\n• Das Lernen aus deinen Zuordnungen wird einmal statt pro ROM gespeichert\n\nAlle Details im Changelog auf GitHub.</string>
 
     <!-- Setup screen -->
     <string name="setup_title">Einrichtung</string>

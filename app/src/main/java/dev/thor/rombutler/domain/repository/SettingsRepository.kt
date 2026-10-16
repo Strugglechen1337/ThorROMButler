@@ -78,6 +78,17 @@ interface SettingsRepository {
     /** Records one successfully processed, user-confirmed extension assignment. */
     suspend fun rememberAssignment(extension: String, systemId: String)
 
+    /**
+     * Records many confirmations in one go ((extension, systemId) -> count).
+     * The default replays [rememberAssignment]; the DataStore override writes
+     * once instead of once per ROM.
+     */
+    suspend fun rememberAssignments(counts: Map<Pair<String, String>, Int>) {
+        for ((key, count) in counts) {
+            repeat(count) { rememberAssignment(key.first, key.second) }
+        }
+    }
+
     /** Deletes every locally learned assignment. */
     suspend fun clearLearnedAssignments()
 

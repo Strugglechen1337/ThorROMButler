@@ -200,6 +200,20 @@ class SettingsDataStore @Inject constructor(
         }
     }
 
+    override suspend fun rememberAssignments(counts: Map<Pair<String, String>, Int>) {
+        if (counts.isEmpty()) return
+        dataStore.edit { prefs ->
+            if (prefs[Keys.ASSIGNMENT_LEARNING] == false) return@edit
+            var current = prefs[Keys.LEARNED_ASSIGNMENTS].parseLearnedAssignments()
+            for ((key, count) in counts) {
+                repeat(count) {
+                    current = AssignmentAdvisor.remember(current, key.first, key.second)
+                }
+            }
+            prefs[Keys.LEARNED_ASSIGNMENTS] = current.toJson()
+        }
+    }
+
     override suspend fun clearLearnedAssignments() {
         dataStore.edit { it.remove(Keys.LEARNED_ASSIGNMENTS) }
     }
