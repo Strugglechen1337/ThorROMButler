@@ -29,6 +29,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -487,7 +488,7 @@ private fun DoctorFindingCard(
     var expanded by remember(title) { mutableStateOf(false) }
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
     ) {
         Column(Modifier.padding(14.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -648,7 +649,7 @@ private fun DoctorReadinessCard(
     val tint = if (ready) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.primary
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
     ) {
         Column(Modifier.padding(14.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -675,7 +676,7 @@ private fun DoctorReadinessCard(
             }
             if (action != null && onAction != null) {
                 Spacer(Modifier.size(8.dp))
-                OutlinedButton(onClick = onAction, modifier = Modifier.fillMaxWidth()) {
+                FilledTonalButton(onClick = onAction, modifier = Modifier.fillMaxWidth()) {
                     Text(action)
                 }
             }
@@ -698,7 +699,7 @@ private fun DuplicateCheck(
 
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
     ) {
         Column(Modifier.padding(14.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {

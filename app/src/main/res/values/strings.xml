@@ -53,6 +53,7 @@
     <string name="scan_permission_missing">File access was revoked</string>
     <string name="scan_permission_missing_hint">Without the "manage all files" permission the butler cannot scan or sort.</string>
     <string name="scan_empty_hint">No archives (ZIP, 7z, RAR) and no loose ROM files in the download folder.</string>
+    <string name="scan_found_summary">%1$d certain · %2$d to review</string>
     <string name="scan_found_count">%d found</string>
     <string name="scan_loose_title">Loose ROM files (%d)</string>
     <string name="scan_rar5_unsupported">RAR5 is not supported – please download as ZIP or 7z.</string>

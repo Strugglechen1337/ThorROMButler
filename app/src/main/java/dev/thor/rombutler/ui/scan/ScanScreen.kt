@@ -62,6 +62,7 @@ import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.thor.rombutler.R
 import dev.thor.rombutler.domain.model.ArchiveAnalysis
+import dev.thor.rombutler.domain.model.Confidence
 import dev.thor.rombutler.domain.model.ArchiveType
 import dev.thor.rombutler.domain.model.DetectedRom
 import dev.thor.rombutler.ui.components.ConfidenceChip
@@ -419,12 +420,29 @@ private fun ArchiveList(
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         item(span = { GridItemSpan(maxLineSpan) }) {
-            Text(
-                text = stringResource(R.string.scan_found_count, items.size + looseRoms.size),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(bottom = 4.dp),
-            )
+            val detected = items.mapNotNull { it.analysis as? ArchiveAnalysis.Success }
+                .flatMap { it.roms } + looseRoms
+            val certain = detected.count { it.detection.confidence == Confidence.CERTAIN }
+            val analysisDone = items.none { it.analysis == null }
+            Column(modifier = Modifier.padding(bottom = 4.dp)) {
+                Text(
+                    text = stringResource(R.string.scan_found_count, items.size + looseRoms.size),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                if (analysisDone && detected.isNotEmpty()) {
+                    // At-a-glance triage: what is safe vs. what needs a decision
+                    Text(
+                        text = stringResource(
+                            R.string.scan_found_summary,
+                            certain,
+                            detected.size - certain,
+                        ),
+                        style = MaterialTheme.typography.titleSmall,
+                        color = MaterialTheme.colorScheme.primary,
+                    )
+                }
+            }
         }
         if (items.any { it.analysis == null }) {
             item(key = "progress", span = { GridItemSpan(maxLineSpan) }) {
