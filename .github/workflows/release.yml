@@ -18,6 +18,10 @@ on:
         description: "Release tag to build, e.g. v0.4.0"
         required: true
         type: string
+      ref:
+        description: "Optional commit/branch to build and tag (default: the tag itself). Use it to create a new tag from main."
+        required: false
+        type: string
 
 jobs:
   release:
@@ -30,7 +34,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ env.RELEASE_TAG }}
+          ref: ${{ (github.event_name == 'workflow_dispatch' && inputs.ref) || env.RELEASE_TAG }}
 
       - uses: actions/setup-java@v4
         with:
@@ -104,6 +108,8 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.RELEASE_TAG }}
+          # Creates the tag at the built commit if it does not exist yet
+          target_commitish: ${{ github.sha }}
           body_path: release-notes.md
           files: ThorROMButler-${{ env.RELEASE_TAG }}.apk
           overwrite_files: true
