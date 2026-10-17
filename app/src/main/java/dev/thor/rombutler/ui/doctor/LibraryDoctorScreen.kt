@@ -30,6 +30,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -331,15 +332,28 @@ private fun DoctorReport(
                 modifier = Modifier.padding(top = 8.dp, bottom = 2.dp),
             )
         }
-        item { BiosReadiness(report, onConfigure) }
-        item { DatReadiness(report, onConfigure) }
         item {
-            BackupReadiness(
-                report = report,
-                runState = backupRunState,
-                onStartBackup = onStartBackup,
-                onConfigure = onConfigure,
-            )
+            // One grouped card instead of three separate ones: ready items
+            // stay a single compact row, only open items show an action.
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                ),
+            ) {
+                Column(Modifier.padding(horizontal = 14.dp, vertical = 4.dp)) {
+                    BiosReadiness(report, onConfigure)
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                    DatReadiness(report, onConfigure)
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                    BackupReadiness(
+                        report = report,
+                        runState = backupRunState,
+                        onStartBackup = onStartBackup,
+                        onConfigure = onConfigure,
+                    )
+                }
+            }
         }
         item {
             DuplicateCheck(
@@ -647,11 +661,8 @@ private fun DoctorReadinessCard(
     progress: Float? = null,
 ) {
     val tint = if (ready) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.primary
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
-    ) {
-        Column(Modifier.padding(14.dp)) {
+    run {
+        Column(Modifier.padding(vertical = 10.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(icon, contentDescription = null, tint = tint)
                 Spacer(Modifier.width(10.dp))
@@ -676,8 +687,10 @@ private fun DoctorReadinessCard(
             }
             if (action != null && onAction != null) {
                 Spacer(Modifier.size(8.dp))
-                FilledTonalButton(onClick = onAction, modifier = Modifier.fillMaxWidth()) {
-                    Text(action)
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                    FilledTonalButton(onClick = onAction) {
+                        Text(action)
+                    }
                 }
             }
         }

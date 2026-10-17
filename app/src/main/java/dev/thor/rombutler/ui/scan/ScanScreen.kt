@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -103,8 +104,10 @@ fun ScanScreen(
                         enabled = found.analysisComplete,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(16.dp)
-                            .height(52.dp)
+                            // Keep the button clear of the gesture handle (edge-to-edge)
+                            .navigationBarsPadding()
+                            .padding(horizontal = 24.dp, vertical = 12.dp)
+                            .height(48.dp)
                             .then(if (found.analysisComplete) Modifier.goldGlow() else Modifier),
                     ) {
                         Text(
