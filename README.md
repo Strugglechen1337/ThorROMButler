@@ -71,7 +71,7 @@ läuft aber auf jedem Android-Smartphone ab Android 13.
 - 🩺 **Bibliotheks-Doktor**: zentraler Gesundheitscheck für falsch
   einsortierte ROMs, defekte M3U-/CUE-Verweise, unlesbare Arcade-/Neo-Geo-ZIPs,
   Varianten sowie BIOS-, DAT- und Sicherungsbereitschaft. Sichere Reparaturen,
-  Details, Ausblenden pro Lauf, Markdown-Bericht und optionaler SHA-256-Lauf.
+  Details, Ausblenden pro Lauf, Markdown-Bericht und optionaler SHA-256-Lauf mit Wegräumen exakter Duplikate (verschoben, nicht gelöscht).
   Bei mehreren Regionen/Revisionen empfiehlt er unverbindlich eine zur
   Gerätesprache passende, saubere und möglichst aktuelle Variante.
 - 💾 **ROM-Sicherung mit Wiederherstellung**: das komplette ROM-Verzeichnis
@@ -273,7 +273,7 @@ newer.
 - 🩺 **Library Doctor**: central health check for misplaced ROMs, broken
   M3U/CUE references, unreadable Arcade/Neo Geo ZIPs, variants, and BIOS, DAT,
   and backup readiness. Safe repairs, per-run hiding, a Markdown report, and
-  an optional memory-efficient SHA-256 pass. For multiple regions or revisions
+  an optional memory-efficient SHA-256 pass with cleanup of exact duplicates (moved, not deleted). For multiple regions or revisions
   it can recommend a clean, current variant suited to the device language,
   without deleting anything.
 - 💾 **ROM library backup & restore**: mirror the complete ROM folder 1:1
