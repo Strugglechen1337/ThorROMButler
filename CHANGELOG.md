@@ -2,6 +2,24 @@
 
 All notable user-facing changes are documented here.
 
+## 1.10.1
+
+### Deutsch
+
+- Bibliotheks-Doktor: BIOS-, DAT- und Sicherungs-Bereitschaft in einer
+  gemeinsamen Karte, Aktions-Buttons rechts.
+- Scan-Screen: kompakterer Hauptbutton mit Abstand zur Gestenleiste.
+- Einstellungs-Screen intern in Karten-Bausteine aufgeteilt, neue
+  Performance-Tests für 10.000 ROMs.
+
+### English
+
+- Library Doctor: BIOS, DAT, and backup readiness in one shared card, action
+  buttons on the right.
+- Scan screen: more compact main button that clears the gesture bar.
+- Settings screen split into card components internally, new performance
+  tests for 10,000 ROMs.
+
 ## 1.10.0
 
 ### Deutsch
