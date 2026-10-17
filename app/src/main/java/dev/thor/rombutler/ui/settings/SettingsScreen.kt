@@ -204,1022 +204,95 @@ fun SettingsScreen(
             verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {
             // Folders
-            SettingsCard {
-                FolderRow(
-                    icon = Icons.Filled.Download,
-                    title = stringResource(R.string.setup_download_title),
-                    path = settings.downloadPath,
-                    onClick = { showDownloadPicker = true },
-                )
-                Spacer(Modifier.size(12.dp))
-                FolderRow(
-                    icon = Icons.Filled.Folder,
-                    title = stringResource(R.string.setup_rombase_title),
-                    path = settings.romBasePath,
-                    onClick = { showRomBasePicker = true },
-                )
-                Spacer(Modifier.size(12.dp))
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Column(
-                        modifier = Modifier
-                            .weight(1f)
-                            .clickable { showDatPicker = true },
-                    ) {
-                        Text(
-                            text = stringResource(R.string.settings_dat_title),
-                            style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.onSurface,
-                        )
-                        Text(
-                            text = settings.datFolderPath
-                                ?: stringResource(R.string.settings_dat_hint),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            maxLines = 2,
-                        )
-                    }
-                    if (settings.datFolderPath != null) {
-                        IconButton(onClick = { viewModel.setDatFolderPath(null) }) {
-                            Icon(
-                                imageVector = Icons.Filled.Delete,
-                                contentDescription = stringResource(R.string.settings_sources_remove),
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                        }
-                    }
-                }
-                Spacer(Modifier.size(12.dp))
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Column(
-                        modifier = Modifier
-                            .weight(1f)
-                            .clickable { showBiosPicker = true },
-                    ) {
-                        Text(
-                            text = stringResource(R.string.settings_bios_title),
-                            style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.onSurface,
-                        )
-                        Text(
-                            text = settings.biosFolderPath
-                                ?: stringResource(R.string.settings_bios_hint),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            maxLines = 2,
-                        )
-                    }
-                    if (settings.biosFolderPath != null) {
-                        IconButton(onClick = { viewModel.setBiosFolderPath(null) }) {
-                            Icon(
-                                imageVector = Icons.Filled.Delete,
-                                contentDescription = stringResource(R.string.settings_sources_remove),
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                        }
-                    }
-                }
-                val suggestion = biosSuggestion
-                if (settings.biosFolderPath == null && suggestion != null) {
-                    Spacer(Modifier.size(8.dp))
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                text = stringResource(
-                                    R.string.settings_bios_suggestion,
-                                    suggestion.path,
-                                ),
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.primary,
-                                maxLines = 2,
-                            )
-                            Text(
-                                text = stringResource(
-                                    when {
-                                        suggestion.containsBios ->
-                                            R.string.settings_bios_suggestion_found
-
-                                        suggestion.exists ->
-                                            R.string.settings_bios_suggestion_existing
-
-                                        else -> R.string.settings_bios_suggestion_create
-                                    },
-                                ),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                        }
-                        Spacer(Modifier.width(12.dp))
-                        Button(onClick = { viewModel.applyBiosSuggestion(suggestion) }) {
-                            Text(stringResource(R.string.settings_bios_suggestion_apply))
-                        }
-                    }
-                }
-            }
+            FoldersCard(
+                settings = settings,
+                viewModel = viewModel,
+                biosSuggestion = biosSuggestion,
+                setShowDownloadPicker = { showDownloadPicker = it },
+                setShowRomBasePicker = { showRomBasePicker = it },
+                setShowBiosPicker = { showBiosPicker = it },
+                setShowDatPicker = { showDatPicker = it },
+            )
 
             // Behavior
-            SettingsCard {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = stringResource(R.string.settings_delete_archives),
-                            style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.onSurface,
-                        )
-                        Text(
-                            text = stringResource(R.string.settings_delete_archives_hint),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                    }
-                    Spacer(Modifier.width(12.dp))
-                    Switch(
-                        checked = settings.deleteArchivesAfterExtract,
-                        onCheckedChange = viewModel::setDeleteArchives,
-                    )
-                }
-                if (settings.deleteArchivesAfterExtract) {
-                    Spacer(Modifier.size(14.dp))
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                text = stringResource(R.string.settings_trash),
-                                style = MaterialTheme.typography.titleMedium,
-                                color = MaterialTheme.colorScheme.onSurface,
-                            )
-                            Text(
-                                text = stringResource(R.string.settings_trash_hint),
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                        }
-                        Spacer(Modifier.width(12.dp))
-                        Switch(
-                            checked = settings.trashInsteadOfDelete,
-                            onCheckedChange = viewModel::setTrashInsteadOfDelete,
-                        )
-                    }
-                }
-                Spacer(Modifier.size(14.dp))
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = stringResource(R.string.settings_auto_update),
-                            style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.onSurface,
-                        )
-                        Text(
-                            text = stringResource(R.string.settings_auto_update_hint),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                    }
-                    Spacer(Modifier.width(12.dp))
-                    Switch(
-                        checked = settings.autoUpdateCheck,
-                        onCheckedChange = viewModel::setAutoUpdateCheck,
-                    )
-                }
-                Spacer(Modifier.size(14.dp))
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = stringResource(R.string.settings_watcher),
-                            style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.onSurface,
-                        )
-                        Text(
-                            text = stringResource(R.string.settings_watcher_hint),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                    }
-                    Spacer(Modifier.width(12.dp))
-                    Switch(
-                        checked = settings.watcherEnabled,
-                        onCheckedChange = viewModel::setWatcherEnabled,
-                    )
-                }
-                Spacer(Modifier.size(14.dp))
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = stringResource(R.string.settings_assignment_learning),
-                            style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.onSurface,
-                        )
-                        Text(
-                            text = stringResource(R.string.settings_assignment_learning_hint),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                    }
-                    Spacer(Modifier.width(12.dp))
-                    Switch(
-                        checked = settings.assignmentLearningEnabled,
-                        onCheckedChange = viewModel::setAssignmentLearningEnabled,
-                    )
-                }
-                if (settings.learnedAssignments.isNotEmpty()) {
-                    Spacer(Modifier.size(8.dp))
-                    Text(
-                        text = pluralStringResource(
-                            R.plurals.settings_assignment_learning_count,
-                            settings.learnedAssignments.size,
-                            settings.learnedAssignments.size,
-                        ),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                    OutlinedButton(
-                        onClick = { showClearLearningConfirm = true },
-                        modifier = Modifier.fillMaxWidth(),
-                    ) {
-                        Icon(Icons.Filled.Delete, contentDescription = null)
-                        Spacer(Modifier.width(8.dp))
-                        Text(stringResource(R.string.settings_assignment_learning_clear))
-                    }
-                }
-                Spacer(Modifier.size(14.dp))
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = stringResource(R.string.settings_m3u),
-                            style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.onSurface,
-                        )
-                        Text(
-                            text = stringResource(R.string.settings_m3u_hint),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                    }
-                    Spacer(Modifier.width(12.dp))
-                    Switch(
-                        checked = settings.writeM3uPlaylists,
-                        onCheckedChange = viewModel::setWriteM3uPlaylists,
-                    )
-                }
-                if (!settings.datFolderPath.isNullOrBlank()) {
-                    Spacer(Modifier.size(14.dp))
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                text = stringResource(R.string.settings_dat_rename),
-                                style = MaterialTheme.typography.titleMedium,
-                                color = MaterialTheme.colorScheme.onSurface,
-                            )
-                            Text(
-                                text = stringResource(R.string.settings_dat_rename_hint),
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                        }
-                        Spacer(Modifier.width(12.dp))
-                        Switch(
-                            checked = settings.renameToDatName,
-                            onCheckedChange = viewModel::setRenameToDatName,
-                        )
-                    }
-                }
-            }
+            BehaviorCard(
+                settings = settings,
+                viewModel = viewModel,
+                setShowClearLearningConfirm = { showClearLearningConfirm = it },
+            )
 
             // Additional source folders (Telegram, USB imports, ...)
-            SettingsCard {
-                Text(
-                    text = stringResource(R.string.settings_sources_title),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurface,
-                )
-                Text(
-                    text = stringResource(R.string.settings_sources_hint),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-                for (path in settings.additionalSourcePaths) {
-                    Spacer(Modifier.size(8.dp))
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(
-                            text = path,
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.primary,
-                            maxLines = 1,
-                            overflow = TextOverflow.StartEllipsis,
-                            modifier = Modifier.weight(1f),
-                        )
-                        IconButton(onClick = { viewModel.removeSourcePath(path) }) {
-                            Icon(
-                                imageVector = Icons.Filled.Delete,
-                                contentDescription = stringResource(R.string.settings_sources_remove),
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                        }
-                    }
-                }
-                Spacer(Modifier.size(8.dp))
-                OutlinedButton(
-                    onClick = { showSourcePicker = true },
-                    modifier = Modifier.fillMaxWidth(),
-                ) { Text(stringResource(R.string.settings_sources_add)) }
-            }
+            SourcesCard(
+                settings = settings,
+                viewModel = viewModel,
+                setShowSourcePicker = { showSourcePicker = it },
+            )
 
             // Settings backup: export/import via JSON in the download folder
-            SettingsCard {
-                SectionHeader(
-                    title = stringResource(R.string.settings_backup_title),
-                    hint = stringResource(R.string.settings_backup_hint),
-                )
-                Spacer(Modifier.size(4.dp))
-                Row {
-                    OutlinedButton(
-                        onClick = {
-                            viewModel.exportSettings { ok ->
-                                android.widget.Toast.makeText(
-                                    context,
-                                    resources.getString(
-                                        if (ok) R.string.settings_backup_done else R.string.settings_backup_failed,
-                                    ),
-                                    android.widget.Toast.LENGTH_SHORT,
-                                ).show()
-                            }
-                        },
-                        modifier = Modifier.weight(1f),
-                    ) { Text(stringResource(R.string.settings_backup_export)) }
-                    Spacer(Modifier.width(10.dp))
-                    OutlinedButton(
-                        onClick = {
-                            viewModel.importSettings { ok ->
-                                android.widget.Toast.makeText(
-                                    context,
-                                    resources.getString(
-                                        if (ok) R.string.settings_backup_done else R.string.settings_backup_failed,
-                                    ),
-                                    android.widget.Toast.LENGTH_SHORT,
-                                ).show()
-                            }
-                        },
-                        modifier = Modifier.weight(1f),
-                    ) { Text(stringResource(R.string.settings_backup_import)) }
-                }
-            }
+            SettingsBackupCard(
+                viewModel = viewModel,
+            )
 
             // Color theme
-            SettingsCard {
-                Text(
-                    text = stringResource(R.string.settings_theme),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurface,
-                )
-                Spacer(Modifier.size(10.dp))
-                // Three per row so five themes stay readable on narrow phones
-                for (rowThemes in dev.thor.rombutler.ui.theme.AppThemes.ALL.chunked(3)) {
-                Row(modifier = Modifier.padding(bottom = 8.dp)) {
-                    for (theme in rowThemes) {
-                        val selected = settings.themeId == theme
-                        val label = when (theme) {
-                            dev.thor.rombutler.ui.theme.AppThemes.ODIN -> "Odin"
-                            dev.thor.rombutler.ui.theme.AppThemes.CRT -> "CRT"
-                            dev.thor.rombutler.ui.theme.AppThemes.RAGNAROK -> "Ragnarök"
-                            dev.thor.rombutler.ui.theme.AppThemes.AURORA -> "Aurora"
-                            else -> "Thor"
-                        }
-                        if (selected) {
-                            Button(
-                                onClick = {},
-                                modifier = Modifier.weight(1f),
-                            ) { Text(label) }
-                        } else {
-                            OutlinedButton(
-                                onClick = { viewModel.setThemeId(theme) },
-                                modifier = Modifier.weight(1f),
-                            ) { Text(label) }
-                        }
-                        if (theme != rowThemes.last()) {
-                            Spacer(Modifier.width(8.dp))
-                        }
-                    }
-                }
-                }
-            }
+            ThemeCard(
+                settings = settings,
+                viewModel = viewModel,
+            )
 
             // LAN receive mode
-            SettingsCard {
-                SectionHeader(
-                    title = stringResource(R.string.receive_title),
-                    hint = stringResource(R.string.receive_hint),
-                )
-                when (val rs = receiveState) {
-                    dev.thor.rombutler.receive.ReceiveState.Off -> {
-                        Spacer(Modifier.size(4.dp))
-                        OutlinedButton(
-                            onClick = {
-                                if (LocalNetworkPermission.isGranted(context)) {
-                                    startReceive()
-                                } else {
-                                    localNetworkPermissionLauncher.launch(
-                                        Manifest.permission.ACCESS_LOCAL_NETWORK,
-                                    )
-                                }
-                            },
-                            modifier = Modifier.fillMaxWidth(),
-                        ) { Text(stringResource(R.string.receive_start)) }
-                    }
-
-                    is dev.thor.rombutler.receive.ReceiveState.Running -> {
-                        Text(
-                            text = stringResource(R.string.receive_running_hint),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                        Spacer(Modifier.size(8.dp))
-                        Text(
-                            text = rs.url,
-                            style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.primary,
-                        )
-                        if (rs.receivedCount > 0) {
-                            Text(
-                                text = stringResource(R.string.receive_count, rs.receivedCount),
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.secondary,
-                            )
-                        }
-                        Spacer(Modifier.size(10.dp))
-                        Button(
-                            onClick = {
-                                context.startActivity(
-                                    Intent(context, ReceivePermissionActivity::class.java),
-                                )
-                            },
-                            modifier = Modifier.fillMaxWidth(),
-                        ) { Text(stringResource(R.string.receive_show_session)) }
-                        Spacer(Modifier.size(6.dp))
-                        OutlinedButton(
-                            onClick = viewModel::stopReceive,
-                            modifier = Modifier.fillMaxWidth(),
-                        ) { Text(stringResource(R.string.receive_stop)) }
-                    }
-                }
-            }
+            ReceiveCard(
+                viewModel = viewModel,
+                receiveState = receiveState,
+                startReceive = ::startReceive,
+                localNetworkPermissionLauncher = localNetworkPermissionLauncher,
+            )
 
             // Library check: statistics + misplaced ROMs
-            SettingsCard {
-                Text(
-                    text = stringResource(R.string.settings_library_title),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurface,
-                )
-                Spacer(Modifier.size(10.dp))
-                Button(
-                    onClick = onOpenDoctor,
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Text(stringResource(R.string.doctor_open))
-                }
-                Text(
-                    text = stringResource(R.string.doctor_entry_hint),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(top = 6.dp),
-                )
-                Spacer(Modifier.size(12.dp))
-                when (val lib = libraryState) {
-                    LibraryCheckState.Idle -> OutlinedButton(
-                        onClick = viewModel::checkLibrary,
-                        modifier = Modifier.fillMaxWidth(),
-                    ) { Text(stringResource(R.string.settings_library_check)) }
-
-                    LibraryCheckState.Running -> Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Center,
-                    ) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(22.dp),
-                            strokeWidth = 2.dp,
-                            color = MaterialTheme.colorScheme.primary,
-                        )
-                    }
-
-                    is LibraryCheckState.Failed -> Column {
-                        Text(
-                            text = lib.message,
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.error,
-                        )
-                        Spacer(Modifier.size(8.dp))
-                        OutlinedButton(
-                            onClick = viewModel::checkLibrary,
-                            modifier = Modifier.fillMaxWidth(),
-                        ) { Text(stringResource(R.string.settings_library_check)) }
-                    }
-
-                    is LibraryCheckState.Done -> Column {
-                        val report = lib.report
-                        Text(
-                            text = stringResource(
-                                R.string.settings_library_summary,
-                                report.totalRoms,
-                                dev.thor.rombutler.ui.components.formatFileSize(report.totalBytes),
-                            ),
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.onSurface,
-                        )
-                        Spacer(Modifier.size(6.dp))
-                        for (stat in report.stats.take(5)) {
-                            Row {
-                                Text(
-                                    text = stat.displayName,
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    modifier = Modifier.weight(1f),
-                                )
-                                Text(
-                                    text = "${stat.romCount} · " +
-                                        dev.thor.rombutler.ui.components.formatFileSize(stat.totalBytes),
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.primary,
-                                )
-                            }
-                        }
-                        if (report.duplicates.isNotEmpty()) {
-                            Spacer(Modifier.size(6.dp))
-                            Text(
-                                text = stringResource(
-                                    R.string.settings_library_duplicates,
-                                    report.duplicates.size,
-                                ),
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.secondary,
-                            )
-                        }
-                        Spacer(Modifier.size(14.dp))
-                        Text(
-                            text = stringResource(R.string.settings_library_exact_title),
-                            style = MaterialTheme.typography.titleSmall,
-                            color = MaterialTheme.colorScheme.onSurface,
-                        )
-                        Text(
-                            text = stringResource(R.string.settings_library_exact_hint),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                        Spacer(Modifier.size(8.dp))
-                        when (val exact = exactDuplicateState) {
-                            ExactDuplicateState.Idle -> OutlinedButton(
-                                onClick = viewModel::findExactDuplicates,
-                                modifier = Modifier.fillMaxWidth(),
-                            ) { Text(stringResource(R.string.settings_library_exact_check)) }
-
-                            ExactDuplicateState.Running -> Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.Center,
-                                verticalAlignment = Alignment.CenterVertically,
-                            ) {
-                                CircularProgressIndicator(
-                                    modifier = Modifier.size(20.dp),
-                                    strokeWidth = 2.dp,
-                                )
-                                Spacer(Modifier.width(10.dp))
-                                Text(stringResource(R.string.settings_library_exact_running))
-                            }
-
-                            is ExactDuplicateState.Failed -> Column {
-                                Text(
-                                    text = exact.message,
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.error,
-                                )
-                                OutlinedButton(
-                                    onClick = viewModel::findExactDuplicates,
-                                    modifier = Modifier.fillMaxWidth(),
-                                ) { Text(stringResource(R.string.settings_library_exact_check)) }
-                            }
-
-                            is ExactDuplicateState.Done -> {
-                                if (exact.report.groups.isEmpty()) {
-                                    Text(
-                                        text = stringResource(R.string.settings_library_exact_none),
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color = MaterialTheme.colorScheme.secondary,
-                                    )
-                                } else {
-                                    Text(
-                                        text = stringResource(
-                                            R.string.settings_library_exact_summary,
-                                            exact.report.groups.size,
-                                            exact.report.duplicateFiles,
-                                            dev.thor.rombutler.ui.components.formatFileSize(
-                                                exact.report.reclaimableBytes,
-                                            ),
-                                        ),
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color = MaterialTheme.colorScheme.secondary,
-                                    )
-                                    Text(
-                                        text = stringResource(R.string.settings_library_exact_details),
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    )
-                                }
-                                Spacer(Modifier.size(6.dp))
-                                OutlinedButton(
-                                    onClick = viewModel::findExactDuplicates,
-                                    modifier = Modifier.fillMaxWidth(),
-                                ) { Text(stringResource(R.string.settings_library_exact_check)) }
-                            }
-                        }
-                        Spacer(Modifier.size(10.dp))
-                        if (report.misplaced.isNotEmpty()) {
-                            Button(
-                                onClick = {
-                                    if (viewModel.prepareMisplacedReview(report)) onOpenReview()
-                                },
-                                modifier = Modifier.fillMaxWidth(),
-                            ) {
-                                Text(
-                                    stringResource(
-                                        R.string.settings_library_misplaced,
-                                        report.misplaced.size,
-                                    ),
-                                )
-                            }
-                        } else {
-                            Text(
-                                text = stringResource(R.string.settings_library_all_good),
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.secondary,
-                            )
-                        }
-                        Spacer(Modifier.size(6.dp))
-                        OutlinedButton(
-                            onClick = {
-                                viewModel.exportLibrary(
-                                    report = report,
-                                    exactDuplicates = (exactDuplicateState as? ExactDuplicateState.Done)?.report,
-                                ) { ok ->
-                                    android.widget.Toast.makeText(
-                                        context,
-                                        resources.getString(
-                                            if (ok) R.string.settings_backup_done else R.string.settings_backup_failed,
-                                        ),
-                                        android.widget.Toast.LENGTH_SHORT,
-                                    ).show()
-                                }
-                            },
-                            modifier = Modifier.fillMaxWidth(),
-                        ) { Text(stringResource(R.string.settings_library_export)) }
-                        Spacer(Modifier.size(6.dp))
-                        OutlinedButton(
-                            onClick = viewModel::checkLibrary,
-                            modifier = Modifier.fillMaxWidth(),
-                        ) { Text(stringResource(R.string.settings_library_check)) }
-                    }
-                }
-            }
+            LibraryCard(
+                viewModel = viewModel,
+                libraryState = libraryState,
+                exactDuplicateState = exactDuplicateState,
+                onOpenReview = onOpenReview,
+                onOpenDoctor = onOpenDoctor,
+            )
 
             // Incremental mirror backup of the whole ROM library
-            SettingsCard {
-                SectionHeader(
-                    title = stringResource(R.string.settings_rombackup_title),
-                    hint = stringResource(R.string.settings_rombackup_hint),
-                )
-                Spacer(Modifier.size(4.dp))
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { showBackupTargetPicker = true },
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Folder,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(24.dp),
-                    )
-                    Spacer(Modifier.width(12.dp))
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = stringResource(R.string.settings_rombackup_choose_target),
-                            style = MaterialTheme.typography.titleSmall,
-                            color = MaterialTheme.colorScheme.onSurface,
-                        )
-                        Text(
-                            text = settings.backupTargetPath
-                                ?: stringResource(R.string.settings_folder_not_set),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.primary,
-                            maxLines = 1,
-                            overflow = TextOverflow.StartEllipsis,
-                        )
-                    }
-                }
-                Spacer(Modifier.size(8.dp))
-                val manifest = backupManifest
-                Text(
-                    text = if (manifest != null) {
-                        stringResource(
-                            R.string.settings_rombackup_last,
-                            java.text.DateFormat.getDateTimeInstance(
-                                java.text.DateFormat.MEDIUM,
-                                java.text.DateFormat.SHORT,
-                            ).format(java.util.Date(manifest.createdAtMillis)),
-                            manifest.fileCount,
-                            dev.thor.rombutler.ui.components.formatFileSize(manifest.totalBytes),
-                        )
-                    } else {
-                        stringResource(R.string.settings_rombackup_none)
-                    },
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-                Spacer(Modifier.size(10.dp))
-                when (val backup = romBackupState) {
-                    is dev.thor.rombutler.backup.BackupRunState.Running -> Column {
-                        androidx.compose.material3.LinearProgressIndicator(
-                            progress = { backup.progress.fraction },
-                            modifier = Modifier.fillMaxWidth(),
-                        )
-                        Spacer(Modifier.size(6.dp))
-                        Text(
-                            text = stringResource(
-                                R.string.backup_progress,
-                                backup.progress.copiedFiles,
-                                backup.progress.totalFiles,
-                                backup.progress.currentName,
-                            ),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                        )
-                        Spacer(Modifier.size(8.dp))
-                        OutlinedButton(
-                            onClick = viewModel::cancelRomBackup,
-                            modifier = Modifier.fillMaxWidth(),
-                        ) { Text(stringResource(R.string.action_cancel)) }
-                    }
-
-                    else -> Column {
-                        val ready = !settings.romBasePath.isNullOrBlank() &&
-                            !settings.backupTargetPath.isNullOrBlank()
-                        Button(
-                            onClick = viewModel::startRomBackup,
-                            enabled = ready,
-                            modifier = Modifier.fillMaxWidth(),
-                        ) { Text(stringResource(R.string.settings_rombackup_run)) }
-                        Spacer(Modifier.size(6.dp))
-                        OutlinedButton(
-                            onClick = { showRestoreConfirm = true },
-                            enabled = ready,
-                            modifier = Modifier.fillMaxWidth(),
-                        ) { Text(stringResource(R.string.settings_rombackup_restore)) }
-                    }
-                }
-            }
+            RomBackupCard(
+                settings = settings,
+                viewModel = viewModel,
+                romBackupState = romBackupState,
+                backupManifest = backupManifest,
+                setShowBackupTargetPicker = { showBackupTargetPicker = it },
+                setShowRestoreConfirm = { showRestoreConfirm = it },
+            )
 
             // Validated local extensions to the built-in system registry
-            SettingsCard {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        imageVector = Icons.Filled.Extension,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(24.dp),
-                    )
-                    Spacer(Modifier.width(12.dp))
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = stringResource(R.string.settings_system_packs_title),
-                            style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.onSurface,
-                        )
-                        Text(
-                            text = if (registryState.customSystems.isEmpty()) {
-                                stringResource(R.string.settings_system_packs_none)
-                            } else {
-                                resources.getQuantityString(
-                                    R.plurals.settings_system_packs_count,
-                                    registryState.customSystems.size,
-                                    registryState.customSystems.size,
-                                )
-                            },
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                    }
-                }
-                Spacer(Modifier.size(8.dp))
-                Text(
-                    text = stringResource(R.string.settings_system_packs_hint),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-                if (registryState.customPackError != null) {
-                    Spacer(Modifier.size(8.dp))
-                    Text(
-                        text = stringResource(R.string.settings_system_pack_invalid_saved),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.error,
-                    )
-                }
-                if (registryState.conflicts.isNotEmpty()) {
-                    Spacer(Modifier.size(8.dp))
-                    Text(
-                        text = resources.getQuantityString(
-                            R.plurals.settings_system_packs_conflicts,
-                            registryState.conflicts.size,
-                            registryState.conflicts.size,
-                        ),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.error,
-                    )
-                }
-                Spacer(Modifier.size(10.dp))
-                OutlinedButton(
-                    onClick = { showSystemPacks = true },
-                    modifier = Modifier.fillMaxWidth(),
-                ) { Text(stringResource(R.string.settings_system_packs_manage)) }
-            }
+            SystemPacksCard(
+                registryState = registryState,
+                setShowSystemPacks = { showSystemPacks = it },
+            )
 
             // System folder overrides (non-ES-DE frontends) + battery hint
-            SettingsCard {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { showFolderOverrides = true },
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Folder,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(24.dp),
-                    )
-                    Spacer(Modifier.width(12.dp))
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = stringResource(R.string.settings_folder_overrides),
-                            style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.onSurface,
-                        )
-                        Text(
-                            text = stringResource(
-                                R.string.settings_folder_overrides_hint,
-                                settings.folderOverrides.size,
-                            ),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                    }
-                }
-                Spacer(Modifier.size(14.dp))
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { showFrontendProfiles = true },
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Tune,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(24.dp),
-                    )
-                    Spacer(Modifier.width(12.dp))
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = stringResource(R.string.settings_frontend_profile),
-                            style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.onSurface,
-                        )
-                        Text(
-                            text = stringResource(R.string.settings_frontend_profile_hint),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                    }
-                }
-                Spacer(Modifier.size(14.dp))
-                Text(
-                    text = stringResource(R.string.settings_battery_hint),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-                Spacer(Modifier.size(6.dp))
-                OutlinedButton(
-                    onClick = {
-                        context.startActivity(
-                            Intent(android.provider.Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS),
-                        )
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Text(stringResource(R.string.settings_battery_button))
-                }
-            }
+            FolderOverridesCard(
+                settings = settings,
+                setShowFolderOverrides = { showFolderOverrides = it },
+                setShowFrontendProfiles = { showFrontendProfiles = it },
+            )
 
             // Explicitly shared, privacy-friendly support report.
-            SettingsCard {
-                SectionHeader(
-                    title = stringResource(R.string.settings_diagnostics_title),
-                    hint = stringResource(R.string.settings_diagnostics_hint),
-                    icon = Icons.Filled.BugReport,
-                )
-                if (viewModel.hasCrashReport) {
-                    Text(
-                        text = stringResource(R.string.settings_diagnostics_crash_included),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.secondary,
-                    )
-                }
-                Spacer(Modifier.size(10.dp))
-                OutlinedButton(
-                    onClick = {
-                        viewModel.buildDiagnosticReport(
-                            onReady = { text ->
-                                val send = Intent(Intent.ACTION_SEND)
-                                    .setType("text/plain")
-                                    .putExtra(Intent.EXTRA_SUBJECT, "Thor ROM Butler diagnostics")
-                                    .putExtra(Intent.EXTRA_TEXT, text)
-                                context.startActivity(Intent.createChooser(send, null))
-                            },
-                            onFailed = {
-                                android.widget.Toast.makeText(
-                                    context,
-                                    resources.getString(R.string.settings_diagnostics_failed),
-                                    android.widget.Toast.LENGTH_LONG,
-                                ).show()
-                            },
-                        )
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Text(stringResource(R.string.settings_diagnostics_share))
-                }
-            }
+            DiagnosticsCard(
+                viewModel = viewModel,
+            )
 
             // Version + update check
-            SettingsCard {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        imageVector = Icons.Filled.SystemUpdate,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(24.dp),
-                    )
-                    Spacer(Modifier.width(12.dp))
-                    Text(
-                        text = stringResource(R.string.settings_version, viewModel.appVersion),
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        modifier = Modifier.weight(1f),
-                    )
-                }
-                Spacer(Modifier.size(10.dp))
-                UpdateSection(
-                    state = updateState,
-                    onCheck = viewModel::checkForUpdates,
-                    onDownload = viewModel::downloadUpdate,
-                    onOpenUrl = { url ->
-                        context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
-                    },
-                )
-            }
+            UpdateCard(
+                viewModel = viewModel,
+                updateState = updateState,
+            )
 
             // Optional support
-            SettingsCard {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        imageVector = Icons.Filled.Favorite,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.secondary,
-                        modifier = Modifier.size(24.dp),
-                    )
-                    Spacer(Modifier.width(12.dp))
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = stringResource(R.string.settings_support_title),
-                            style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.onSurface,
-                        )
-                        Text(
-                            text = stringResource(R.string.settings_support_hint),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                    }
-                }
-                Spacer(Modifier.size(10.dp))
-                OutlinedButton(
-                    onClick = {
-                        context.startActivity(
-                            Intent(Intent.ACTION_VIEW, Uri.parse(SUPPORT_URL)),
-                        )
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Text(stringResource(R.string.settings_support_button))
-                }
-            }
+            SupportCard(
+            )
         }
     }
 
@@ -1409,7 +482,7 @@ private fun android.content.res.Resources.systemPackActionMessage(
     }
 }
 
-private const val SUPPORT_URL = "https://paypal.me/marcelstrohmeyer"
+internal const val SUPPORT_URL = "https://paypal.me/marcelstrohmeyer"
 
 /**
  * Frontend presets: applying one replaces ALL folder overrides so the
@@ -1611,7 +684,7 @@ private fun FolderOverridesDialog(
 }
 
 @Composable
-private fun SettingsCard(content: @Composable () -> Unit) {
+internal fun SettingsCard(content: @Composable () -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
@@ -1628,7 +701,7 @@ private fun SettingsCard(content: @Composable () -> Unit) {
  * wall, while every detail stays one tap away.
  */
 @Composable
-private fun SectionHeader(
+internal fun SectionHeader(
     title: String,
     hint: String? = null,
     icon: ImageVector? = null,
@@ -1677,7 +750,7 @@ private fun SectionHeader(
 }
 
 @Composable
-private fun FolderRow(
+internal fun FolderRow(
     icon: ImageVector,
     title: String,
     path: String?,
@@ -1714,7 +787,7 @@ private fun FolderRow(
 }
 
 @Composable
-private fun UpdateSection(
+internal fun UpdateSection(
     state: UpdateCheckState,
     onCheck: () -> Unit,
     onDownload: (dev.thor.rombutler.data.update.UpdateInfo) -> Unit,
