@@ -305,6 +305,20 @@
     <string name="doctor_exact_hint">SHA-256 wird nur für gleich große Kandidaten berechnet.</string>
     <string name="doctor_exact_run">Bytegleiche Dateien suchen</string>
     <string name="doctor_exact_running">Dateiinhalte werden verglichen…</string>
+    <string name="doctor_exact_keep_hint">Wähle die Kopie, die bleibt. Alle anderen werden in einen versteckten Ordner verschoben, nicht gelöscht.</string>
+    <string name="doctor_exact_more">… und %1$d weitere Gruppen (es gilt dieselbe Regel: die vorgeschlagene Kopie bleibt)</string>
+    <string name="doctor_exact_cleanup">Duplikate wegräumen</string>
+    <string name="doctor_exact_cleaning">Duplikate werden verschoben…</string>
+    <string name="doctor_exact_confirm_title">Duplikate verschieben?</string>
+    <string name="doctor_exact_confirm_text">Pro Gruppe bleibt eine Kopie liegen. Alle anderen werden in den versteckten Ordner .thor_duplicates in deinem ROM-Ordner verschoben und lassen sich dort manuell wiederherstellen. Dateien, die von Playlists oder Cue-Sheets referenziert werden, werden übersprungen.</string>
+    <string name="doctor_exact_cancel">Abbrechen</string>
+    <string name="doctor_exact_ok">OK</string>
+    <plurals name="doctor_exact_cleanup_done">
+        <item quantity="one">1 Duplikat verschoben · %2$s frei</item>
+        <item quantity="other">%1$d Duplikate verschoben · %2$s frei</item>
+    </plurals>
+    <string name="doctor_exact_cleanup_skipped">Übersprungen: %1$d von Playlists referenziert, %2$d geändert oder fehlgeschlagen.</string>
+    <string name="doctor_exact_cleanup_location">Verschoben nach: %1$s</string>
     <string name="doctor_exact_none">Keine bytegleichen ROM-Dateien gefunden.</string>
     <plurals name="doctor_exact_groups">
         <item quantity="one">1 Duplikatgruppe · %2$d Dateien · %3$s freigebbar</item>

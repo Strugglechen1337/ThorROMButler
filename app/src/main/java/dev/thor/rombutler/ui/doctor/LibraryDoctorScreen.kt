@@ -1,6 +1,7 @@
 package dev.thor.rombutler.ui.doctor
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -23,6 +24,7 @@ import androidx.compose.material.icons.filled.HealthAndSafety
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Storage
 import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -32,6 +34,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -47,6 +50,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -56,6 +60,9 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.thor.rombutler.R
 import dev.thor.rombutler.backup.BackupRunState
+import dev.thor.rombutler.data.files.DuplicateCleaner
+import dev.thor.rombutler.data.files.DuplicateCleanupResult
+import dev.thor.rombutler.domain.repository.ExactDuplicateGroup
 import dev.thor.rombutler.domain.repository.LibraryArchiveIssue
 import dev.thor.rombutler.domain.repository.LibraryArchiveProblem
 import dev.thor.rombutler.domain.repository.LibraryBackupState
@@ -77,6 +84,9 @@ fun LibraryDoctorScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val duplicateState by viewModel.duplicateState.collectAsStateWithLifecycle()
+    val keepChoices by viewModel.keepChoices.collectAsStateWithLifecycle()
+    val cleanupResult by viewModel.cleanupResult.collectAsStateWithLifecycle()
+    val cleanupRunning by viewModel.cleanupRunning.collectAsStateWithLifecycle()
     val ignoredIds by viewModel.ignoredIssueIds.collectAsStateWithLifecycle()
     val backupState by viewModel.backupState.collectAsStateWithLifecycle()
     val context = LocalContext.current
@@ -130,6 +140,12 @@ fun LibraryDoctorScreen(
             is DoctorState.Done -> DoctorReport(
                 report = current.report,
                 duplicateState = duplicateState,
+                keepChoices = keepChoices,
+                cleanupResult = cleanupResult,
+                cleanupRunning = cleanupRunning,
+                onChooseKeep = viewModel::chooseKeep,
+                onCleanUpDuplicates = viewModel::cleanUpDuplicates,
+                onDismissCleanupResult = viewModel::dismissCleanupResult,
                 ignoredIds = ignoredIds,
                 backupRunState = backupState,
                 onIgnore = viewModel::ignoreIssue,
@@ -206,6 +222,12 @@ private fun DoctorFailure(
 private fun DoctorReport(
     report: LibraryReport,
     duplicateState: DoctorDuplicateState,
+    keepChoices: Map<String, String>,
+    cleanupResult: DuplicateCleanupResult?,
+    cleanupRunning: Boolean,
+    onChooseKeep: (String, String) -> Unit,
+    onCleanUpDuplicates: () -> Unit,
+    onDismissCleanupResult: () -> Unit,
     ignoredIds: Set<String>,
     backupRunState: BackupRunState,
     onIgnore: (String) -> Unit,
@@ -321,7 +343,13 @@ private fun DoctorReport(
         item {
             DuplicateCheck(
                 state = duplicateState,
+                keepChoices = keepChoices,
+                cleanupResult = cleanupResult,
+                cleanupRunning = cleanupRunning,
                 onRun = onFindDuplicates,
+                onChooseKeep = onChooseKeep,
+                onCleanUp = onCleanUpDuplicates,
+                onDismissResult = onDismissCleanupResult,
             )
         }
         item {
@@ -656,7 +684,18 @@ private fun DoctorReadinessCard(
 }
 
 @Composable
-private fun DuplicateCheck(state: DoctorDuplicateState, onRun: () -> Unit) {
+private fun DuplicateCheck(
+    state: DoctorDuplicateState,
+    keepChoices: Map<String, String>,
+    cleanupResult: DuplicateCleanupResult?,
+    cleanupRunning: Boolean,
+    onRun: () -> Unit,
+    onChooseKeep: (String, String) -> Unit,
+    onCleanUp: () -> Unit,
+    onDismissResult: () -> Unit,
+) {
+    var confirmCleanup by remember { mutableStateOf(false) }
+
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
@@ -721,11 +760,145 @@ private fun DuplicateCheck(state: DoctorDuplicateState, onRun: () -> Unit) {
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.secondary,
                     )
+                    if (state.report.groups.isNotEmpty()) {
+                        Spacer(Modifier.size(8.dp))
+                        Text(
+                            stringResource(R.string.doctor_exact_keep_hint),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                        for (group in state.report.groups.take(MAX_DUPLICATE_GROUPS_SHOWN)) {
+                            DuplicateGroupRow(
+                                group = group,
+                                keep = keepChoices[group.sha256]
+                                    ?: DuplicateCleaner.suggestKeep(group.files),
+                                onChooseKeep = { onChooseKeep(group.sha256, it) },
+                            )
+                        }
+                        if (state.report.groups.size > MAX_DUPLICATE_GROUPS_SHOWN) {
+                            Text(
+                                stringResource(
+                                    R.string.doctor_exact_more,
+                                    state.report.groups.size - MAX_DUPLICATE_GROUPS_SHOWN,
+                                ),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.padding(top = 4.dp),
+                            )
+                        }
+                        Spacer(Modifier.size(8.dp))
+                        Button(
+                            onClick = { confirmCleanup = true },
+                            enabled = !cleanupRunning,
+                            modifier = Modifier.fillMaxWidth(),
+                        ) {
+                            Text(stringResource(R.string.doctor_exact_cleanup))
+                        }
+                    }
                     Spacer(Modifier.size(6.dp))
                     OutlinedButton(onClick = onRun, modifier = Modifier.fillMaxWidth()) {
                         Text(stringResource(R.string.doctor_exact_run))
                     }
                 }
+            }
+            if (cleanupRunning) {
+                Spacer(Modifier.size(8.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
+                    Spacer(Modifier.width(10.dp))
+                    Text(stringResource(R.string.doctor_exact_cleaning))
+                }
+            }
+            cleanupResult?.let { result ->
+                Spacer(Modifier.size(8.dp))
+                Text(
+                    text = pluralStringResource(
+                        R.plurals.doctor_exact_cleanup_done,
+                        result.movedFiles,
+                        result.movedFiles,
+                        formatFileSize(result.movedBytes),
+                    ),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.secondary,
+                )
+                if (result.skippedReferenced > 0 || result.failed > 0) {
+                    Text(
+                        stringResource(
+                            R.string.doctor_exact_cleanup_skipped,
+                            result.skippedReferenced,
+                            result.failed,
+                        ),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                if (result.trashPath != null) {
+                    Text(
+                        stringResource(R.string.doctor_exact_cleanup_location, result.trashPath),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                TextButton(onClick = onDismissResult) { Text(stringResource(R.string.doctor_exact_ok)) }
+            }
+        }
+    }
+
+    if (confirmCleanup) {
+        AlertDialog(
+            onDismissRequest = { confirmCleanup = false },
+            title = { Text(stringResource(R.string.doctor_exact_confirm_title)) },
+            text = { Text(stringResource(R.string.doctor_exact_confirm_text)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    confirmCleanup = false
+                    onCleanUp()
+                }) { Text(stringResource(R.string.doctor_exact_cleanup)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { confirmCleanup = false }) {
+                    Text(stringResource(R.string.doctor_exact_cancel))
+                }
+            },
+        )
+    }
+}
+
+private const val MAX_DUPLICATE_GROUPS_SHOWN = 30
+
+/** One duplicate group: every file with a radio button to choose the copy that stays. */
+@Composable
+private fun DuplicateGroupRow(
+    group: ExactDuplicateGroup,
+    keep: String,
+    onChooseKeep: (String) -> Unit,
+) {
+    Column(Modifier.fillMaxWidth().padding(top = 8.dp)) {
+        Text(
+            text = formatFileSize(group.sizeBytes),
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.primary,
+        )
+        for (path in group.files) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .selectable(
+                        selected = path == keep,
+                        role = Role.RadioButton,
+                        onClick = { onChooseKeep(path) },
+                    ),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                RadioButton(selected = path == keep, onClick = null)
+                Spacer(Modifier.width(8.dp))
+                Text(
+                    text = path,
+                    style = MaterialTheme.typography.bodySmall,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.padding(vertical = 8.dp),
+                )
             }
         }
     }

@@ -5,6 +5,8 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.thor.rombutler.backup.BackupManager
 import dev.thor.rombutler.backup.BackupMode
+import dev.thor.rombutler.data.files.DuplicateCleaner
+import dev.thor.rombutler.data.files.DuplicateCleanupResult
 import dev.thor.rombutler.di.IoDispatcher
 import dev.thor.rombutler.domain.repository.ExactDuplicateReport
 import dev.thor.rombutler.domain.repository.LibraryArchiveIssue
@@ -48,6 +50,7 @@ class LibraryDoctorViewModel @Inject constructor(
     private val libraryRepository: LibraryRepository,
     private val reviewSession: ReviewSession,
     private val backupManager: BackupManager,
+    private val duplicateCleaner: DuplicateCleaner,
     @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
@@ -57,6 +60,17 @@ class LibraryDoctorViewModel @Inject constructor(
     private val _duplicateState =
         MutableStateFlow<DoctorDuplicateState>(DoctorDuplicateState.Idle)
     val duplicateState: StateFlow<DoctorDuplicateState> = _duplicateState.asStateFlow()
+
+    private val _keepChoices = MutableStateFlow<Map<String, String>>(emptyMap())
+
+    /** Explicit "keep this file" choices per duplicate group (SHA-256 -> relative path). */
+    val keepChoices: StateFlow<Map<String, String>> = _keepChoices.asStateFlow()
+
+    private val _cleanupResult = MutableStateFlow<DuplicateCleanupResult?>(null)
+    val cleanupResult: StateFlow<DuplicateCleanupResult?> = _cleanupResult.asStateFlow()
+
+    private val _cleanupRunning = MutableStateFlow(false)
+    val cleanupRunning: StateFlow<Boolean> = _cleanupRunning.asStateFlow()
 
     private val _ignoredIssueIds = MutableStateFlow<Set<String>>(emptySet())
     val ignoredIssueIds: StateFlow<Set<String>> = _ignoredIssueIds.asStateFlow()
@@ -82,6 +96,7 @@ class LibraryDoctorViewModel @Inject constructor(
     fun findExactDuplicates() {
         if (_duplicateState.value == DoctorDuplicateState.Running) return
         _duplicateState.value = DoctorDuplicateState.Running
+        _keepChoices.value = emptyMap()
         duplicateJob = viewModelScope.launch {
             _duplicateState.value = runCatching { libraryRepository.findExactDuplicates() }
                 .fold(
@@ -89,6 +104,33 @@ class LibraryDoctorViewModel @Inject constructor(
                     onFailure = { DoctorDuplicateState.Failed(it.message ?: "?") },
                 )
         }
+    }
+
+    fun chooseKeep(sha256: String, relativePath: String) {
+        _keepChoices.value += (sha256 to relativePath)
+    }
+
+    /** Moves all non-kept copies to the hidden duplicate folder, then rescans. */
+    fun cleanUpDuplicates() {
+        val report = (_duplicateState.value as? DoctorDuplicateState.Done)?.report ?: return
+        if (_cleanupRunning.value || report.groups.isEmpty()) return
+        _cleanupRunning.value = true
+        viewModelScope.launch {
+            val base = settingsRepository.settings.first().romBasePath
+            if (base != null) {
+                _cleanupResult.value = duplicateCleaner.clean(
+                    base = File(base),
+                    groups = report.groups,
+                    keep = _keepChoices.value,
+                )
+            }
+            _cleanupRunning.value = false
+            findExactDuplicates()
+        }
+    }
+
+    fun dismissCleanupResult() {
+        _cleanupResult.value = null
     }
 
     fun ignoreIssue(id: String) {
