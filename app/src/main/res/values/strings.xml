@@ -17,7 +17,7 @@
 
     <!-- What's new (update every release!) -->
     <string name="whatsnew_title">New in version %s</string>
-    <string name="whatsnew_body">• New: pick and clean up byte-identical duplicates in the Library Doctor (nothing is deleted)\n• Status bar readable in light mode too\n• Clearer assignment screen and scan summary\n\nFull details in the changelog on GitHub.</string>
+    <string name="whatsnew_body">• Library Doctor: readiness in one clear card\n• Scan button more compact, clear of the gesture bar\n• Internal cleanup and new performance tests\n\nFull details in the changelog on GitHub.</string>
 
     <!-- Setup screen -->
     <string name="setup_title">Setup</string>
