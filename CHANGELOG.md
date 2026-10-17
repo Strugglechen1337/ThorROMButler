@@ -2,6 +2,31 @@
 
 All notable user-facing changes are documented here.
 
+## 1.10.0
+
+### Deutsch
+
+- Bibliotheks-Doktor: bytegleiche Duplikate werden gruppiert aufgelistet; pro
+  Gruppe bestimmst du, welche Kopie bleibt. Die übrigen Kopien wandern nach
+  `.thor_duplicates/` im ROM-Ordner (nichts wird gelöscht).
+- Geänderte Dateien und von `.m3u`/`.cue` referenzierte Dateien werden beim
+  Wegräumen übersprungen.
+- Statusleisten-Icons auch im Hell-Modus lesbar, untere Leiste im
+  Zuordnungs-Screen mit voller Breite, gedimmte übersprungene Karten,
+  besserer Kontrast im Doktor.
+- Scan-Screen zeigt „x sicher · y zu prüfen“.
+
+### English
+
+- Library Doctor: byte-identical duplicates are listed in groups; per group
+  you choose which copy stays. The other copies move to `.thor_duplicates/`
+  inside the ROM folder (nothing is deleted).
+- Changed files and files referenced by `.m3u`/`.cue` are skipped during
+  cleanup.
+- Status bar icons readable in light mode, full-width bottom bar on the
+  assignment screen, dimmed skipped cards, better contrast in the Doctor.
+- The scan screen shows "x certain · y to review".
+
 ## 1.9.7
 
 ### Deutsch

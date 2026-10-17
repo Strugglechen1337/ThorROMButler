@@ -146,8 +146,11 @@ anders überlegst.
   Dump-Qualität und Revision unverbindlich einen Kandidaten; gelöscht wird
   nichts.
 - **Exakte Duplikate**: Im Bibliotheks-Doktor kannst du optional
-  einen SHA-256-Abgleich starten. Nur gleich große Kandidaten werden gelesen;
-  gelöscht wird nichts. Pfade und Prüfsummen stehen im Gesundheitsbericht.
+  einen SHA-256-Abgleich starten. Nur gleich große Kandidaten werden gelesen.
+  Pro Gruppe wählst du die Kopie, die bleibt; „Duplikate wegräumen“ verschiebt
+  die übrigen nach `.thor_duplicates/` im ROM-Ordner (nichts wird gelöscht,
+  Dateien aus `.m3u`/`.cue` werden übersprungen). Pfade und Prüfsummen stehen
+  im Gesundheitsbericht.
 - **Diagnose teilen**: Der Diagnosebericht in den Einstellungen sammelt App-,
   Geräte-, Speicher-, Berechtigungs- und LAN-Status. ROM-Namen und der geheime
   Sitzungscode werden nicht aufgenommen.
@@ -302,8 +305,11 @@ your mind.
   recommend a candidate based on device language, region, dump quality, and
   revision; nothing is deleted.
 - **Exact duplicates**: optionally run a SHA-256 comparison in the Library
-  Doctor. Only same-sized candidates are read and nothing is
-  deleted. Paths and hashes are included in the health report.
+  Doctor. Only same-sized candidates are read. Per group you choose
+  the copy that stays; "Move duplicates away" moves the others to
+  `.thor_duplicates/` inside the ROM folder (nothing is deleted, files
+  referenced by `.m3u`/`.cue` are skipped). Paths and hashes are included in
+  the health report.
 - **Share diagnostics**: the report in Settings collects app, device, storage,
   permission, and LAN status. ROM names and the protected session code are
   omitted.
