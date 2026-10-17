@@ -52,6 +52,7 @@
     <string name="scan_permission_missing">Dateizugriff wurde entzogen</string>
     <string name="scan_permission_missing_hint">Ohne die Berechtigung „Verwaltung aller Dateien" kann der Butler nicht scannen oder einsortieren.</string>
     <string name="scan_empty_hint">Im Download-Ordner liegen keine Archive (ZIP, 7z, RAR) und keine losen ROM-Dateien.</string>
+    <string name="scan_found_summary">%1$d sicher · %2$d zu prüfen</string>
     <string name="scan_found_count">%d Funde</string>
     <string name="scan_loose_title">Lose ROM-Dateien (%d)</string>
     <string name="scan_rar5_unsupported">RAR5 wird nicht unterstützt – bitte als ZIP oder 7z laden.</string>

@@ -39,7 +39,7 @@ val ThorSuccess = Color(0xFF4ADE80)
 val ThorWarning = ThorGold
 
 // Outlines / dividers
-val ThorOutline = Color(0xFF2A3A5C)
+val ThorOutline = Color(0xFF3B5483)
 val ThorOutlineVariant = Color(0xFF1A2740)
 
 // Glow colors (used with alpha for shadow/glow modifiers)
