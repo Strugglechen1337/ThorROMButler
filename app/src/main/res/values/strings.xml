@@ -306,6 +306,20 @@
     <string name="doctor_exact_hint">SHA-256 is calculated only for same-sized candidates.</string>
     <string name="doctor_exact_run">Find byte-identical files</string>
     <string name="doctor_exact_running">Comparing file contents…</string>
+    <string name="doctor_exact_keep_hint">Choose the copy that stays. All others are moved to a hidden folder, not deleted.</string>
+    <string name="doctor_exact_more">… and %1$d more groups (the same rule applies: the suggested copy stays)</string>
+    <string name="doctor_exact_cleanup">Move duplicates away</string>
+    <string name="doctor_exact_cleaning">Moving duplicates…</string>
+    <string name="doctor_exact_confirm_title">Move duplicates?</string>
+    <string name="doctor_exact_confirm_text">One copy per group stays in place. All other copies are moved to the hidden folder .thor_duplicates in your ROM folder, where you can restore them manually. Files referenced by playlists or cue sheets are skipped.</string>
+    <string name="doctor_exact_cancel">Cancel</string>
+    <string name="doctor_exact_ok">OK</string>
+    <plurals name="doctor_exact_cleanup_done">
+        <item quantity="one">1 duplicate moved · %2$s freed</item>
+        <item quantity="other">%1$d duplicates moved · %2$s freed</item>
+    </plurals>
+    <string name="doctor_exact_cleanup_skipped">Skipped: %1$d referenced by playlists, %2$d changed or failed.</string>
+    <string name="doctor_exact_cleanup_location">Moved to: %1$s</string>
     <string name="doctor_exact_none">No byte-identical ROM files found.</string>
     <plurals name="doctor_exact_groups">
         <item quantity="one">1 duplicate group · %2$d files · %3$s reclaimable</item>
